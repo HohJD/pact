@@ -221,6 +221,24 @@ export function TimelineView() {
                         )}
                       </motion.button>
 
+                      {/* narrow bars: label sits outside the bar so it isn't clipped */}
+                      {bw <= 90 &&
+                        (bx >= 124 ? (
+                          <span
+                            className="pointer-events-none absolute top-1/2 -translate-y-1/2 truncate pr-1 text-right text-[9px] leading-[14px] text-muted-foreground"
+                            style={{ left: bx - 124, width: 120 }}
+                          >
+                            {p.short_name ?? p.name}
+                          </span>
+                        ) : (
+                          <span
+                            className="pointer-events-none absolute top-1/2 -translate-y-1/2 truncate pl-1 text-[9px] leading-[14px] text-muted-foreground"
+                            style={{ left: bx + bw + 4, width: 120 }}
+                          >
+                            {p.short_name ?? p.name}
+                          </span>
+                        ))}
+
                       {markers?.evidence.map((ev) => {
                         const y = firstYearOf(ev.publication_date);
                         if (!y) return null;

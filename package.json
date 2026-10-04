@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "embed": "tsx scripts/embed-seed.ts"
+    "embed": "tsx scripts/embed-seed.ts",
+    "seed:supabase": "tsx scripts/seed-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
@@ -40,6 +41,7 @@
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "topojson-client": "^3.1.0",
+    "unpdf": "^1.8.1",
     "world-atlas": "^2.0.2",
     "zod": "^4.6.5",
     "zustand": "^5.0.15"

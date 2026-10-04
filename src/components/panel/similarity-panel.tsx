@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useDataset } from "@/components/providers/dataset-provider";
+import { explainSimilarity } from "@/lib/similarity/engine";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
 import { SectionTitle } from "./section-title";
@@ -21,14 +22,7 @@ export function SimilarityPanel({ edgeId }: { edgeId: string }) {
   const b = dataset.policies.find((p) => p.id === sim.policy_b);
   const bd = sim.breakdown;
   const pct = Math.round(bd.overall * 100);
-
-  const rows: Array<[string, boolean | string]> = [
-    ["Mechanism", bd.same_mechanism],
-    ["Technology", bd.same_technology],
-    ["Target", bd.same_target],
-    ["Sector", bd.same_sector],
-    ["Jurisdiction", bd.jurisdiction_similarity],
-  ];
+  const rows = explainSimilarity(sim, dataset);
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
@@ -55,28 +49,29 @@ export function SimilarityPanel({ edgeId }: { edgeId: string }) {
       </div>
 
       <SectionTitle>Structure</SectionTitle>
-      <dl className="space-y-1">
-        {rows.map(([label, v]) => (
-          <div key={label} className="flex items-center justify-between text-[11px]">
-            <dt className="text-muted-foreground">{label}</dt>
-            <dd
-              className={cn(
-                "font-mono text-[10px]",
-                v === true || v === "HIGH"
-                  ? "text-entity-outcome"
-                  : "text-muted-foreground",
-              )}
-            >
-              {typeof v === "boolean"
-                ? v
+      <dl className="space-y-1.5">
+        {rows.map((r) => (
+          <div key={r.label} className="text-[11px]">
+            <div className="flex items-center justify-between">
+              <dt className="text-muted-foreground">{r.label}</dt>
+              <dd
+                className={cn(
+                  "font-mono text-[10px]",
+                  r.status === "same"
+                    ? "text-entity-outcome"
+                    : "text-muted-foreground",
+                )}
+              >
+                {r.status === "same"
                   ? "✓ same"
-                  : "△ different"
-                : v === "HIGH"
-                  ? "✓ same"
-                  : v === "MEDIUM"
-                    ? "△ different (medium)"
+                  : r.status === "partial"
+                    ? "△ partially"
                     : "△ different"}
-            </dd>
+              </dd>
+            </div>
+            <p className="text-[9.5px] leading-snug text-muted-foreground/70">
+              {r.detail}
+            </p>
           </div>
         ))}
       </dl>

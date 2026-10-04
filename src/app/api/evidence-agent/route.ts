@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
-import { getRepository } from "@/lib/data";
+import { loadDataset } from "@/lib/data";
 import { runEvidenceAgent } from "@/lib/ai/evidence-agent";
 import { getProvider } from "@/lib/ai/provider";
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
 
-  const dataset = getRepository().getDataset();
+  const dataset = await loadDataset();
   const result = await runEvidenceAgent(parsed.data, dataset, getProvider());
   return NextResponse.json(result);
 }

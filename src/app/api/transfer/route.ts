@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextResponse } from "next/server";
 
-import { getRepository } from "@/lib/data";
+import { loadDataset } from "@/lib/data";
 import { getProvider } from "@/lib/ai/provider";
 import { assessTransfer } from "@/lib/ai/transfer";
 import { CountryCode } from "@/lib/domain/schema";
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
 
-  const dataset = getRepository().getDataset();
+  const dataset = await loadDataset();
   const result = await assessTransfer(parsed.data, dataset, getProvider());
   return NextResponse.json(result);
 }
