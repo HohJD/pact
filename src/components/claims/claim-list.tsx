@@ -68,6 +68,7 @@ export function ClaimList({
                 <button
                   key={id}
                   type="button"
+                  data-citation
                   onClick={() => openEvidence(id)}
                   title={ev ? `${ev.title} — ${ev.publisher}` : id}
                   className="rounded border border-entity-evidence/40 px-1 font-mono text-[8px] text-entity-evidence hover:bg-entity-evidence/10"

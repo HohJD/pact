@@ -211,6 +211,20 @@ describe("analyse", () => {
     expect(r.source).toBe("LLM");
     expect(r.claims[0].evidence_ids).toContain("ev_desnz_bus_stats");
   });
+
+  it("mode: 'fallback' never calls the provider (demo determinism)", async () => {
+    const spy = vi.fn();
+    const provider: LLMProvider = {
+      isConfigured: () => true,
+      embed: vi.fn(),
+      chatJSON: spy,
+    };
+    const r = await analyse(FLAGSHIP, seedDataset, undefined, provider, {
+      mode: "fallback",
+    });
+    expect(r.source).toBe("FALLBACK");
+    expect(spy).not.toHaveBeenCalled();
+  });
 });
 
 describe("evidence agent", () => {

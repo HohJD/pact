@@ -156,7 +156,7 @@ function materialise(
     .map((t) => fuzzyId(t, dataset.technologies))
     .filter((x): x is string => Boolean(x));
 
-  let base = `pol_ingest_${slug(name)}`;
+  const base = `pol_ingest_${slug(name)}`;
   let id = base;
   for (let i = 2; takenIds.has(id); i++) id = `${base}_${i}`;
   takenIds.add(id);
