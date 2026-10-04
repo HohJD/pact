@@ -162,15 +162,21 @@ const STRENGTH_DOTS: Record<string, number> = {
 
 export function EvidenceNode({ data, selected }: NodeProps<PactFlowNode>) {
   const dots = STRENGTH_DOTS[String(data.meta.causal_strength)] ?? 1;
+  const candidate = data.meta.data_status === "CANDIDATE";
   return (
     <div
       className={cn(
         "flex w-[110px] flex-col gap-0.5 rounded border bg-card p-1.5 transition-[opacity,transform] hover:scale-[1.03]",
+        candidate && "border-dashed",
         data.dim && "opacity-40",
       )}
       style={{
         borderColor: `${data.color}66`,
-        boxShadow: data.glow ? `0 0 0 2px ${data.color}66` : undefined,
+        boxShadow: data.glow
+          ? `0 0 0 2px ${data.color}66`
+          : candidate
+            ? `0 0 0 2px ${data.color}33`
+            : undefined,
         outline: selected ? `1.5px solid ${data.color}` : undefined,
       }}
     >

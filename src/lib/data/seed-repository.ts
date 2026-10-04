@@ -186,6 +186,7 @@ export class SeedRepository implements PactRepository {
       monitors: evs.filter((e) => e.policy_relevance === "MONITORS").length,
       context: evs.filter((e) => e.policy_relevance === "CONTEXT").length,
       demo: evs.filter((e) => e.data_status === "DEMO").length,
+      candidate: evs.filter((e) => e.data_status === "CANDIDATE").length,
     };
     const summary = evs.map((e) => {
       const type = EVIDENCE_TYPE_LABEL[e.evidence_type] ?? e.evidence_type;
@@ -194,9 +195,12 @@ export class SeedRepository implements PactRepository {
     });
 
     // CONTEXT evidence informs interpretation but does not count toward the score;
-    // DEMO records are synthetic placeholders and never count either.
+    // DEMO records are synthetic and CANDIDATE records unreviewed — neither counts.
     const scoring = evs.filter(
-      (e) => e.policy_relevance !== "CONTEXT" && e.data_status !== "DEMO",
+      (e) =>
+        e.policy_relevance !== "CONTEXT" &&
+        e.data_status !== "DEMO" &&
+        e.data_status !== "CANDIDATE",
     );
 
     if (scoring.length === 0) {

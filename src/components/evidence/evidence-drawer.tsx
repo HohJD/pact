@@ -42,6 +42,12 @@ export function EvidenceDrawer() {
                   DEMO DATA — synthetic record for demonstration; not a real publication.
                 </div>
               )}
+              {e.data_status === "CANDIDATE" && (
+                <div className="rounded border border-entity-mechanism/50 bg-entity-mechanism/10 px-2.5 py-1.5 text-[10px] font-medium text-entity-mechanism">
+                  Found by web search and machine-classified from a snippet. Not
+                  reviewed. Verify at source.
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-1">
                 <Chip className="border-border text-muted-foreground">
                   {e.evidence_type.replace(/_/g, " ")}

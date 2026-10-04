@@ -34,7 +34,7 @@ export const ExtractedEvidence = z.object({
   methodology: z.string().default(""),
   geography: z.array(CountryCode).default([]),
   policy_ids: z.array(z.string()).default([]),
-  policy_relevance: z.enum(["EVALUATES", "MONITORS", "CONTEXT"]).default("MONITORS"),
+  policy_relevance: z.enum(["EVALUATES", "MONITORS", "CONTEXT"]).default("CONTEXT"),
   metrics: z.array(z.string()).default([]),
   findings: z.array(z.string()).default([]),
   limitations: z.array(z.string()).default([]),
@@ -56,15 +56,32 @@ export const EvidenceStrengthResult = z.object({
     monitors: z.number(),
     context: z.number(),
     demo: z.number(),
+    candidate: z.number(),
   }),
 });
+
+/** A raw web-search hit that hasn't been (or couldn't be) classified. */
+export const SearchHit = z.object({
+  title: z.string(),
+  url: z.string(),
+  snippet: z.string(),
+  score: z.number().default(0),
+  published_date: z.string().optional(),
+});
+export type SearchHit = z.infer<typeof SearchHit>;
 
 export const EvidenceAgentResult = z.object({
   status: z.enum(["OK", "INSUFFICIENT_EVIDENCE"]),
   policy_id: z.string(),
   existing: z.array(Evidence),
+  /** machine-found + machine-classified records — always data_status CANDIDATE */
+  candidates: z.array(Evidence),
+  /** search hits returned when no extraction provider is configured */
+  candidates_unclassified: z.array(SearchHit),
   extracted: z.array(Evidence),
   strength: EvidenceStrengthResult,
   notes: z.array(z.string()),
+  /** whether an external search ran */
+  source: z.enum(["LIVE", "NONE"]),
 });
 export type EvidenceAgentResult = z.infer<typeof EvidenceAgentResult>;

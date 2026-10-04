@@ -4,9 +4,10 @@ import { NextResponse } from "next/server";
 import { loadDataset } from "@/lib/data";
 import { runEvidenceAgent } from "@/lib/ai/evidence-agent";
 import { getProvider } from "@/lib/ai/provider";
+import { TavilySearchAdapter } from "@/lib/ai/search/tavily";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 90;
 
 const Body = z.object({
   policy_id: z.string().min(1),
@@ -28,6 +29,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid request" }, { status: 400 });
 
   const dataset = await loadDataset();
-  const result = await runEvidenceAgent(parsed.data, dataset, getProvider());
+  const result = await runEvidenceAgent(
+    { ...parsed.data, adapter: new TavilySearchAdapter() },
+    dataset,
+    getProvider(),
+  );
   return NextResponse.json(result);
 }

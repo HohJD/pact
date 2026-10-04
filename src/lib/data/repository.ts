@@ -42,7 +42,13 @@ export interface EvidenceStrength {
   score: number; // 0–5
   label: EvidenceStrengthLabel;
   summary: string[];
-  counts: { evaluates: number; monitors: number; context: number; demo: number };
+  counts: {
+    evaluates: number;
+    monitors: number;
+    context: number;
+    demo: number;
+    candidate: number;
+  };
 }
 
 export interface PactRepository {

@@ -14,7 +14,7 @@ import { PolicyCard } from "./policy-card";
 import { SimilarityPanel } from "./similarity-panel";
 import { WorkspaceSummary } from "./workspace-summary";
 
-export function RightPanel({ open }: { open: boolean }) {
+export function RightPanel({ open, demo = false }: { open: boolean; demo?: boolean }) {
   const selection = useWorkspace((s) => s.selection);
   const panel = useWorkspace((s) => s.panel);
   const select = useWorkspace((s) => s.select);
@@ -41,7 +41,7 @@ export function RightPanel({ open }: { open: boolean }) {
     );
     show = show && !!panel;
   } else if (selection?.kind === "policy") {
-    if (panel === "EVIDENCE") content = <EvidencePanel policyId={selection.id} />;
+    if (panel === "EVIDENCE") content = <EvidencePanel policyId={selection.id} hideAgent={demo} />;
     else if (panel === "OUTCOMES") content = <OutcomesPanel policyId={selection.id} />;
     else content = <PolicyCard policyId={selection.id} />;
     show = show && !!panel;

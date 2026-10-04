@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { AnalystResponse, CountryCode } from "@/lib/domain/schema";
+import type { AnalystResponse, CountryCode, Evidence } from "@/lib/domain/schema";
 import type { PolicyFilter } from "@/lib/data/repository";
 import type { TransferAssessment } from "@/lib/ai/transfer-fallback";
 
@@ -68,6 +68,8 @@ interface WorkspaceState {
   transferPending: boolean;
   paletteOpen: boolean;
   savedSearches: SavedSearch[];
+  /** CANDIDATE evidence accepted via "Add to workspace" this session */
+  candidateEvidence: Evidence[];
 
   setQuery: (q: string) => void;
   setView: (v: WorkspaceView) => void;
@@ -93,6 +95,7 @@ interface WorkspaceState {
   setPaletteOpen: (b: boolean) => void;
   highlight: (ids: string[]) => void;
   clearHighlights: () => void;
+  addCandidateEvidence: (e: Evidence) => void;
   saveCurrentSearch: () => void;
   removeSavedSearch: (at: number) => void;
   reset: () => void;
@@ -121,6 +124,7 @@ export const useWorkspace = create<WorkspaceState>()(
       transferPending: false,
       paletteOpen: false,
       savedSearches: [],
+      candidateEvidence: [],
 
       setQuery: (query) => set({ query }),
       setView: (view) => set({ view }),
@@ -162,6 +166,12 @@ export const useWorkspace = create<WorkspaceState>()(
       setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
       highlight: (ids) => set({ highlighted: new Set(ids) }),
       clearHighlights: () => set({ highlighted: new Set() }),
+      addCandidateEvidence: (e) =>
+        set((s) =>
+          s.candidateEvidence.some((x) => x.id === e.id)
+            ? s
+            : { candidateEvidence: [...s.candidateEvidence, e] },
+        ),
       saveCurrentSearch: () =>
         set((s) =>
           s.query.trim()

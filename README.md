@@ -113,6 +113,14 @@ EXPERIMENTAL / META_ANALYSIS (+ UNKNOWN).
 - **Policy Transfer**: evidence-based comparison ("not a forecast") via
   `/api/transfer` + TransferView (target jurisdiction, sources, transferability
   badge, lessons as claims, caveats).
+- **Evidence Agent** (`/api/evidence-agent`): finds external evidence for a
+  policy. With `TAVILY_API_KEY` it runs two Tavily searches per policy,
+  filters hits by a relevance guard (the snippet must name the policy), then
+  classifies each hit **from its snippet only** into `CANDIDATE` records
+  (`ev_cand_*` ids, real source URLs, `confidence: LOW`). Candidates never
+  count toward evidence strength, are labelled everywhere, and can be added
+  to the workspace from the Evidence panel for the session. Without the key
+  the agent returns seeded evidence only.
 
 ## Demo mode
 
@@ -155,6 +163,7 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`| read access (RLS-gated)                             | supabase |
 | `SUPABASE_SERVICE_ROLE_KEY`    | seeding + ingest publish                            | server-only |
 | `NEXT_PUBLIC_MAPBOX_TOKEN`     | enables the Mapbox GL map (else SVG)                | no       |
+| `TAVILY_API_KEY`               | Evidence Agent live web search (Tavily free tier)   | no       |
 
 ## OpenRouter configuration
 

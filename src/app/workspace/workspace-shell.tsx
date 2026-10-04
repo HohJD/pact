@@ -188,7 +188,7 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
             )}
           </div>
         </main>
-        <RightPanel open={panelOpen && !comparing} />
+        <RightPanel open={panelOpen && !comparing} demo={demo} />
         <EvidenceDrawer />
         <CommandPalette />
       </div>
