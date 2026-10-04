@@ -123,7 +123,7 @@ export function FilterSidebar() {
   );
 
   return (
-    <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-border bg-card scrollbar-thin max-md:absolute max-md:inset-y-0 max-md:left-0 max-md:z-30 max-md:shadow-2xl">
+    <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-border bg-card scrollbar-thin max-lg:absolute max-lg:inset-y-0 max-lg:left-0 max-lg:z-30 max-lg:shadow-2xl">
       <Section title="Current query">
         {query ? (
           <div className="w-full">
@@ -185,7 +185,12 @@ export function FilterSidebar() {
             color="#9B7BFF"
             onClick={() => toggleIn("countries", j.country_code)}
           >
-            <span title={j.name}>{j.country_code}</span>
+            <span title={j.name} className="flex items-baseline gap-1">
+              {j.country_code}
+              <span className="font-sans text-[9px] normal-case tracking-normal opacity-80">
+                {j.name}
+              </span>
+            </span>
           </Chip>
         ))}
       </Section>

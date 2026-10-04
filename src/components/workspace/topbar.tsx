@@ -2,14 +2,22 @@
 
 import { useRef, useState } from "react";
 
-import { Sparkles } from "lucide-react";
+import { PanelRight, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { submitAnalystQuestion } from "@/lib/ai/client";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { useWorkspace } from "@/store/workspace";
 
-export function TopBar({ demo = false }: { demo?: boolean }) {
+export function TopBar({
+  demo = false,
+  onToggleSidebar,
+  onTogglePanel,
+}: {
+  demo?: boolean;
+  onToggleSidebar?: () => void;
+  onTogglePanel?: () => void;
+}) {
   const dataset = useDataset();
   const query = useWorkspace((s) => s.query);
   const setQuery = useWorkspace((s) => s.setQuery);
@@ -30,9 +38,17 @@ export function TopBar({ demo = false }: { demo?: boolean }) {
 
   return (
     <header className="relative flex h-10 shrink-0 items-center gap-4 border-b border-border bg-card px-3">
-      <span className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground">
+      <span className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground max-sm:hidden">
         PACT
       </span>
+      <button
+        type="button"
+        onClick={onToggleSidebar}
+        className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground lg:hidden"
+        aria-label="Filters"
+      >
+        <SlidersHorizontal className="size-3.5" />
+      </button>
       <div className="flex flex-1 justify-center">
         <div className="flex w-full max-w-xl items-center gap-2 rounded-md border border-border bg-secondary/60 px-2.5 py-1">
           <Sparkles className="size-3.5 text-entity-policy" />
@@ -55,6 +71,14 @@ export function TopBar({ demo = false }: { demo?: boolean }) {
             Demo
           </span>
         )}
+        <button
+          type="button"
+          onClick={onTogglePanel}
+          className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground lg:hidden"
+          aria-label="Panel"
+        >
+          <PanelRight className="size-3.5" />
+        </button>
         <button
           type="button"
           onClick={() => setPaletteOpen(true)}

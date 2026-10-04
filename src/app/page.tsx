@@ -109,7 +109,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="pointer-events-none mt-10 h-[300px] w-full max-w-3xl sm:h-[340px]">
+        <div className="pointer-events-none relative left-1/2 mt-8 h-[360px] w-[min(1100px,96vw)] -translate-x-1/2">
           <NetworkPreview />
         </div>
       </section>

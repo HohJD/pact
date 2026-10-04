@@ -125,6 +125,13 @@ The 12 steps: curated answer → citation drawer → highlighted graph → selec
 BUS/BEG/MPR → comparison → outcomes → map focus → timeline → second question →
 policy transfer → ⌘K evidence search.
 
+## Screens
+
+- `/` — landing: hero search, suggested questions, live network preview
+- `/workspace` — the analyst workspace: graph, filters, panels, comparison, map, timeline
+- `/demo` — deterministic presenter demo of the flagship scenario (works offline)
+- `/admin/ingest` — internal ingestion pipeline review UI
+
 ## Running locally
 
 ```bash

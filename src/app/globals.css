@@ -23,12 +23,13 @@
   --radius: 0.375rem;
 
   --accent-brand: #4c8dff;
-  --entity-policy: #4c8dff;
-  --entity-jurisdiction: #9b7bff;
-  --entity-mechanism: #ff9a3d;
-  --entity-technology: #2fd3e6;
-  --entity-evidence: #f2c94c;
-  --entity-outcome: #3ddc97;
+  /* light theme: entity hues darkened enough to read as text on white */
+  --entity-policy: #2f6fe0;
+  --entity-jurisdiction: #7c5cf0;
+  --entity-mechanism: #d97a12;
+  --entity-technology: #0e9cb0;
+  --entity-evidence: #a07d0a;
+  --entity-outcome: #159763;
 
   --chart-1: #4c8dff;
   --chart-2: #9b7bff;
@@ -65,6 +66,14 @@
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.14);
   --ring: #4c8dff;
+
+  /* dark theme: full-saturation entity hues */
+  --entity-policy: #4c8dff;
+  --entity-jurisdiction: #9b7bff;
+  --entity-mechanism: #ff9a3d;
+  --entity-technology: #2fd3e6;
+  --entity-evidence: #f2c94c;
+  --entity-outcome: #3ddc97;
 
   --sidebar: #121418;
   --sidebar-foreground: #ecedef;

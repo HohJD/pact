@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { GraphCanvas } from "@/components/graph/graph-canvas";
 import { CompareView } from "@/components/compare/compare-view";
@@ -59,8 +59,31 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   const transferRequest = useWorkspace((s) => s.transferRequest);
   const comparing = panel === "COMPARE" && compareIds.length >= 2;
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [panelOpen, setPanelOpen] = useState(true);
+  // sidebar and panel start closed below lg — they render as overlays there.
+  // isDesktop via useSyncExternalStore stays hydration-safe (server snapshot = true)
+  const isDesktop = useSyncExternalStore(
+    (cb) => {
+      const mq = window.matchMedia("(min-width: 1024px)");
+      mq.addEventListener("change", cb);
+      return () => mq.removeEventListener("change", cb);
+    },
+    () => window.matchMedia("(min-width: 1024px)").matches,
+    () => true,
+  );
+  const [sidebarToggled, setSidebarToggled] = useState<boolean | null>(null);
+  const [panelToggled, setPanelToggled] = useState<boolean | null>(null);
+  const sidebarOpen = sidebarToggled ?? isDesktop;
+  const panelOpen = panelToggled ?? isDesktop;
+  const setSidebarOpen = useCallback(
+    (up: boolean | ((p: boolean) => boolean)) =>
+      setSidebarToggled((p) => (typeof up === "function" ? up(p ?? isDesktop) : up)),
+    [isDesktop],
+  );
+  const setPanelOpen = useCallback(
+    (up: boolean | ((p: boolean) => boolean)) =>
+      setPanelToggled((p) => (typeof up === "function" ? up(p ?? isDesktop) : up)),
+    [isDesktop],
+  );
   const [scriptOpen, setScriptOpen] = useState(false);
   const params = useSearchParams();
   const initialised = useRef(false);
@@ -117,11 +140,15 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [select, openPanel, demo, scriptOpen]);
+  }, [select, openPanel, demo, scriptOpen, setSidebarOpen, setPanelOpen]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <TopBar demo={demo} />
+      <TopBar
+        demo={demo}
+        onToggleSidebar={() => setSidebarOpen((v) => !v)}
+        onTogglePanel={() => setPanelOpen((v) => !v)}
+      />
       <div className="relative flex min-h-0 flex-1">
         {sidebarOpen && <FilterSidebar />}
         <main className="flex min-w-0 flex-1 flex-col">

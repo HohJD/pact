@@ -11,7 +11,7 @@ import {
   type Edge,
   type Node,
 } from "@xyflow/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import "@xyflow/react/dist/style.css";
 
@@ -112,6 +112,47 @@ function Canvas() {
   // a focused country (from the map, filters or AI actions) glows its
   // policy + jurisdiction nodes just like an explicit highlight
   const hasHighlight = highlighted.size > 0 || !!focusedCountry;
+
+  const highlightedIds = useMemo(() => {
+    if (highlighted.size) return [...highlighted];
+    if (focusedCountry)
+      return positioned
+        .filter(
+          (n) =>
+            (n.kind === "policy" || n.kind === "jurisdiction") &&
+            n.meta.country_code === focusedCountry,
+        )
+        .map((n) => n.id);
+    return [];
+  }, [highlighted, focusedCountry, positioned]);
+
+  const fitAll = useCallback(
+    () => fitView({ duration: 400, padding: 0.08, minZoom: 0.5, maxZoom: 1.1 }),
+    [fitView],
+  );
+  const fitHighlights = useCallback(() => {
+    const nodes = highlightedIds
+      .filter((id) => positionedById.has(id))
+      .map((id) => ({ id }));
+    if (nodes.length)
+      fitView({ nodes, padding: 0.35, duration: 600, maxZoom: 1.2 });
+  }, [highlightedIds, positionedById, fitView]);
+
+  // after HIGHLIGHT_NODES / FOCUS_COUNTRY applies, zoom the canvas to the
+  // highlighted cluster; when highlights clear, fit the whole graph again
+  const highlightKey = [...highlighted].sort().join(",") + "|" + (focusedCountry ?? "");
+  const fittedKey = useRef<string>(highlightKey);
+  useEffect(() => {
+    if (highlightKey === fittedKey.current) return;
+    const wasEmpty = fittedKey.current === "";
+    fittedKey.current = highlightKey;
+    // let the animated node positions settle before framing
+    const t = setTimeout(() => {
+      if (hasHighlight) fitHighlights();
+      else if (!wasEmpty) fitAll();
+    }, 500);
+    return () => clearTimeout(t);
+  }, [highlightKey, hasHighlight, fitHighlights, fitAll]);
 
   const nodes: Node<PactNodeData>[] = useMemo(
     () =>
@@ -238,12 +279,10 @@ function Canvas() {
         </span>
         <button
           type="button"
-          onClick={() =>
-            fitView({ duration: 400, padding: 0.08, minZoom: 0.5, maxZoom: 1.1 })
-          }
+          onClick={() => (hasHighlight ? fitHighlights() : fitAll())}
           className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase hover:text-foreground"
         >
-          Fit
+          {hasHighlight ? "Fit highlights" : "Fit all"}
         </button>
       </div>
 
