@@ -1604,7 +1604,7 @@ export const policies: Policy[] = [
     name: "Energy Performance of Buildings Directive recast (EPBD 2024)",
     short_name: "EPBD 2024",
     jurisdiction_id: "jur_eu",
-    country_code: "FR",
+    country_code: "EU",
     status: "ACTIVE",
     introduced: "2024-05",
     ended: null,

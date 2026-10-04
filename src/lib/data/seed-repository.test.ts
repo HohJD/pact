@@ -98,10 +98,20 @@ describe("SeedRepository", () => {
       expect(s.summary.join(" ")).toMatch(/experimental/i);
     });
 
-    it("scores BUS Strong (meta-analysis present)", () => {
+    it("scores BUS from non-CONTEXT evidence only (Joule meta-analysis excluded)", () => {
       const s = repo.getEvidenceStrength("pol_gb_bus");
-      expect(s.score).toBe(5);
+      // CONTEXT records (E9, E10, E11, E27 incl. META_ANALYSIS) must not score.
+      // Scoring records: E1/E2/E4 descriptive + demo quasi-experimental → best 4.
+      expect(s.score).toBe(4);
       expect(s.label).toBe("Strong");
+      expect(s.counts.context).toBe(3);
+    });
+
+    it("excludes CONTEXT from the score but reports counts", () => {
+      const s = repo.getEvidenceStrength("pol_gb_ggg");
+      // Only E3 (DESCRIPTIVE GOVERNMENT_EVALUATION) → single scoring record → 1
+      expect(s.score).toBe(1);
+      expect(s.counts.evaluates).toBe(1);
     });
 
     it("scores a single-descriptive-evidence policy as Limited with score 1", () => {

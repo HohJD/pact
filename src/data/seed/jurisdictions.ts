@@ -187,13 +187,13 @@ export const jurisdictions: Jurisdiction[] = [
   {
     id: "jur_eu",
     name: "European Union",
-    country_code: "FR",
+    country_code: "EU",
     level: "SUPRANATIONAL",
     parent_id: null,
     lat: 50.8,
     lng: 4.4,
     context: {
-      housing_stock_note: "Supranational jurisdiction. country_code uses FR as an enum placeholder pending a schema extension (no EU/BE code available).",
+      housing_stock_note: "Supranational jurisdiction; rendered as a marker at Brussels rather than a country shape.",
     },
     data_status: "CURATED",
   },

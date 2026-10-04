@@ -17,6 +17,7 @@ export const evidence: Evidence[] = [
     methodology: "Delivery audit of DESNZ home-heating decarbonisation programmes.",
     geography: ["GB"],
     policy_ids: ["pol_gb_bus", "pol_gb_hp_target", "pol_gb_chmm"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_grants_issued", "metric_hp_installs_certified"],
     findings: [
       "BUS uptake ran well below forecast in its first years (around half of expected grants).",
@@ -39,6 +40,7 @@ export const evidence: Evidence[] = [
     methodology: "Monthly official statistics series of applications and vouchers.",
     geography: ["GB"],
     policy_ids: ["pol_gb_bus"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_grants_issued"],
     findings: [
       "Monthly applications rose markedly after the grant increased to £7,500 in October 2023 (applications roughly doubled versus prior months).",
@@ -60,6 +62,7 @@ export const evidence: Evidence[] = [
     methodology: "Process evaluation of scheme design and delivery.",
     geography: ["GB"],
     policy_ids: ["pol_gb_ggg"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_retrofits", "metric_grants_issued"],
     findings: [
       "The scheme was rushed (12-week design).",
@@ -82,6 +85,7 @@ export const evidence: Evidence[] = [
     methodology: "Annual statutory progress monitoring against carbon budgets.",
     geography: ["GB"],
     policy_ids: ["pol_gb_bus", "pol_gb_hp_target", "pol_gb_chmm", "pol_gb_mees"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_installs_certified", "metric_emissions"],
     findings: [
       "UK heat-pump installations are far below the required trajectory (roughly a tenth of the 2028 target rate).",
@@ -104,6 +108,7 @@ export const evidence: Evidence[] = [
     methodology: "Industry-reported annual sales statistics.",
     geography: ["DE"],
     policy_ids: ["pol_de_beg", "pol_de_beg_em_2024", "pol_de_geg_2024", "pol_de_map"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "German heat-pump sales: 154,000 (2021), 236,000 (2022, +53%), 356,000 (2023, +51%), 193,000 (2024, −46%).",
@@ -124,6 +129,7 @@ export const evidence: Evidence[] = [
     methodology: "Industry-reported heating appliance market statistics.",
     geography: ["DE"],
     policy_ids: ["pol_de_geg_2024"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_gas_boiler_sales"],
     findings: [
       "2023 total heating appliance market ~1.3m units (+34%), with gas boilers ~790,000 (+32%) — a record driven by anticipatory purchases during the GEG debate.",
@@ -144,6 +150,7 @@ export const evidence: Evidence[] = [
     methodology: "Evaluation series of the MAP programme; latest covering 2019/2020.",
     geography: ["DE"],
     policy_ids: ["pol_de_map"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_hp_sales", "metric_retrofits"],
     findings: [
       "MAP triggered substantial renewable heat investment.",
@@ -166,6 +173,7 @@ export const evidence: Evidence[] = [
     methodology: "Think-tank analysis of German heat-transition policy.",
     geography: ["DE"],
     policy_ids: ["pol_de_geg_2024", "pol_de_beg_em_2024", "pol_de_behg"],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_hp_sales", "metric_gas_boiler_sales"],
     findings: [
       "Policy uncertainty in 2023 depressed demand.",
@@ -196,6 +204,7 @@ export const evidence: Evidence[] = [
       "pol_no_oil_ban",
       "pol_us_25c",
     ],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_hp_sales"],
     findings: [
       "Global heat-pump sales grew ~13% in 2021; Europe ~35%.",
@@ -219,6 +228,7 @@ export const evidence: Evidence[] = [
     methodology: "Annual industry market report.",
     geography: ["GB", "DE", "FR", "NL", "DK", "NO"],
     policy_ids: ["pol_de_beg", "pol_fr_maprimerenov", "pol_nl_isde", "pol_gb_bus"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "Around 3m units sold in Europe in 2022 (+~38%).",
@@ -241,6 +251,7 @@ export const evidence: Evidence[] = [
     methodology: "Comparative descriptive analysis of heat-pump markets and policy mixes.",
     geography: ["GB", "DE", "FR", "NL", "DK", "NO", "US"],
     policy_ids: ["pol_gb_bus", "pol_de_beg", "pol_fr_maprimerenov", "pol_no_oil_ban", "pol_gb_hp_target"],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_hp_sales"],
     findings: [
       "Markets with high heat-pump uptake combine financial incentives, fossil-heating restrictions and favourable electricity-gas price ratios.",
@@ -262,6 +273,7 @@ export const evidence: Evidence[] = [
     methodology: "Randomised encouragement design in Michigan.",
     geography: ["US"],
     policy_ids: ["pol_us_wap"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_energy_consumption"],
     findings: [
       "Realised energy savings ~10–20% versus modelled savings roughly 2.5× higher.",
@@ -284,6 +296,7 @@ export const evidence: Evidence[] = [
     methodology: "Retrospective national evaluation (ARRA period) with billing analysis and comparison groups.",
     geography: ["US"],
     policy_ids: ["pol_us_wap"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_energy_consumption"],
     findings: [
       "Average savings ~18% of gas use in single-family homes.",
@@ -305,6 +318,7 @@ export const evidence: Evidence[] = [
     methodology: "Quasi-experimental decomposition of the projected/realised savings gap.",
     geography: ["US"],
     policy_ids: ["pol_us_wap"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_energy_consumption"],
     findings: [
       "A large share of the performance gap is attributable to contractor quality and workmanship rather than household behaviour.",
@@ -325,6 +339,7 @@ export const evidence: Evidence[] = [
     methodology: "Tax-claim statistics for residential energy credits.",
     geography: ["US"],
     policy_ids: ["pol_us_25c"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_grants_issued"],
     findings: [
       "Over 2.3 million households claimed §25C in tax year 2023 (~$2bn), roughly 267,000 for heat pumps.",
@@ -345,6 +360,7 @@ export const evidence: Evidence[] = [
     methodology: "Administrative milestone and programme reporting.",
     geography: ["US"],
     policy_ids: ["pol_us_me_hp_target"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_installs_certified"],
     findings: [
       "The 100,000-heat-pump target (set 2019 for 2025) was reached in 2023, two years early.",
@@ -366,6 +382,7 @@ export const evidence: Evidence[] = [
     methodology: "Public audit of renovation policy.",
     geography: ["FR"],
     policy_ids: ["pol_fr_maprimerenov", "pol_fr_cee"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_retrofits", "metric_grants_issued"],
     findings: [
       "High volume of single-measure grants (especially heat pumps) but few deep renovations.",
@@ -387,6 +404,7 @@ export const evidence: Evidence[] = [
     methodology: "Administrative grant statistics.",
     geography: ["FR"],
     policy_ids: ["pol_fr_maprimerenov"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_grants_issued"],
     findings: [
       "Grants issued: ~644,000 (2021), ~670,000 (2022), ~570,000 (2023); ~€2.6bn committed in 2022.",
@@ -408,6 +426,7 @@ export const evidence: Evidence[] = [
     methodology: "Annual industry market statistics.",
     geography: ["FR"],
     policy_ids: ["pol_fr_maprimerenov", "pol_fr_coup_de_pouce_chauffage", "pol_fr_re2020"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "Air-to-water heat-pump sales grew strongly 2019–2022 to a record (~350,000 in 2022), then declined in 2023–24.",
@@ -428,6 +447,7 @@ export const evidence: Evidence[] = [
     methodology: "National statistics on installed heat-pump stock and sales.",
     geography: ["NL"],
     policy_ids: ["pol_nl_isde", "pol_nl_gasloos_nieuwbouw", "pol_nl_energiebelasting"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "Installed heat-pump stock in homes rose rapidly after 2018.",
@@ -449,6 +469,7 @@ export const evidence: Evidence[] = [
     methodology: "Court of Audit review of the gas-free neighbourhoods programme.",
     geography: ["NL"],
     policy_ids: ["pol_nl_paw"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_retrofits"],
     findings: [
       "Pilot neighbourhoods were far behind target.",
@@ -470,6 +491,7 @@ export const evidence: Evidence[] = [
     methodology: "National energy statistics.",
     geography: ["DK"],
     policy_ids: ["pol_dk_oil_ban_new", "pol_dk_bygningspulje", "pol_dk_el_afgift", "pol_dk_afkobling"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "The number of oil boilers fell steadily.",
@@ -492,6 +514,7 @@ export const evidence: Evidence[] = [
     methodology: "National dwelling heating statistics.",
     geography: ["NO"],
     policy_ids: ["pol_no_oil_ban", "pol_no_enova_hp"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_hp_sales"],
     findings: [
       "Oil heating was almost eliminated by 2020.",
@@ -513,6 +536,7 @@ export const evidence: Evidence[] = [
     methodology: "Compliance modelling for LL97 emissions caps.",
     geography: ["US"],
     policy_ids: ["pol_us_nyc_ll97"],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_emissions"],
     findings: [
       "A majority of covered buildings already comply with the 2024 limits.",
@@ -534,6 +558,7 @@ export const evidence: Evidence[] = [
     methodology: "Administrative certification statistics.",
     geography: ["SG"],
     policy_ids: ["pol_sg_green_mark", "pol_sg_gbmp_2030", "pol_sg_gmis_eb"],
+    policy_relevance: "MONITORS",
     metrics: ["metric_green_mark_share"],
     findings: [
       "More than 49% of buildings by GFA were Green Mark certified by 2023 (target 80% by 2030).",
@@ -554,6 +579,7 @@ export const evidence: Evidence[] = [
     methodology: "Ex-ante impact assessment for the EPBD recast.",
     geography: [],
     policy_ids: ["pol_eu_epbd_2024"],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_energy_label", "metric_retrofits"],
     findings: [
       "Around 75% of the EU building stock is energy-inefficient.",
@@ -575,6 +601,7 @@ export const evidence: Evidence[] = [
     methodology: "Meta-analysis of field data on heat-pump efficiency in cold climates.",
     geography: ["GB", "DE", "NO", "US"],
     policy_ids: ["pol_gb_bus", "pol_de_beg", "pol_no_enova_hp"],
+    policy_relevance: "CONTEXT",
     metrics: ["metric_energy_consumption"],
     findings: [
       "Field data across cold climates show heat-pump efficiency 2–3× resistive heating even below −10°C.",
@@ -595,6 +622,7 @@ export const evidence: Evidence[] = [
     methodology: "Synthetic difference-in-differences example for architecture demonstration.",
     geography: ["GB"],
     policy_ids: ["pol_gb_bus"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_grants_issued"],
     findings: [
       "Illustrates how a difference-in-differences evaluation would appear in PACT; values are not real.",
@@ -615,6 +643,7 @@ export const evidence: Evidence[] = [
     methodology: "Synthetic correlational example for architecture demonstration.",
     geography: ["SG"],
     policy_ids: ["pol_sg_gmis_eb"],
+    policy_relevance: "EVALUATES",
     metrics: ["metric_energy_consumption"],
     findings: [
       "Illustrates how a correlational outcome study would appear in PACT; values are not real.",

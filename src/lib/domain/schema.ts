@@ -16,7 +16,7 @@ export const DataStatus = z.enum([
 ]);
 export type DataStatus = z.infer<typeof DataStatus>;
 
-export const CountryCode = z.enum(["GB", "DE", "FR", "NL", "DK", "NO", "US", "SG"]);
+export const CountryCode = z.enum(["GB", "DE", "FR", "NL", "DK", "NO", "US", "SG", "EU"]);
 export type CountryCode = z.infer<typeof CountryCode>;
 
 export const JurisdictionLevel = z.enum(["NATIONAL", "STATE", "CITY", "SUPRANATIONAL"]);
@@ -141,6 +141,13 @@ export const Evidence = z.object({
   methodology: z.string(),
   geography: z.array(CountryCode),
   policy_ids: z.array(z.string()),
+  /**
+   * EVALUATES: assesses the linked policies themselves (audits, evaluations, impact studies).
+   * MONITORS: statistics/market data describing outcomes around the policies, without attribution.
+   * CONTEXT: background or technical evidence; informs interpretation but does NOT count toward
+   *          a policy's evidence-strength score.
+   */
+  policy_relevance: z.enum(["EVALUATES", "MONITORS", "CONTEXT"]).default("MONITORS"),
   metrics: z.array(z.string()), // metric ids this evidence speaks to
   findings: z.array(z.string()),
   limitations: z.array(z.string()),

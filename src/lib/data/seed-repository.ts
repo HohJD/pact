@@ -181,22 +181,30 @@ export class SeedRepository implements PactRepository {
 
   getEvidenceStrength(policyId: string): EvidenceStrength {
     const evs = this.getEvidenceForPolicy(policyId);
+    const counts = {
+      evaluates: evs.filter((e) => e.policy_relevance === "EVALUATES").length,
+      monitors: evs.filter((e) => e.policy_relevance === "MONITORS").length,
+      context: evs.filter((e) => e.policy_relevance === "CONTEXT").length,
+    };
     const summary = evs.map((e) => {
       const type = EVIDENCE_TYPE_LABEL[e.evidence_type] ?? e.evidence_type;
       const strength = STRENGTH_LABEL[e.causal_strength];
       return strength ? `${type} (${strength})` : type;
     });
 
-    if (evs.length === 0) {
-      return { score: 0, label: labelFor(0), summary };
+    // CONTEXT evidence informs interpretation but does not count toward the score.
+    const scoring = evs.filter((e) => e.policy_relevance !== "CONTEXT");
+
+    if (scoring.length === 0) {
+      return { score: 0, label: labelFor(0), summary, counts };
     }
 
-    const best = Math.max(...evs.map((e) => STRENGTH_SCORE[e.causal_strength] ?? 0));
+    const best = Math.max(...scoring.map((e) => STRENGTH_SCORE[e.causal_strength] ?? 0));
     let score = best;
     if (best === 2) {
       // DESCRIPTIVE evidence only: 2 if at least two records, else 1.
-      score = evs.length >= 2 ? 2 : 1;
+      score = scoring.length >= 2 ? 2 : 1;
     }
-    return { score, label: labelFor(score), summary };
+    return { score, label: labelFor(score), summary, counts };
   }
 }
