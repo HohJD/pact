@@ -169,67 +169,68 @@ export function CompareView() {
       </div>
 
       <div className="flex-1 overflow-auto scrollbar-thin">
-        {/* comparison table */}
-        <div className="flex min-w-max">
-          {/* label column */}
-          <div className="w-[180px] shrink-0 border-r border-border">
-            <div className="h-[92px] border-b border-border" />
-            {rows.map((r) => (
-              <div
-                key={r.label}
-                className="border-b border-border/50 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground"
-              >
-                {r.label}
-              </div>
-            ))}
-          </div>
-
+        {/* comparison table — a single CSS grid so every row shares height */}
+        <div
+          className="grid min-w-full"
+          style={{
+            gridTemplateColumns: `180px repeat(${policies.length}, minmax(260px, 1fr))`,
+          }}
+        >
+          {/* header row */}
+          <div className="border-b border-r border-border" />
           {policies.map((p, i) => (
             <motion.div
               key={p.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06, duration: 0.2, ease: "easeOut" }}
-              className="w-[300px] shrink-0 border-r border-border"
+              className="border-b border-r border-border p-3"
             >
-              <div className="h-[92px] border-b border-border p-3">
-                <div className="font-mono text-[9px] uppercase tracking-wider text-entity-jurisdiction">
-                  {jurName(p.jurisdiction_id)}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    select({ kind: "policy", id: p.id });
-                    openPanel("DETAILS");
-                  }}
-                  className="mt-0.5 text-left text-[12px] font-medium leading-tight text-foreground hover:underline"
-                >
-                  {p.name}
-                </button>
-                <div className="mt-1 flex gap-1">
-                  <span
-                    className={cn(
-                      "rounded border px-1 font-mono text-[8px]",
-                      STATUS_COLOR[p.status],
-                    )}
-                  >
-                    {p.status}
-                  </span>
-                  {p.data_status === "DEMO" && (
-                    <span className="rounded bg-entity-evidence/20 px-1 font-mono text-[8px] text-entity-evidence">
-                      DEMO
-                    </span>
-                  )}
-                </div>
+              <div className="font-mono text-[9px] uppercase tracking-wider text-entity-jurisdiction">
+                {jurName(p.jurisdiction_id)}
               </div>
-              {rows.map((r) => {
-                const texts = policies.map((q) => r.text(q));
-                const same = texts.every((t) => t === texts[0]);
-                return (
+              <button
+                type="button"
+                onClick={() => {
+                  select({ kind: "policy", id: p.id });
+                  openPanel("DETAILS");
+                }}
+                className="mt-0.5 text-left text-[12px] font-medium leading-tight text-foreground hover:underline"
+              >
+                {p.name}
+              </button>
+              <div className="mt-1 flex gap-1">
+                <span
+                  className={cn(
+                    "rounded border px-1 font-mono text-[8px]",
+                    STATUS_COLOR[p.status],
+                  )}
+                >
+                  {p.status}
+                </span>
+                {p.data_status === "DEMO" && (
+                  <span className="rounded bg-entity-evidence/20 px-1 font-mono text-[8px] text-entity-evidence">
+                    DEMO
+                  </span>
+                )}
+              </div>
+            </motion.div>
+          ))}
+
+          {/* data rows */}
+          {rows.map((r) => {
+            const texts = policies.map((q) => r.text(q));
+            const same = texts.every((t) => t === texts[0]);
+            return (
+              <div key={r.label} className="contents">
+                <div className="border-b border-r border-border/50 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {r.label}
+                </div>
+                {policies.map((p) => (
                   <div
-                    key={r.label}
+                    key={p.id}
                     className={cn(
-                      "border-b border-border/50 px-3 py-2 text-[10.5px] leading-snug text-foreground",
+                      "border-b border-r border-border/50 px-3 py-2 text-[10.5px] leading-snug text-foreground",
                       !same && "border-l-2 border-l-entity-mechanism/50",
                     )}
                   >
@@ -238,10 +239,10 @@ export function CompareView() {
                     )}
                     {r.values(p)}
                   </div>
-                );
-              })}
-            </motion.div>
-          ))}
+                ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* differences + lessons */}

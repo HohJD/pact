@@ -121,7 +121,7 @@ export function OutcomesView() {
           <EmptyState />
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-4 p-4 xl:flex-row">
-            <div className="flex flex-1 flex-col gap-4">
+            <div className="grid flex-1 grid-cols-1 content-start gap-4 2xl:grid-cols-2">
               <SeriesCards subject={subject} repo={repo} dataset={dataset} openEvidence={openEvidence} />
             </div>
             <div className="w-full shrink-0 xl:w-[320px]">
@@ -294,7 +294,7 @@ function SeriesCard({
           {ts.precision}
         </span>
       </div>
-      <div className="h-[180px]">
+      <div className="h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -18 }}>
             <CartesianGrid stroke="#ffffff08" vertical={false} />

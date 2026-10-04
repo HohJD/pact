@@ -76,6 +76,7 @@ function Canvas() {
   const collapseNode = useWorkspace((s) => s.collapseNode);
   const toggleCompare = useWorkspace((s) => s.toggleCompare);
   const focusCountry = useWorkspace((s) => s.focusCountry);
+  const focusedCountry = useWorkspace((s) => s.focusedCountry);
   const { setCenter, fitView } = useReactFlow();
 
   const built = useMemo(
@@ -108,12 +109,18 @@ function Canvas() {
   );
 
   const selectionId = selection?.kind !== "edge" ? selection?.id : undefined;
-  const hasHighlight = highlighted.size > 0;
+  // a focused country (from the map, filters or AI actions) glows its
+  // policy + jurisdiction nodes just like an explicit highlight
+  const hasHighlight = highlighted.size > 0 || !!focusedCountry;
 
   const nodes: Node<PactNodeData>[] = useMemo(
     () =>
       positioned.map((n) => {
-        const glow = highlighted.has(n.id);
+        const glow =
+          highlighted.has(n.id) ||
+          (!!focusedCountry &&
+            (n.kind === "policy" || n.kind === "jurisdiction") &&
+            n.meta.country_code === focusedCountry);
         const dim = hasHighlight && !glow;
         const pos = positions.get(n.id) ?? { x: n.x, y: n.y };
         return {
@@ -130,7 +137,7 @@ function Canvas() {
           },
         };
       }),
-    [positioned, positions, highlighted, hasHighlight, selectionId],
+    [positioned, positions, highlighted, hasHighlight, selectionId, focusedCountry],
   );
 
   const edges: Edge[] = useMemo(
@@ -231,7 +238,9 @@ function Canvas() {
         </span>
         <button
           type="button"
-          onClick={() => fitView({ duration: 400, padding: 0.15 })}
+          onClick={() =>
+            fitView({ duration: 400, padding: 0.08, minZoom: 0.5, maxZoom: 1.1 })
+          }
           className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase hover:text-foreground"
         >
           Fit
@@ -264,6 +273,7 @@ function Canvas() {
           setMenu(null);
         }}
         fitView
+        fitViewOptions={{ padding: 0.08, minZoom: 0.5, maxZoom: 1.1 }}
         minZoom={0.2}
         maxZoom={2.5}
         colorMode="dark"

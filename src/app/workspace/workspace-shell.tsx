@@ -6,7 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { GraphCanvas } from "@/components/graph/graph-canvas";
 import { CompareView } from "@/components/compare/compare-view";
 import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
+import { MapRoot } from "@/components/map/map-root";
 import { OutcomesView } from "@/components/outcomes/outcomes-view";
+import { TimelineView } from "@/components/timeline/timeline-view";
 import { RightPanel } from "@/components/panel/right-panel";
 import { FilterSidebar } from "@/components/workspace/filter-sidebar";
 import { TopBar } from "@/components/workspace/topbar";
@@ -110,12 +112,16 @@ export function WorkspaceShell() {
               <GraphCanvas />
             ) : view === "OUTCOMES" ? (
               <OutcomesView />
+            ) : view === "MAP" ? (
+              <MapRoot />
+            ) : view === "TIMELINE" ? (
+              <TimelineView />
             ) : (
               <PlaceholderView name={view} />
             )}
           </div>
         </main>
-        <RightPanel open={panelOpen} />
+        <RightPanel open={panelOpen && !comparing} />
         <EvidenceDrawer />
       </div>
     </div>
