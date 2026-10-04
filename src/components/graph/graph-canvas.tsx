@@ -266,7 +266,8 @@ function Canvas() {
   return (
     <div className="relative h-full w-full">
       {/* header strip */}
-      <div className="glass absolute left-3 top-3 z-10 flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px] text-muted-foreground">
+      <div className="absolute left-3 top-3 z-10">
+      <div className="glass flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px] text-muted-foreground">
         <span>
           <b className="font-medium text-foreground">{built.policyCount}</b> policies
           {built.truncated > 0 && (
@@ -284,6 +285,16 @@ function Canvas() {
         >
           {hasHighlight ? "Fit highlights" : "Fit all"}
         </button>
+      </div>
+      {!!filters.technology_ids?.length && (
+        <p className="mt-1 max-w-[320px] px-1 font-mono text-[8.5px] leading-snug text-muted-foreground">
+          Policies clustered around{" "}
+          {filters.technology_ids
+            .map((id) => dataset.technologies.find((t) => t.id === id)?.name ?? id)
+            .join(", ")}{" "}
+          · ring = jurisdiction · brightness = evidence strength
+        </p>
+      )}
       </div>
 
       {/* legend */}

@@ -34,14 +34,18 @@ const STATUS_COLOR: Record<string, string> = {
 export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
   const status = String(data.meta.status ?? "");
   const demo = data.meta.data_status === "DEMO";
+  // border brightness scales with evidence strength (0–5)
+  const score = Math.max(0, Math.min(5, Number(data.meta.evidenceScore ?? 0)));
+  const borderAlpha = Math.round(((0.25 + score * 0.15) * 255)).toString(16).padStart(2, "0");
   return (
     <div
       className={cn(
-        "w-[170px] rounded-md border border-border bg-card px-2 py-1.5 shadow-sm transition-[opacity,transform] hover:scale-[1.03]",
+        "w-[170px] rounded-md border bg-card px-2 py-1.5 shadow-sm transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
         selected && "border-entity-policy",
       )}
       style={{
+        borderColor: selected ? undefined : `${data.color}${borderAlpha}`,
         borderLeft: `3px solid ${data.color}`,
         boxShadow: data.glow ? `0 0 0 2px ${data.color}66, 0 0 18px ${data.color}44` : undefined,
       }}

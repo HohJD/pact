@@ -223,7 +223,13 @@ function SeriesCards({
       p.technology_ids.some((t) => subject.technology_ids.includes(t)),
   );
 
-  if (series.length === 0)
+  // metrics the policy reports outcomes on but PACT holds no series for
+  const coveredMetrics = new Set(series.map((ts) => ts.metric_id));
+  const missingMetrics = [...new Set(subjectOutcomes.map((o) => o.metric_id))].filter(
+    (m) => !coveredMetrics.has(m),
+  );
+
+  if (series.length === 0 && missingMetrics.length === 0)
     return (
       <div className="surface p-4 text-[11px] text-muted-foreground">
         No time-series for {subject.country_code}.
@@ -232,6 +238,14 @@ function SeriesCards({
 
   return (
     <>
+      {missingMetrics.map((m) => (
+        <div key={m} className="surface p-4">
+          <p className="text-[11px] text-muted-foreground">
+            No time-series data in PACT for{" "}
+            {dataset.metrics.find((mm) => mm.id === m)?.name ?? m}.
+          </p>
+        </div>
+      ))}
       {series.map((ts) => (
         <SeriesCard
           key={ts.id}
@@ -314,13 +328,13 @@ function SeriesCard({
               tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))}
             />
             <Tooltip
-              contentStyle={{
-                background: "#121418",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 6,
-                fontSize: 11,
-              }}
-              labelStyle={{ color: MUTED, fontFamily: "var(--font-mono)", fontSize: 9 }}
+              content={
+                <SeriesTooltip
+                  metric={metric}
+                  precision={ts.precision}
+                  sourceName={source?.publisher ?? null}
+                />
+              }
             />
             {data.some((p) => p.year === subjectYear) && (
               <ReferenceLine
@@ -397,6 +411,46 @@ function SeriesCard({
             : "Observed around implementation — not attribution"}
         </span>
       </div>
+    </div>
+  );
+}
+
+function SeriesTooltip({
+  active,
+  payload,
+  label,
+  metric,
+  precision,
+  sourceName,
+}: {
+  active?: boolean;
+  payload?: { value?: number }[];
+  label?: number;
+  metric: { name: string; unit?: string } | undefined;
+  precision: string;
+  sourceName: string | null;
+}) {
+  if (!active || !payload?.length) return null;
+  const v = payload[0].value;
+  return (
+    <div className="rounded-md border border-border bg-card px-2.5 py-1.5 shadow-lg">
+      <p className="font-mono text-[9px] text-muted-foreground">{label}</p>
+      <p className="text-[12px] font-medium text-foreground">
+        {typeof v === "number" ? v.toLocaleString() : v}
+        {metric?.unit ? (
+          <span className="ml-1 font-mono text-[9px] text-muted-foreground">
+            {metric.unit}
+          </span>
+        ) : null}
+      </p>
+      <p className="mt-0.5 flex items-center gap-1.5">
+        <span className="rounded border border-border px-1 font-mono text-[8px] text-muted-foreground">
+          {precision}
+        </span>
+        {sourceName && (
+          <span className="font-mono text-[8px] text-muted-foreground">{sourceName}</span>
+        )}
+      </p>
     </div>
   );
 }

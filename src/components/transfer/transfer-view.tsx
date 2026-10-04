@@ -1,8 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { ClaimList } from "@/components/claims/claim-list";
 import { SectionTitle } from "@/components/panel/section-title";
@@ -11,6 +25,8 @@ import { useDataset } from "@/components/providers/dataset-provider";
 import type { TransferAssessment } from "@/lib/ai/transfer-fallback";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
+
+const COUNTRY_ORDER = ["GB", "DE", "FR", "NL", "DK", "NO", "EU", "US", "SG"];
 
 const LEVEL_STYLE: Record<string, string> = {
   HIGH: "border-entity-technology/40 bg-entity-technology/10 text-entity-technology",
@@ -49,6 +65,26 @@ export function TransferView() {
     request?.target_jurisdiction_id ?? defaultTarget?.id ?? "",
   );
   const [sourceIds, setSourceIds] = useState<string[]>(defaultSources);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const policiesByCountry = useMemo(() => {
+    const m = new Map<string, typeof dataset.policies>();
+    for (const p of dataset.policies) {
+      const list = m.get(p.country_code) ?? [];
+      list.push(p);
+      m.set(p.country_code, list);
+    }
+    return m;
+  }, [dataset]);
+
+  // target select: default jurisdiction (Oxford) first, then the rest
+  const jurisdictions = useMemo(
+    () =>
+      [...dataset.jurisdictions].sort(
+        (a, b) => (b.id === defaultTarget?.id ? 1 : 0) - (a.id === defaultTarget?.id ? 1 : 0),
+      ),
+    [dataset, defaultTarget],
+  );
 
   const target = dataset.jurisdictions.find((j) => j.id === targetId);
   const sources = sourceIds
@@ -93,7 +129,7 @@ export function TransferView() {
             onChange={(e) => setTargetId(e.target.value)}
             className="rounded border border-border bg-secondary px-1.5 py-0.5 text-[10.5px] text-foreground"
           >
-            {dataset.jurisdictions.map((j) => (
+            {jurisdictions.map((j) => (
               <option key={j.id} value={j.id}>
                 → {j.name}
               </option>
@@ -111,25 +147,77 @@ export function TransferView() {
           <span className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
             Sources
           </span>
-          {dataset.policies.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() =>
-                setSourceIds((ids) =>
-                  ids.includes(p.id) ? ids.filter((i) => i !== p.id) : [...ids, p.id].slice(0, 4),
-                )
-              }
-              className={cn(
-                "rounded border px-1.5 py-0.5 font-mono text-[9px]",
-                sourceIds.includes(p.id)
-                  ? "border-entity-policy bg-entity-policy/15 text-entity-policy"
-                  : "border-border text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {p.short_name ?? p.name}
-            </button>
-          ))}
+          {sourceIds.map((id) => {
+            const p = dataset.policies.find((x) => x.id === id);
+            if (!p) return null;
+            return (
+              <span
+                key={id}
+                className="flex items-center gap-1 rounded border border-entity-policy bg-entity-policy/15 px-1.5 py-0.5 font-mono text-[9px] text-entity-policy"
+              >
+                {p.short_name ?? p.name}
+                <button
+                  type="button"
+                  aria-label={`Remove ${p.short_name ?? p.name}`}
+                  onClick={() => setSourceIds((ids) => ids.filter((i) => i !== id))}
+                  className="hover:text-foreground"
+                >
+                  ×
+                </button>
+              </span>
+            );
+          })}
+          <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="rounded border border-dashed border-border px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground hover:border-foreground/40 hover:text-foreground"
+              >
+                + Add policy
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-[320px] p-0">
+              <Command>
+                <CommandInput placeholder="Search policies…" />
+                <CommandList className="max-h-[280px]">
+                  <CommandEmpty>No matching policy.</CommandEmpty>
+                  {COUNTRY_ORDER.map((cc) => {
+                    const ps = policiesByCountry.get(cc);
+                    if (!ps?.length) return null;
+                    return (
+                      <CommandGroup key={cc} heading={cc}>
+                        {ps.map((p) => {
+                          const sel = sourceIds.includes(p.id);
+                          return (
+                            <CommandItem
+                              key={p.id}
+                              value={`${p.name} ${p.short_name ?? ""} ${cc}`}
+                              onSelect={() =>
+                                setSourceIds((ids) =>
+                                  sel
+                                    ? ids.filter((i) => i !== p.id)
+                                    : [...ids, p.id].slice(0, 4),
+                                )
+                              }
+                              className="text-[11px]"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-1.5 size-3 text-entity-policy",
+                                  sel ? "opacity-100" : "opacity-0",
+                                )}
+                              />
+                              <span className="truncate">{p.short_name ?? p.name}</span>
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                    );
+                  })}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
 
         <div className="mb-4 rounded border border-entity-jurisdiction/30 bg-entity-jurisdiction/10 px-3 py-2 text-[10.5px] text-foreground">
