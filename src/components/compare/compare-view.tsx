@@ -247,6 +247,7 @@ export function CompareView() {
 
         {/* differences + lessons */}
         <div className="max-w-3xl p-4">
+          <span id="compare-key-differences" />
           <SectionTitle>Key differences</SectionTitle>
           <ul className="space-y-1.5">
             {diffs.map((d, i) => (

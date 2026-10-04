@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { DemoPresenter } from "@/components/demo/presenter";
 import { GraphCanvas } from "@/components/graph/graph-canvas";
 import { CompareView } from "@/components/compare/compare-view";
 import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
@@ -191,6 +192,8 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         <EvidenceDrawer />
         <CommandPalette />
       </div>
+
+      {demo && <DemoPresenter dataset={dataset} />}
 
       {/* demo script — “?” toggles it (presenter aid) */}
       {demo && (
