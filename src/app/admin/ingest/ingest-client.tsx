@@ -281,7 +281,7 @@ export function IngestClient({ dataset }: { dataset: Dataset }) {
                         <span className="text-[11px] font-medium">
                           {other?.short_name ?? other?.name ?? s.policy_b}
                         </span>
-                        <span className="font-mono text-[10px] text-entity-similarity">
+                        <span className="font-mono text-[10px] text-entity-evidence">
                           {Math.round(s.breakdown.overall * 100)}%
                         </span>
                       </div>

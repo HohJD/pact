@@ -236,6 +236,7 @@ export function SvgMapView() {
                 }
                 onMouseLeave={() => setTooltip(null)}
               >
+                <g className="pact-marker">
                 <circle
                   r={r}
                   fill={PURPLE}
@@ -263,6 +264,7 @@ export function SvgMapView() {
                     {m.label}
                   </text>
                 )}
+                </g>
               </g>
             );
           })}

@@ -37,7 +37,7 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "w-[170px] rounded-md border border-border bg-card px-2 py-1.5 shadow-sm transition-opacity",
+        "w-[170px] rounded-md border border-border bg-card px-2 py-1.5 shadow-sm transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
         selected && "border-entity-policy",
       )}
@@ -79,7 +79,7 @@ export function JurisdictionNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-full border-2 bg-card text-center transition-opacity",
+        "flex flex-col items-center justify-center rounded-full border-2 bg-card text-center transition-[opacity,transform] hover:scale-[1.03]",
         national ? "size-20" : "size-14",
         data.dim && "opacity-40",
       )}
@@ -110,7 +110,7 @@ export function TechnologyNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "flex h-16 w-24 items-center justify-center rounded-full border bg-card px-1 text-center transition-opacity",
+        "flex h-16 w-24 items-center justify-center rounded-full border bg-card px-1 text-center transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
       )}
       style={{
@@ -133,7 +133,7 @@ export function MechanismNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "rounded-full border px-2.5 py-1 transition-opacity",
+        "rounded-full border px-2.5 py-1 transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
         selected && "ring-1",
       )}
@@ -165,7 +165,7 @@ export function EvidenceNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "flex w-[110px] flex-col gap-0.5 rounded border bg-card p-1.5 transition-opacity",
+        "flex w-[110px] flex-col gap-0.5 rounded border bg-card p-1.5 transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
       )}
       style={{
@@ -203,7 +203,7 @@ export function OutcomeNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "flex size-10 items-center justify-center rounded-full border bg-card transition-opacity",
+        "flex size-10 items-center justify-center rounded-full border bg-card transition-[opacity,transform] hover:scale-[1.03]",
         data.dim && "opacity-40",
       )}
       style={{

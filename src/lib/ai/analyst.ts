@@ -2,10 +2,7 @@ import {
   AnalystResponse,
   type Dataset,
 } from "@/lib/domain/schema";
-import {
-  FALLBACK_GENERIC,
-  FALLBACK_RESPONSES,
-} from "./fallback-content";
+import { matchFallback } from "./fallback-content";
 import { guardAnalystResponse } from "./guardrails";
 import {
   ANALYST_SYSTEM_PROMPT,
@@ -20,14 +17,7 @@ import {
 
 /** Deterministic offline analyst: first fallback entry whose token groups all match. */
 export function fallbackAnalyse(question: string): AnalystResponse {
-  const q = question.toLowerCase();
-  for (const entry of FALLBACK_RESPONSES) {
-    const match = entry.must.every((group) =>
-      group.some((tok) => q.includes(tok.toLowerCase())),
-    );
-    if (match) return { ...entry.response, source: "FALLBACK" };
-  }
-  return { ...FALLBACK_GENERIC, source: "FALLBACK" };
+  return matchFallback(question);
 }
 
 export async function analyse(
@@ -35,8 +25,12 @@ export async function analyse(
   dataset: Dataset,
   workspace: WorkspaceContext | undefined,
   provider: LLMProvider,
+  opts?: { mode?: "live" | "fallback" },
 ): Promise<AnalystResponse> {
-  if (!provider.isConfigured()) return fallbackAnalyse(question);
+  const mode = opts?.mode ?? process.env.PACT_ANALYST_MODE ?? "live";
+  if (mode === "fallback" || !provider.isConfigured()) {
+    return fallbackAnalyse(question);
+  }
 
   try {
     const ctx = await retrieveContext(question, dataset, workspace, provider);
@@ -51,7 +45,7 @@ export async function analyse(
       null,
       0,
     );
-    const { data } = await provider.chatJSON({
+    const { data, model } = await provider.chatJSON({
       system: ANALYST_SYSTEM_PROMPT,
       user: buildAnalystUserMessage({
         question,
@@ -64,7 +58,9 @@ export async function analyse(
       maxTokens: 4000,
     });
     const guarded = guardAnalystResponse(data, ctx, dataset);
-    return { ...guarded, source: "LLM" };
+    return { ...guarded, source: "LLM", model } as AnalystResponse & {
+      model?: string;
+    };
   } catch (err) {
     // provider/validation failure → deterministic fallback, never throw
     console.warn(

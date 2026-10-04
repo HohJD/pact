@@ -59,7 +59,7 @@ export function RightPanel({ open }: { open: boolean }) {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 360, opacity: 0 }}
           transition={{ duration: 0.18, ease: "easeOut" }}
-          className="relative flex h-full w-[360px] shrink-0 flex-col border-l border-border bg-card"
+          className="relative flex h-full w-[360px] shrink-0 flex-col border-l border-border bg-card max-md:fixed max-md:inset-y-0 max-md:right-0 max-md:z-40 max-md:w-[min(360px,92vw)] max-md:shadow-2xl"
         >
           <button
             type="button"

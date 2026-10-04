@@ -351,3 +351,18 @@ export const FALLBACK_GENERIC: Omit<AnalystResponse, "source"> = {
   actions: [],
   insufficient_evidence: true,
 };
+
+/**
+ * Deterministic matcher — client-safe (used by /demo without any network call)
+ * and reused by the server analyst when the provider is unavailable or fails.
+ */
+export function matchFallback(question: string): AnalystResponse {
+  const q = question.toLowerCase();
+  for (const entry of FALLBACK_RESPONSES) {
+    const match = entry.must.every((group) =>
+      group.some((tok) => q.includes(tok.toLowerCase())),
+    );
+    if (match) return { ...entry.response, source: "FALLBACK" };
+  }
+  return { ...FALLBACK_GENERIC, source: "FALLBACK" };
+}

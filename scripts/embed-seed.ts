@@ -18,6 +18,12 @@ if (!key) {
   console.error("OPENROUTER_API_KEY is not set — cannot embed.");
   process.exit(1);
 }
+if (process.env.OPENROUTER_FREE_ONLY === "true") {
+  console.error(
+    "Embeddings are disabled: OpenRouter has no free embedding models (OPENROUTER_FREE_ONLY=true).",
+  );
+  process.exit(0);
+}
 
 const provider = new OpenRouterProvider(key);
 const CHUNK = 64;

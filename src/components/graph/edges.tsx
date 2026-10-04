@@ -56,6 +56,9 @@ export function PactEdge({
       <BaseEdge
         id={id}
         path={path}
+        className={
+          d.relationType === "SIMILAR_TO" && selected ? "pact-edge-flow" : undefined
+        }
         style={{
           stroke: color,
           strokeWidth: d.illuminated || selected ? style.width + 0.8 : style.width,

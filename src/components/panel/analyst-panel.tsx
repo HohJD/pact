@@ -82,7 +82,11 @@ export function AnalystPanel() {
               : "border-entity-evidence/40 text-entity-evidence",
           )}
         >
-          {r.source === "LLM" ? `LIVE${entry.model ? ` · ${entry.model}` : ""}` : "CURATED RESPONSE"}
+          {r.source === "LLM"
+            ? `LIVE${entry.model ? ` · ${entry.model}` : ""}`
+            : entry.offline
+              ? "OFFLINE — CURATED RESPONSE"
+              : "CURATED RESPONSE"}
         </span>
         <span
           className={cn(

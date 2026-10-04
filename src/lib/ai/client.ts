@@ -1,6 +1,7 @@
 "use client";
 
 import type { AnalystResponse, Dataset } from "@/lib/domain/schema";
+import { matchFallback } from "@/lib/ai/fallback-content";
 import { resolveQuery } from "@/lib/query/resolve";
 import { applyUIActions } from "@/lib/ui-actions/apply";
 import { useWorkspace } from "@/store/workspace";
@@ -45,6 +46,7 @@ export async function applyActionsSequenced(
 export async function submitAnalystQuestion(
   question: string,
   dataset: Dataset,
+  opts?: { demo?: boolean },
 ): Promise<void> {
   const q = question.trim();
   if (!q) return;
@@ -63,6 +65,18 @@ export async function submitAnalystQuestion(
 
   store.setAnalystPending(true);
   store.openPanel("ANALYST");
+
+  // demo mode is deterministic — curated response only, no network call
+  if (opts?.demo) {
+    const data = matchFallback(q);
+    // brief pause so the staged actions read as "thinking"
+    await wait(300);
+    useWorkspace.getState().setAnalyst({ data });
+    await applyActionsSequenced(data.actions ?? [], dataset);
+    useWorkspace.getState().setAnalystPending(false);
+    return;
+  }
+
   try {
     const s = useWorkspace.getState();
     const res = await fetch("/api/analyst", {
@@ -84,8 +98,10 @@ export async function submitAnalystQuestion(
     useWorkspace.getState().setAnalyst({ data, model: data.model });
     await applyActionsSequenced(data.actions ?? [], dataset);
   } catch (err) {
-    console.warn("[pact] analyst request failed", err);
-    useWorkspace.getState().setAnalyst(null);
+    console.warn("[pact] analyst request failed — using curated response", err);
+    // offline → curated fallback so the UI never dead-ends
+    const data = matchFallback(q);
+    useWorkspace.getState().setAnalyst({ data, offline: true });
   } finally {
     useWorkspace.getState().setAnalystPending(false);
   }

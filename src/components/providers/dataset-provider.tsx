@@ -1,5 +1,6 @@
 "use client";
 
+import { MotionConfig } from "framer-motion";
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { Dataset } from "@/lib/domain/schema";
@@ -14,7 +15,11 @@ export function DatasetProvider({
   dataset: Dataset;
   children: ReactNode;
 }) {
-  return <DatasetContext.Provider value={dataset}>{children}</DatasetContext.Provider>;
+  return (
+    <DatasetContext.Provider value={dataset}>
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+    </DatasetContext.Provider>
+  );
 }
 
 export function useDataset(): Dataset {

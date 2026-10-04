@@ -30,8 +30,25 @@ if (
 }
 
 const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
+const DEMO_QUESTION =
+  "Which policies have successfully accelerated heat-pump adoption?";
 
-export function WorkspaceShell() {
+const DEMO_STEPS = [
+  "Open /demo — the heat-pump scenario loads by itself (curated, no network).",
+  "Read the analyst answer in the right panel.",
+  "Click a citation [n] → the evidence drawer opens.",
+  "Esc closes it; browse the graph — nodes highlighted by the answer.",
+  "Select BUS, BEG 2024 and MaPrimeRénov' (⌘K or right-click → compare).",
+  "Open the comparison — shared-row table, key differences, cited lessons.",
+  "SHOW OUTCOMES → time series with policy markers.",
+  "MAP → click Germany → focus + zoom; back to GRAPH.",
+  "TIMELINE → country lanes; click a bar to select.",
+  "Ask “What could the UK learn from Germany?” in the command bar.",
+  "Open Policy transfer from a policy card (Oxford ← BEG).",
+  "⌘K → search evidence, open the drawer.",
+];
+
+export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   const dataset = useDataset();
   const view = useWorkspace((s) => s.view);
   const setView = useWorkspace((s) => s.setView);
@@ -44,12 +61,17 @@ export function WorkspaceShell() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [scriptOpen, setScriptOpen] = useState(false);
   const params = useSearchParams();
   const initialised = useRef(false);
 
   useEffect(() => {
     if (initialised.current) return;
     initialised.current = true;
+    if (demo) {
+      void submitAnalystQuestion(DEMO_QUESTION, dataset, { demo: true });
+      return;
+    }
     const q = params.get("q");
     const v = params.get("view")?.toUpperCase();
     if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
@@ -61,32 +83,49 @@ export function WorkspaceShell() {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const s = useWorkspace.getState();
       if (e.key === "Escape") {
+        if (scriptOpen) {
+          setScriptOpen(false);
+          return;
+        }
+        // drawer first, then selection/panel
+        if (s.evidenceDrawerId) {
+          s.closeEvidence();
+          return;
+        }
         select(null);
         openPanel(null);
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        useWorkspace.getState().setPaletteOpen(true);
+        s.setPaletteOpen(true);
       }
       if (e.key === "/") {
         e.preventDefault();
         document.getElementById("pact-command-input")?.focus();
+      }
+      if (e.key === "?") {
+        if (demo) setScriptOpen((v) => !v);
+      }
+      if (e.key >= "1" && e.key <= "4") {
+        const i = Number(e.key) - 1;
+        if (VIEWS[i]) s.setView(VIEWS[i]);
       }
       if (e.key === "[") setSidebarOpen((v) => !v);
       if (e.key === "]") setPanelOpen((v) => !v);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [select, openPanel]);
+  }, [select, openPanel, demo, scriptOpen]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <TopBar />
-      <div className="flex min-h-0 flex-1">
+      <TopBar demo={demo} />
+      <div className="relative flex min-h-0 flex-1">
         {sidebarOpen && <FilterSidebar />}
         <main className="flex min-w-0 flex-1 flex-col">
-          <div className="flex h-9 shrink-0 items-center gap-1 border-b border-border px-3">
+          <div className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
             {VIEWS.map((v) => (
               <button
                 key={v}
@@ -125,6 +164,38 @@ export function WorkspaceShell() {
         <EvidenceDrawer />
         <CommandPalette />
       </div>
+
+      {/* demo script — “?” toggles it (presenter aid) */}
+      {demo && (
+        <button
+          type="button"
+          onClick={() => setScriptOpen((v) => !v)}
+          className="glass fixed bottom-3 left-3 z-40 flex size-8 items-center justify-center rounded-full font-mono text-[13px] text-muted-foreground hover:text-foreground"
+          aria-label="Demo script"
+        >
+          ?
+        </button>
+      )}
+      {demo && scriptOpen && (
+        <div className="glass fixed bottom-14 left-3 z-40 w-80 rounded-lg p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+              Demo script
+            </span>
+            <span className="kbd">?</span>
+          </div>
+          <ol className="space-y-1.5">
+            {DEMO_STEPS.map((s, i) => (
+              <li key={i} className="flex gap-2 text-[10.5px] leading-snug text-foreground">
+                <span className="font-mono text-muted-foreground">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                {s}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
     </div>
   );
 }

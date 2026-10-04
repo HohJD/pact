@@ -123,7 +123,7 @@ export function FilterSidebar() {
   );
 
   return (
-    <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-border bg-card scrollbar-thin">
+    <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-border bg-card scrollbar-thin max-md:absolute max-md:inset-y-0 max-md:left-0 max-md:z-30 max-md:shadow-2xl">
       <Section title="Current query">
         {query ? (
           <div className="w-full">

@@ -24,6 +24,13 @@ export class ProviderUnavailableError extends Error {
   }
 }
 
+class FormatUnsupportedError extends Error {
+  constructor(msg: string) {
+    super(msg);
+    this.name = "FormatUnsupportedError";
+  }
+}
+
 export class LLMOutputError extends Error {
   constructor(
     message: string,
@@ -49,9 +56,9 @@ function stripFences(s: string): string {
 export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model = process.env.OPENROUTER_MODEL ??
+    private readonly model = process.env.OPENROUTER_MODEL ||
       (FREE_ONLY ? FREE_DEFAULT_MODEL : "anthropic/claude-sonnet-4.5"),
-    private readonly embeddingModel = process.env.OPENROUTER_EMBEDDING_MODEL ??
+    private readonly embeddingModel = process.env.OPENROUTER_EMBEDDING_MODEL ||
       "openai/text-embedding-3-small",
   ) {
     if (FREE_ONLY && !this.model.endsWith(":free")) {
@@ -67,7 +74,12 @@ export class OpenRouterProvider implements LLMProvider {
 
   private async call(
     messages: { role: string; content: string }[],
-    opts: { jsonSchema?: object; temperature?: number; maxTokens?: number },
+    opts: {
+      jsonSchema?: object;
+      format: "schema" | "json" | "text";
+      temperature?: number;
+      maxTokens?: number;
+    },
   ) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -87,7 +99,7 @@ export class OpenRouterProvider implements LLMProvider {
           messages,
           temperature: opts.temperature ?? 0.2,
           max_tokens: opts.maxTokens ?? 4000,
-          ...(opts.jsonSchema
+          ...(opts.format === "schema"
             ? {
                 response_format: {
                   type: "json_schema",
@@ -98,13 +110,25 @@ export class OpenRouterProvider implements LLMProvider {
                   },
                 },
               }
-            : {}),
+            : opts.format === "json"
+              ? { response_format: { type: "json_object" } }
+              : {}),
         }),
       });
-      if (!res.ok) throw new Error(`OpenRouter HTTP ${res.status}`);
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        if (
+          res.status >= 400 &&
+          res.status < 500 &&
+          /response_format|json_schema|unsupported|not supported/i.test(body)
+        ) {
+          throw new FormatUnsupportedError(`HTTP ${res.status}`);
+        }
+        throw new Error(`OpenRouter HTTP ${res.status}`);
+      }
       const json = await res.json();
       console.info(
-        `[pact-ai] chat model=${this.model} latency=${Date.now() - started}ms`,
+        `[pact-ai] chat model=${this.model} format=${opts.format} latency=${Date.now() - started}ms`,
       );
       return json.choices?.[0]?.message?.content ?? "";
     } finally {
@@ -112,9 +136,40 @@ export class OpenRouterProvider implements LLMProvider {
     }
   }
 
+  /** Extract the first balanced {…} block — for models that wrap JSON in prose. */
+  private extractJson(raw: string): string | null {
+    const clean = stripFences(raw);
+    const start = clean.indexOf("{");
+    if (start < 0) return null;
+    let depth = 0;
+    let inStr = false;
+    let esc = false;
+    for (let i = start; i < clean.length; i++) {
+      const c = clean[i];
+      if (esc) {
+        esc = false;
+        continue;
+      }
+      if (c === "\\" && inStr) {
+        esc = true;
+        continue;
+      }
+      if (c === '"') inStr = !inStr;
+      if (inStr) continue;
+      if (c === "{") depth++;
+      if (c === "}") {
+        depth--;
+        if (depth === 0) return clean.slice(start, i + 1);
+      }
+    }
+    return null;
+  }
+
   private parse<T>(raw: string, schema: z.ZodType<T>): T | null {
+    const candidate = this.extractJson(raw);
+    if (!candidate) return null;
     try {
-      const parsed = schema.safeParse(JSON.parse(stripFences(raw)));
+      const parsed = schema.safeParse(JSON.parse(candidate));
       return parsed.success ? parsed.data : null;
     } catch {
       return null;
@@ -134,21 +189,42 @@ export class OpenRouterProvider implements LLMProvider {
       { role: "system", content: system },
       { role: "user", content: user },
     ];
-    let raw = await this.call(messages, { jsonSchema, temperature, maxTokens });
-    let data = this.parse(raw, schema);
-    if (data === null) {
-      console.warn(`[pact-ai] ${schemaName}: invalid JSON — retrying with repair prompt`);
-      raw = await this.call(
-        [...messages, { role: "assistant", content: raw }, { role: "user", content: ANALYST_REPAIR_PROMPT }],
-        { jsonSchema, temperature, maxTokens },
-      );
-      data = this.parse(raw, schema);
+
+    // Free-tier models often reject response_format — walk the ladder:
+    // strict json_schema → json_object → plain text with a JSON block.
+    let raw = "";
+    let lastErr: unknown = null;
+    for (const format of ["schema", "json", "text"] as const) {
+      try {
+        const msgs =
+          format === "text"
+            ? [...messages, { role: "user", content: "Return JSON only — no prose." }]
+            : messages;
+        raw = await this.call(msgs, { jsonSchema, format, temperature, maxTokens });
+        let data = this.parse(raw, schema);
+        if (data === null) {
+          console.warn(`[pact-ai] ${schemaName}: invalid JSON (${format}) — repair turn`);
+          raw = await this.call(
+            [...msgs, { role: "assistant", content: raw }, { role: "user", content: ANALYST_REPAIR_PROMPT }],
+            { jsonSchema, format, temperature, maxTokens },
+          );
+          data = this.parse(raw, schema);
+        }
+        if (data !== null) return { data, raw, model: this.model };
+        lastErr = new LLMOutputError(`${schemaName}: validation failed (${format})`, raw);
+      } catch (err) {
+        if (err instanceof FormatUnsupportedError) {
+          console.warn(`[pact-ai] ${schemaName}: ${format} format unsupported — trying next`);
+          lastErr = err;
+          continue;
+        }
+        throw err;
+      }
     }
-    if (data === null) {
-      console.warn(`[pact-ai] ${schemaName}: validation failed after repair`);
-      throw new LLMOutputError(`${schemaName}: model output failed schema validation`, raw);
-    }
-    return { data, raw, model: this.model };
+    console.warn(`[pact-ai] ${schemaName}: validation failed across all formats`);
+    throw lastErr instanceof Error
+      ? lastErr
+      : new LLMOutputError(`${schemaName}: model output failed schema validation`, raw);
   }
 
   async embed(texts: string[]): Promise<number[][]> {

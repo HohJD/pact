@@ -9,7 +9,7 @@ import { submitAnalystQuestion } from "@/lib/ai/client";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { useWorkspace } from "@/store/workspace";
 
-export function TopBar() {
+export function TopBar({ demo = false }: { demo?: boolean }) {
   const dataset = useDataset();
   const query = useWorkspace((s) => s.query);
   const setQuery = useWorkspace((s) => s.setQuery);
@@ -25,7 +25,7 @@ export function TopBar() {
       setQuery("");
       return;
     }
-    void submitAnalystQuestion(q, dataset);
+    void submitAnalystQuestion(q, dataset, { demo });
   };
 
   return (
@@ -50,6 +50,11 @@ export function TopBar() {
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {demo && (
+          <span className="rounded border border-entity-evidence/50 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-entity-evidence">
+            Demo
+          </span>
+        )}
         <button
           type="button"
           onClick={() => setPaletteOpen(true)}

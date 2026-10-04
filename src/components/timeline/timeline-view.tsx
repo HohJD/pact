@@ -255,7 +255,7 @@ export function TimelineView() {
                               showTip(e, p, `${ev.title} · ${ev.publication_date}`)
                             }
                             onMouseLeave={() => setTip(null)}
-                            className="absolute top-1/2 z-10 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45"
+                            className="pact-marker absolute top-1/2 z-10 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45"
                             style={{
                               left: x(y),
                               backgroundColor: YELLOW,

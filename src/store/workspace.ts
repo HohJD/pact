@@ -59,7 +59,7 @@ interface WorkspaceState {
   expanded: Set<string>;
   focusedCountry: CountryCode | null;
   evidenceDrawerId: string | null;
-  analystResponse: { data: AnalystResponse; model?: string } | null;
+  analystResponse: { data: AnalystResponse; model?: string; offline?: boolean } | null;
   analystPending: boolean;
   transferRequest: TransferRequest | null;
   transferResult: TransferAssessment | null;
@@ -80,7 +80,7 @@ interface WorkspaceState {
   focusCountry: (c: CountryCode | null) => void;
   openEvidence: (id: string) => void;
   closeEvidence: () => void;
-  setAnalyst: (r: { data: AnalystResponse; model?: string } | null) => void;
+  setAnalyst: (r: { data: AnalystResponse; model?: string; offline?: boolean } | null) => void;
   setAnalystPending: (b: boolean) => void;
   openTransfer: (req: TransferRequest) => void;
   closeTransfer: () => void;
