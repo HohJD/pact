@@ -16,6 +16,24 @@ const DOMAIN_TABLES = [
   "similarities",
 ] as const;
 
+/** Fields modelled as `.nullable()` in the Zod schema — null is meaningful and must be kept. */
+const KEEP_NULL_FIELDS = new Set([
+  "parent_id",
+  "ended",
+  "source_url",
+  "source_evidence_id",
+]);
+
+/**
+ * Postgres returns null for empty nullable columns; the Zod schema models them
+ * as optional. Shallow only — nested jsonb (points, sources, breakdown, context)
+ * is left untouched.
+ */
+export const stripNulls = (row: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(row).filter(([k, v]) => v !== null || KEEP_NULL_FIELDS.has(k)),
+  );
+
 /**
  * Supabase-backed repository. All PactRepository behaviour is in-memory over a
  * Dataset, so once the 9 domain tables are loaded and validated the repository
@@ -38,7 +56,7 @@ export class SupabaseRepository extends SeedRepository {
     for (const table of DOMAIN_TABLES) {
       const { data, error } = await client.from(table).select("*");
       if (error) throw new Error(`supabase ${table}: ${error.message}`);
-      raw[table] = data ?? [];
+      raw[table] = (data ?? []).map(stripNulls);
     }
     return new SupabaseRepository(Dataset.parse(raw));
   }
