@@ -36,6 +36,8 @@ export class LLMOutputError extends Error {
 
 const BASE = "https://openrouter.ai/api/v1";
 const TIMEOUT_MS = 20_000;
+const FREE_ONLY = process.env.OPENROUTER_FREE_ONLY === "true";
+const FREE_DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 
 function stripFences(s: string): string {
   return s
@@ -48,10 +50,16 @@ export class OpenRouterProvider implements LLMProvider {
   constructor(
     private readonly apiKey: string,
     private readonly model = process.env.OPENROUTER_MODEL ??
-      "anthropic/claude-sonnet-4.5",
+      (FREE_ONLY ? FREE_DEFAULT_MODEL : "anthropic/claude-sonnet-4.5"),
     private readonly embeddingModel = process.env.OPENROUTER_EMBEDDING_MODEL ??
       "openai/text-embedding-3-small",
-  ) {}
+  ) {
+    if (FREE_ONLY && !this.model.endsWith(":free")) {
+      throw new Error(
+        `OPENROUTER_FREE_ONLY is set but OPENROUTER_MODEL="${this.model}" is not a free model (must end in ":free")`,
+      );
+    }
+  }
 
   isConfigured() {
     return true;
@@ -144,6 +152,11 @@ export class OpenRouterProvider implements LLMProvider {
   }
 
   async embed(texts: string[]): Promise<number[][]> {
+    if (FREE_ONLY) {
+      throw new ProviderUnavailableError(
+        "embeddings disabled: OpenRouter has no free embedding models (OPENROUTER_FREE_ONLY=true)",
+      );
+    }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     try {
