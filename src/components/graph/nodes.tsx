@@ -45,8 +45,13 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
         selected && "border-entity-policy",
       )}
       style={{
-        borderColor: selected ? undefined : `${data.color}${borderAlpha}`,
-        borderLeft: `3px solid ${data.color}`,
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderTopColor: `${data.color}${borderAlpha}`,
+        borderRightColor: `${data.color}${borderAlpha}`,
+        borderBottomColor: `${data.color}${borderAlpha}`,
+        borderLeftWidth: 3,
+        borderLeftColor: data.color,
         boxShadow: data.glow ? `0 0 0 2px ${data.color}66, 0 0 18px ${data.color}44` : undefined,
       }}
     >
