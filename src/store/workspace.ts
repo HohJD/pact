@@ -3,8 +3,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { CountryCode } from "@/lib/domain/schema";
+import type { AnalystResponse, CountryCode } from "@/lib/domain/schema";
 import type { PolicyFilter } from "@/lib/data/repository";
+import type { TransferAssessment } from "@/lib/ai/transfer-fallback";
 
 export type WorkspaceView = "GRAPH" | "MAP" | "TIMELINE" | "OUTCOMES";
 
@@ -28,7 +29,15 @@ export type PanelKind =
   | "OUTCOMES"
   | "COMPARE"
   | "SIMILARITY"
+  | "ANALYST"
   | null;
+
+export interface TransferRequest {
+  target_jurisdiction_id: string;
+  source_policy_ids?: string[];
+  source_country?: CountryCode;
+  question?: string;
+}
 
 export interface WorkspaceFilter extends PolicyFilter {
   evidence_strength_min?: number; // 0–5
@@ -50,6 +59,12 @@ interface WorkspaceState {
   expanded: Set<string>;
   focusedCountry: CountryCode | null;
   evidenceDrawerId: string | null;
+  analystResponse: { data: AnalystResponse; model?: string } | null;
+  analystPending: boolean;
+  transferRequest: TransferRequest | null;
+  transferResult: TransferAssessment | null;
+  transferPending: boolean;
+  paletteOpen: boolean;
   savedSearches: SavedSearch[];
 
   setQuery: (q: string) => void;
@@ -65,6 +80,13 @@ interface WorkspaceState {
   focusCountry: (c: CountryCode | null) => void;
   openEvidence: (id: string) => void;
   closeEvidence: () => void;
+  setAnalyst: (r: { data: AnalystResponse; model?: string } | null) => void;
+  setAnalystPending: (b: boolean) => void;
+  openTransfer: (req: TransferRequest) => void;
+  closeTransfer: () => void;
+  setTransferResult: (r: TransferAssessment | null) => void;
+  setTransferPending: (b: boolean) => void;
+  setPaletteOpen: (b: boolean) => void;
   highlight: (ids: string[]) => void;
   clearHighlights: () => void;
   saveCurrentSearch: () => void;
@@ -87,6 +109,12 @@ export const useWorkspace = create<WorkspaceState>()(
       expanded: new Set<string>(),
       focusedCountry: null,
       evidenceDrawerId: null,
+      analystResponse: null,
+      analystPending: false,
+      transferRequest: null,
+      transferResult: null,
+      transferPending: false,
+      paletteOpen: false,
       savedSearches: [],
 
       setQuery: (query) => set({ query }),
@@ -115,6 +143,15 @@ export const useWorkspace = create<WorkspaceState>()(
       focusCountry: (focusedCountry) => set({ focusedCountry }),
       openEvidence: (evidenceDrawerId) => set({ evidenceDrawerId }),
       closeEvidence: () => set({ evidenceDrawerId: null }),
+      setAnalyst: (analystResponse) => set({ analystResponse }),
+      setAnalystPending: (analystPending) => set({ analystPending }),
+      openTransfer: (transferRequest) =>
+        set({ transferRequest, transferResult: null }),
+      closeTransfer: () =>
+        set({ transferRequest: null, transferResult: null, transferPending: false }),
+      setTransferResult: (transferResult) => set({ transferResult }),
+      setTransferPending: (transferPending) => set({ transferPending }),
+      setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
       highlight: (ids) => set({ highlighted: new Set(ids) }),
       clearHighlights: () => set({ highlighted: new Set() }),
       saveCurrentSearch: () =>
@@ -140,6 +177,11 @@ export const useWorkspace = create<WorkspaceState>()(
           compareIds: [],
           expanded: new Set(),
           focusedCountry: null,
+          analystResponse: null,
+          analystPending: false,
+          transferRequest: null,
+          transferResult: null,
+          transferPending: false,
         }),
     }),
     {

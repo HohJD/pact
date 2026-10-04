@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
 import { useWorkspace } from "@/store/workspace";
+import { AnalystPanel } from "./analyst-panel";
 import { ComparePanel } from "./compare-panel";
 import { EntityPanel } from "./entity-panel";
 import { EvidencePanel } from "./evidence-panel";
@@ -22,7 +23,10 @@ export function RightPanel({ open }: { open: boolean }) {
   let content: React.ReactNode = <WorkspaceSummary />;
   let show = open;
 
-  if (selection?.kind === "edge") {
+  if (panel === "ANALYST") {
+    content = <AnalystPanel />;
+    show = open;
+  } else if (selection?.kind === "edge") {
     content = <SimilarityPanel edgeId={selection.id} />;
     show = show && panel === "SIMILARITY";
   } else if (selection?.kind === "jurisdiction") {

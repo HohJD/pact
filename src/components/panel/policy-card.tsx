@@ -48,6 +48,7 @@ export function PolicyCard({ policyId }: { policyId: string }) {
   const expanded = useWorkspace((s) => s.expanded);
   const setView = useWorkspace((s) => s.setView);
   const openEvidence = useWorkspace((s) => s.openEvidence);
+  const openTransfer = useWorkspace((s) => s.openTransfer);
 
   if (!policy || !strength) return null;
 
@@ -263,6 +264,19 @@ export function PolicyCard({ policyId }: { policyId: string }) {
           }
         >
           {expanded.has(policyId) ? "Collapse" : "Expand"}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="col-span-4 h-7 px-1 text-[9px]"
+          onClick={() =>
+            openTransfer({
+              target_jurisdiction_id: "jur_gb_oxford",
+              source_policy_ids: [policyId],
+            })
+          }
+        >
+          Policy transfer — assess fit for another jurisdiction
         </Button>
       </div>
     </div>

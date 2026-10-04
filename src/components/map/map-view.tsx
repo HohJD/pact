@@ -16,8 +16,27 @@ import { useMapData } from "./use-map-data";
 const W = 960;
 const H = 560;
 const PURPLE = "#9B7BFF";
-const LAND = "#181B21";
-const STROKE = "#262a33";
+// base land: --secondary (#181B21) lightened ~6% so land reads against ocean
+const LAND = "#22252A";
+const STROKE = "#2a2e36";
+
+// initial view frames N. America + Europe (Singapore via the SG chip)
+const VIEW_BBOX: GeoJSON.Feature = {
+  type: "Feature",
+  properties: {},
+  geometry: {
+    type: "Polygon",
+    coordinates: [
+      [
+        [-130, 20],
+        [35, 20],
+        [35, 72],
+        [-130, 72],
+        [-130, 20],
+      ],
+    ],
+  },
+};
 
 // numeric ISO (world-atlas feature ids) → our codes
 const ISO_TO_CODE: Record<string, CountryCode> = {
@@ -58,9 +77,10 @@ export function SvgMapView() {
     null,
   );
   const [hovered, setHovered] = useState<string | null>(null);
+  const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
 
   const projection = useMemo(
-    () => geoNaturalEarth1().fitSize([W, H], world),
+    () => geoNaturalEarth1().fitExtent([[8, 8], [W - 8, H - 8]], VIEW_BBOX),
     [],
   );
   const path = useMemo(() => geoPath(projection), [projection]);
@@ -100,6 +120,7 @@ export function SvgMapView() {
       .scaleExtent([1, 6])
       .on("zoom", (e) => {
         select(g).attr("transform", e.transform.toString());
+        setTransform({ k: e.transform.k, x: e.transform.x, y: e.transform.y });
       });
     select(svg).call(zm);
     zoomRef.current = zm;
@@ -159,7 +180,7 @@ export function SvgMapView() {
                 stroke={STROKE}
                 strokeWidth={0.5}
                 style={{
-                  fill: d ? PURPLE : isHovered && code ? "#22262e" : LAND,
+                  fill: d ? PURPLE : isHovered && code ? "#2a2f38" : LAND,
                   fillOpacity: d ? 0.25 + d.intensity * 0.6 : 1,
                   transition: "fill-opacity 300ms, opacity 300ms, fill 150ms",
                   opacity: dimmed ? 0.5 : 1,
@@ -186,14 +207,20 @@ export function SvgMapView() {
               />
             );
           })}
+        </g>
+        {/* markers live outside the zoomed group so they keep constant size;
+            their screen coords follow the same transform */}
+        <g>
           {data.markers.map((m) => {
             const pt = projection([m.lng, m.lat]);
             if (!pt) return null;
             const r = 5 + 2.2 * Math.sqrt(m.count);
+            const sx = pt[0] * transform.k + transform.x;
+            const sy = pt[1] * transform.k + transform.y;
             return (
               <g
                 key={m.id}
-                transform={`translate(${pt[0]},${pt[1]})`}
+                transform={`translate(${sx},${sy})`}
                 className="cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -225,15 +252,17 @@ export function SvgMapView() {
                 >
                   {m.count}
                 </text>
-                <text
-                  textAnchor="middle"
-                  dy={r + 9}
-                  fontSize={7.5}
-                  fill="#c9cdd4"
-                  fontFamily="var(--font-mono)"
-                >
-                  {m.label}
-                </text>
+                {transform.k >= 2.5 && (
+                  <text
+                    textAnchor="middle"
+                    dy={r + 9}
+                    fontSize={7.5}
+                    fill="#c9cdd4"
+                    fontFamily="var(--font-mono)"
+                  >
+                    {m.label}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -257,19 +286,37 @@ export function SvgMapView() {
         </div>
       </div>
 
-      {/* reset */}
-      {focusedCountry && (
+      {/* reset + SG */}
+      <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5">
+        {focusedCountry && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              reset();
+            }}
+            className="glass rounded-md px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-entity-jurisdiction hover:text-foreground"
+          >
+            ← Reset — {focusedCountry}
+          </button>
+        )}
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            reset();
+            focusCountry("SG");
+            const jur = dataset.jurisdictions.find((j) => j.country_code === "SG");
+            if (jur) {
+              selectEntity({ kind: "jurisdiction", id: jur.id });
+              openPanel("DETAILS");
+            }
           }}
-          className="glass absolute left-3 top-3 z-10 rounded-md px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-entity-jurisdiction hover:text-foreground"
+          className="glass rounded-md px-2 py-1.5 font-mono text-[10px] tracking-wider text-entity-jurisdiction hover:text-foreground"
+          title="Focus Singapore"
         >
-          ← Reset — {focusedCountry}
+          SG
         </button>
-      )}
+      </div>
 
       {/* policies-in-view panel for focused country */}
       {focusedData && (

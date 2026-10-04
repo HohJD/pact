@@ -6,14 +6,16 @@ import { useEffect, useRef, useState } from "react";
 import { GraphCanvas } from "@/components/graph/graph-canvas";
 import { CompareView } from "@/components/compare/compare-view";
 import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
+import { CommandPalette } from "@/components/command-palette";
 import { MapRoot } from "@/components/map/map-root";
 import { OutcomesView } from "@/components/outcomes/outcomes-view";
 import { TimelineView } from "@/components/timeline/timeline-view";
+import { TransferView } from "@/components/transfer/transfer-view";
 import { RightPanel } from "@/components/panel/right-panel";
 import { FilterSidebar } from "@/components/workspace/filter-sidebar";
 import { TopBar } from "@/components/workspace/topbar";
 import { useDataset } from "@/components/providers/dataset-provider";
-import { resolveQuery } from "@/lib/query/resolve";
+import { submitAnalystQuestion } from "@/lib/ai/client";
 import { cn } from "@/lib/utils";
 import { useWorkspace, type WorkspaceView } from "@/store/workspace";
 
@@ -33,13 +35,11 @@ export function WorkspaceShell() {
   const dataset = useDataset();
   const view = useWorkspace((s) => s.view);
   const setView = useWorkspace((s) => s.setView);
-  const setQuery = useWorkspace((s) => s.setQuery);
-  const setFilters = useWorkspace((s) => s.setFilters);
-  const highlight = useWorkspace((s) => s.highlight);
   const select = useWorkspace((s) => s.select);
   const openPanel = useWorkspace((s) => s.openPanel);
   const panel = useWorkspace((s) => s.panel);
   const compareIds = useWorkspace((s) => s.compareIds);
+  const transferRequest = useWorkspace((s) => s.transferRequest);
   const comparing = panel === "COMPARE" && compareIds.length >= 2;
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -53,17 +53,7 @@ export function WorkspaceShell() {
     const q = params.get("q");
     const v = params.get("view")?.toUpperCase();
     if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
-    if (q) {
-      setQuery(q);
-      const resolved = resolveQuery(q, dataset);
-      setFilters(resolved.filters);
-      highlight([
-        ...resolved.highlightTechnologyIds,
-        ...dataset.jurisdictions
-          .filter((j) => resolved.highlightCountries.includes(j.country_code))
-          .map((j) => j.id),
-      ]);
-    }
+    if (q) void submitAnalystQuestion(q, dataset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -74,6 +64,14 @@ export function WorkspaceShell() {
       if (e.key === "Escape") {
         select(null);
         openPanel(null);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        useWorkspace.getState().setPaletteOpen(true);
+      }
+      if (e.key === "/") {
+        e.preventDefault();
+        document.getElementById("pact-command-input")?.focus();
       }
       if (e.key === "[") setSidebarOpen((v) => !v);
       if (e.key === "]") setPanelOpen((v) => !v);
@@ -106,7 +104,9 @@ export function WorkspaceShell() {
             ))}
           </div>
           <div className="min-h-0 flex-1">
-            {comparing ? (
+            {transferRequest ? (
+              <TransferView />
+            ) : comparing ? (
               <CompareView />
             ) : view === "GRAPH" ? (
               <GraphCanvas />
@@ -123,6 +123,7 @@ export function WorkspaceShell() {
         </main>
         <RightPanel open={panelOpen && !comparing} />
         <EvidenceDrawer />
+        <CommandPalette />
       </div>
     </div>
   );

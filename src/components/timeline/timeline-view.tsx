@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { motion } from "framer-motion";
 
@@ -26,13 +26,9 @@ const ORANGE = "#FF9A3D";
 const YELLOW = "#F2C94C";
 const GREEN = "#3DDC97";
 
-const AXIS_W = 1100;
 const LABEL_W = 150;
-const ROW_H = 26;
+const ROW_H = 24;
 const HEADER_H = 24;
-
-const x = (year: number) =>
-  ((year - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * AXIS_W;
 
 export function TimelineView() {
   const dataset = useDataset();
@@ -64,6 +60,22 @@ export function TimelineView() {
     extra?: string;
   } | null>(null);
 
+  // measure the lane area so the full 2005–2026 range always fits
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [axisW, setAxisW] = useState(1000);
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setAxisW(Math.max(400, el.clientWidth - LABEL_W - 40));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const x = (year: number) =>
+    ((year - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * axisW;
+
   const showTip = (e: React.MouseEvent, policy: Policy, extra?: string) =>
     setTip({ x: e.clientX + 14, y: e.clientY + 14, policy, extra });
 
@@ -77,12 +89,12 @@ export function TimelineView() {
     );
 
   return (
-    <div className="h-full overflow-y-auto scrollbar-thin">
-      <div style={{ width: LABEL_W + AXIS_W + 40 }} className="relative">
+    <div ref={containerRef} className="h-full overflow-y-auto scrollbar-thin">
+      <div style={{ width: LABEL_W + axisW + 40 }} className="relative">
         {/* sticky year axis */}
         <div className="sticky top-0 z-20 flex h-7 items-end border-b border-border bg-[#0B0C0F]/95 backdrop-blur">
           <div style={{ width: LABEL_W }} />
-          <div className="relative" style={{ width: AXIS_W }}>
+          <div className="relative" style={{ width: axisW }}>
             {Array.from(
               { length: TIMELINE_END - TIMELINE_START + 1 },
               (_, i) => TIMELINE_START + i,

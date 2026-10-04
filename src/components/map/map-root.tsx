@@ -19,7 +19,7 @@ class MapErrorBoundary extends Component<{ children: ReactNode }, BoundaryState>
   }
 
   componentDidCatch(err: unknown) {
-    // eslint-disable-next-line no-console
+     
     console.warn("[pact] Mapbox failed, falling back to SVG map:", err);
   }
 

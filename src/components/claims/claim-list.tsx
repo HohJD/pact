@@ -18,7 +18,14 @@ const CONFIDENCE_DOTS: Record<string, number> = { LOW: 1, MEDIUM: 2, HIGH: 3 };
  * Generic claim renderer — used for computed lessons now and analyst LLM
  * output later. Citations are numbered evidence chips that open the drawer.
  */
-export function ClaimList({ claims }: { claims: Claim[] }) {
+export function ClaimList({
+  claims,
+  anchorId,
+}: {
+  claims: Claim[];
+  /** optional id per claim item so inline [n] markers can scroll to it */
+  anchorId?: (index: number) => string;
+}) {
   const dataset = useDataset();
   const openEvidence = useWorkspace((s) => s.openEvidence);
 
@@ -32,7 +39,7 @@ export function ClaimList({ claims }: { claims: Claim[] }) {
   return (
     <ul className="space-y-2">
       {claims.map((c, i) => (
-        <li key={i} className="rounded border border-border/60 p-2.5">
+        <li key={i} id={anchorId?.(i)} className="rounded border border-border/60 p-2.5">
           <p className="text-[11.5px] leading-snug text-foreground">{c.text}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             <span

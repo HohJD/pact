@@ -9,6 +9,8 @@ export function JurisdictionPanel({ jurisdictionId }: { jurisdictionId: string }
   const select = useWorkspace((s) => s.select);
   const openPanel = useWorkspace((s) => s.openPanel);
   const focusCountry = useWorkspace((s) => s.focusCountry);
+  const openTransfer = useWorkspace((s) => s.openTransfer);
+  const compareIds = useWorkspace((s) => s.compareIds);
   const j = dataset.jurisdictions.find((x) => x.id === jurisdictionId);
   if (!j) return null;
 
@@ -67,6 +69,18 @@ export function JurisdictionPanel({ jurisdictionId }: { jurisdictionId: string }
         className="mt-3 w-full rounded border border-border px-2 py-1.5 text-[10px] text-muted-foreground hover:text-foreground"
       >
         Focus on map
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          openTransfer({
+            target_jurisdiction_id: j.id,
+            source_policy_ids: compareIds,
+          })
+        }
+        className="mt-1.5 w-full rounded border border-entity-jurisdiction/40 px-2 py-1.5 text-[10px] text-entity-jurisdiction hover:bg-entity-jurisdiction/10"
+      >
+        Policy transfer — what could {j.name} learn?
       </button>
     </div>
   );

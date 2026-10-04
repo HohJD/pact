@@ -1,0 +1,238 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+import type { Dataset, Evidence, Outcome, Policy } from "@/lib/domain/schema";
+import type { WorkspaceFilter } from "@/store/workspace";
+import { resolveQuery } from "@/lib/query/resolve";
+import type { LLMProvider } from "./provider";
+
+export interface WorkspaceContext {
+  selectedPolicyIds?: string[];
+  focusedCountry?: string | null;
+  compareIds?: string[];
+  filters?: WorkspaceFilter;
+}
+
+export interface RetrievalContext {
+  question: string;
+  intent: string;
+  policies: Policy[];
+  evidence: Evidence[];
+  outcomes: Outcome[];
+  timeSeries: Dataset["time_series"];
+  similarities: Dataset["similarities"];
+  jurisdictions: Dataset["jurisdictions"];
+  /** evidence ids present in context — the citation allow-list */
+  evidenceIds: Set<string>;
+  policyIds: Set<string>;
+}
+
+const STOP = new Set(
+  "the a an and or of to in for on with by is are was were be been what which how have has do does did it its that this from as at not no but can could should would will".split(
+    " ",
+  ),
+);
+
+function tokenize(s: string): string[] {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9äöüéè\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !STOP.has(t))
+    .map((t) => (t.length > 3 && t.endsWith("s") ? t.slice(0, -1) : t));
+}
+
+function lexicalScore(policy: Policy, qTokens: string[]): number {
+  if (qTokens.length === 0) return 0;
+  const doc = `${policy.name} ${policy.short_name ?? ""} ${policy.description} ${policy.incentive} ${policy.eligibility} ${policy.tags.join(" ")}`.toLowerCase();
+  let score = 0;
+  for (const t of qTokens) {
+    const matches = doc.split(t).length - 1;
+    if (matches > 0) score += Math.min(3, matches);
+  }
+  return score;
+}
+
+interface EmbeddingsFile {
+  policies: Record<string, number[]>;
+  evidence: Record<string, number[]>;
+}
+
+function loadEmbeddings(): EmbeddingsFile | null {
+  try {
+    const p = path.join(process.cwd(), "src/data/seed/embeddings.json");
+    return JSON.parse(readFileSync(p, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function cosine(a: number[], b: number[]): number {
+  let dot = 0,
+    na = 0,
+    nb = 0;
+  for (let i = 0; i < a.length && i < b.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  return na && nb ? dot / Math.sqrt(na * nb) : 0;
+}
+
+export async function retrieveContext(
+  question: string,
+  dataset: Dataset,
+  workspace?: WorkspaceContext,
+  provider?: LLMProvider,
+): Promise<RetrievalContext> {
+  const resolved = resolveQuery(question, dataset);
+  const qTokens = tokenize(question);
+
+  const hintTech = new Set(resolved.filters.technology_ids ?? []);
+  const hintMech = new Set(resolved.filters.mechanism_ids ?? []);
+  const hintCountry = new Set(resolved.filters.countries ?? []);
+  const pinned = new Set([
+    ...(workspace?.selectedPolicyIds ?? []),
+    ...(workspace?.compareIds ?? []),
+  ]);
+
+  // optional embedding blend
+  let emb: Record<string, number> | null = null;
+  const embFile = provider?.isConfigured() ? loadEmbeddings() : null;
+  if (provider?.isConfigured() && embFile) {
+    try {
+      const [qv] = await provider.embed([question]);
+      emb = Object.fromEntries(
+        Object.entries(embFile.policies).map(([id, v]) => [id, cosine(qv, v)]),
+      );
+    } catch {
+      emb = null; // embeddings unavailable → lexical only
+    }
+  }
+
+  const scored = dataset.policies.map((p) => {
+    const lex = lexicalScore(p, qTokens);
+    let score = lex * 0.5;
+    if (p.technology_ids.some((t) => hintTech.has(t))) score += 2;
+    if (p.mechanism_ids.some((m) => hintMech.has(m))) score += 2;
+    if (hintCountry.has(p.country_code)) score += 2;
+    if (pinned.has(p.id)) score += 3;
+    // popularity nudge: policies with observed outcomes / evaluating evidence
+    // surface above obscure records at equal relevance
+    const nOutcomes = dataset.outcomes.filter((o) => o.policy_id === p.id).length;
+    const nEvidence = dataset.evidence.filter(
+      (e) =>
+        e.policy_ids.includes(p.id) &&
+        e.policy_relevance !== "CONTEXT" &&
+        e.data_status !== "DEMO",
+    ).length;
+    score += Math.min(3, nOutcomes) * 2.0 + Math.min(5, nEvidence) * 0.75;
+    // evidence-backed coverage bonus: policies with both outcomes and evidence
+    // are the analyst's canonical reference set
+    if (nOutcomes > 0 && nEvidence > 0) score += 1.0;
+    // curated-similarity hubness: well-connected reference policies surface higher
+    const nSim = dataset.similarities.filter(
+      (s) => s.policy_a === p.id || s.policy_b === p.id,
+    ).length;
+    score += Math.min(4, nSim) * 1.5;
+    if (emb) score = score * 0.6 + (emb[p.id] ?? 0) * 10 * 0.4;
+    return { p, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored.slice(0, 8).map((s) => s.p);
+  // always include selected/compared policies
+  for (const id of pinned) {
+    const p = dataset.policies.find((x) => x.id === id);
+    if (p && !top.includes(p)) top.push(p);
+  }
+
+  const policyIds = new Set(top.map((p) => p.id));
+  const evidence = dataset.evidence
+    .filter((e) => e.policy_ids.some((id) => policyIds.has(id)))
+    .slice(0, 20);
+  const outcomes = dataset.outcomes.filter((o) => policyIds.has(o.policy_id));
+  const countries = new Set(top.map((p) => p.country_code));
+  const metricIds = new Set(outcomes.map((o) => o.metric_id));
+  const timeSeries = dataset.time_series.filter(
+    (t) => countries.has(t.country_code) && (metricIds.size === 0 || metricIds.has(t.metric_id)),
+  );
+  const similarities = dataset.similarities.filter(
+    (s) => policyIds.has(s.policy_a) && policyIds.has(s.policy_b),
+  );
+  const jurisdictionIds = new Set(top.map((p) => p.jurisdiction_id));
+  const jurisdictions = dataset.jurisdictions.filter((j) => jurisdictionIds.has(j.id));
+
+  return {
+    question,
+    intent: resolved.intent,
+    policies: top,
+    evidence,
+    outcomes,
+    timeSeries,
+    similarities,
+    jurisdictions,
+    evidenceIds: new Set(evidence.map((e) => e.id)),
+    policyIds,
+  };
+}
+
+const trunc = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)}…` : s);
+
+/** Compact plain-text context document for the analyst (~12k tokens budget). */
+export function formatContextDocument(
+  ctx: RetrievalContext,
+  dataset: Dataset,
+): string {
+  const mech = (id: string) => dataset.mechanisms.find((m) => m.id === id)?.name ?? id;
+  const tech = (id: string) => dataset.technologies.find((t) => t.id === id)?.name ?? id;
+  const metric = (id: string) => dataset.metrics.find((m) => m.id === id)?.name ?? id;
+
+  const lines: string[] = [];
+
+  lines.push("JURISDICTIONS");
+  for (const j of ctx.jurisdictions)
+    lines.push(
+      `- ${j.id} | ${j.name} (${j.country_code}, ${j.level}) | heating: ${j.context.dominant_heating}; owner-occupier ${j.context.owner_occupier_share}; elec/gas price ratio ${j.context.electricity_gas_price_ratio} | ${trunc(j.context.housing_stock_note ?? "", 300)}`,
+    );
+
+  lines.push("", "POLICIES");
+  for (const p of ctx.policies)
+    lines.push(
+      `- ${p.id} | ${p.name} | ${p.country_code} | ${p.status} | introduced ${p.introduced}${p.ended ? `, ended ${p.ended}` : ""} | mechanisms: ${p.mechanism_ids.map(mech).join(", ")} | technologies: ${p.technology_ids.map(tech).join(", ")} | incentive: ${trunc(p.incentive, 200)} | data_status ${p.data_status} | ${trunc(p.description, 400)}`,
+    );
+
+  lines.push("", "EVIDENCE");
+  for (const e of ctx.evidence)
+    lines.push(
+      [
+        `- ${e.id} | ${trunc(e.title, 140)} | ${e.publisher} ${e.publication_date} | ${e.evidence_type} | causal_strength ${e.causal_strength} | relevance ${e.policy_relevance} | confidence ${e.confidence} | data_status ${e.data_status}`,
+        `  findings: ${e.findings.map((f) => trunc(f, 220)).join(" | ")}`,
+        e.limitations.length ? `  limitations: ${e.limitations.join(" | ")}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    );
+
+  lines.push("", "OUTCOMES");
+  for (const o of ctx.outcomes)
+    lines.push(
+      `- ${o.id} | policy ${o.policy_id} | ${o.headline} | ${o.magnitude ?? ""} ${o.period} | inference ${o.inference} | evidence ${o.evidence_ids.join(", ")}${o.note ? ` | ${trunc(o.note, 200)}` : ""}`,
+    );
+
+  lines.push("", "TIME SERIES");
+  for (const t of ctx.timeSeries)
+    lines.push(
+      `- ${t.id} | ${metric(t.metric_id)} | ${t.country_code} | precision ${t.precision} | data_status ${t.data_status} | ${t.points.map((p) => `${p.year}:${p.value}`).join(" ")}${t.note ? ` | ${t.note}` : ""}`,
+    );
+
+  if (ctx.similarities.length) {
+    lines.push("", "SIMILARITIES");
+    for (const s of ctx.similarities)
+      lines.push(
+        `- ${s.policy_a} ~ ${s.policy_b} | overall ${s.breakdown.overall} | ${s.breakdown.differences.join("; ")}`,
+      );
+  }
+
+  return lines.join("\n");
+}
