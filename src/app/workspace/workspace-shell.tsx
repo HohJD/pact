@@ -4,6 +4,9 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { GraphCanvas } from "@/components/graph/graph-canvas";
+import { CompareView } from "@/components/compare/compare-view";
+import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
+import { OutcomesView } from "@/components/outcomes/outcomes-view";
 import { RightPanel } from "@/components/panel/right-panel";
 import { FilterSidebar } from "@/components/workspace/filter-sidebar";
 import { TopBar } from "@/components/workspace/topbar";
@@ -12,8 +15,13 @@ import { resolveQuery } from "@/lib/query/resolve";
 import { cn } from "@/lib/utils";
 import { useWorkspace, type WorkspaceView } from "@/store/workspace";
 
-// expose the store for programmatic control (agent UI actions, e2e, demos)
-if (typeof window !== "undefined") {
+// expose the store for programmatic control (agent UI actions, e2e, demos) —
+// development and debug builds only
+if (
+  typeof window !== "undefined" &&
+  (process.env.NODE_ENV !== "production" ||
+    new URLSearchParams(window.location.search).has("debug"))
+) {
   (window as unknown as { __pact: typeof useWorkspace }).__pact = useWorkspace;
 }
 
@@ -28,6 +36,9 @@ export function WorkspaceShell() {
   const highlight = useWorkspace((s) => s.highlight);
   const select = useWorkspace((s) => s.select);
   const openPanel = useWorkspace((s) => s.openPanel);
+  const panel = useWorkspace((s) => s.panel);
+  const compareIds = useWorkspace((s) => s.compareIds);
+  const comparing = panel === "COMPARE" && compareIds.length >= 2;
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [panelOpen, setPanelOpen] = useState(true);
@@ -93,14 +104,19 @@ export function WorkspaceShell() {
             ))}
           </div>
           <div className="min-h-0 flex-1">
-            {view === "GRAPH" ? (
+            {comparing ? (
+              <CompareView />
+            ) : view === "GRAPH" ? (
               <GraphCanvas />
+            ) : view === "OUTCOMES" ? (
+              <OutcomesView />
             ) : (
               <PlaceholderView name={view} />
             )}
           </div>
         </main>
         <RightPanel open={panelOpen} />
+        <EvidenceDrawer />
       </div>
     </div>
   );

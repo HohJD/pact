@@ -93,12 +93,13 @@ describe("layoutGraph", () => {
     const first = layoutGraph(g.nodes, g.edges);
     const prev = new Map(first.map((n) => [n.id, { x: n.x, y: n.y }]));
     const second = layoutGraph(g.nodes, g.edges, prev);
-    // re-layout from a converged state should stay in the same neighbourhood
-    // (the simulation re-heats from alpha=1, so positions drift but do not reshuffle)
+    // re-layout from a converged state should stay in the same neighbourhood.
+    // policy collide radius is now the rect half-diagonal (~110px), so a node
+    // squeezed out of a cluster can legitimately drift a few hundred px.
     for (const n of second) {
       const before = first.find((m) => m.id === n.id)!;
-      expect(Math.abs(n.x - before.x)).toBeLessThan(120);
-      expect(Math.abs(n.y - before.y)).toBeLessThan(120);
+      expect(Math.abs(n.x - before.x)).toBeLessThan(300);
+      expect(Math.abs(n.y - before.y)).toBeLessThan(300);
     }
   });
 });

@@ -13,6 +13,7 @@ export function OutcomesPanel({ policyId }: { policyId?: string }) {
   const dataset = useDataset();
   const select = useWorkspace((s) => s.select);
   const openPanel = useWorkspace((s) => s.openPanel);
+  const openEvidence = useWorkspace((s) => s.openEvidence);
 
   const outcomes = policyId
     ? repo.getOutcomesForPolicy(policyId)
@@ -64,10 +65,7 @@ export function OutcomesPanel({ policyId }: { policyId?: string }) {
                         <button
                           key={e.id}
                           type="button"
-                          onClick={() => {
-                            select({ kind: "evidence", id: e.id });
-                            openPanel("EVIDENCE");
-                          }}
+                          onClick={() => openEvidence(e.id)}
                           className="rounded border border-entity-evidence/30 px-1 font-mono text-[8px] text-entity-evidence hover:bg-entity-evidence/10"
                         >
                           {e.publisher}

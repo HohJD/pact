@@ -117,7 +117,10 @@ export function FilterSidebar() {
   const yearFrom = filters.year_from ?? 2005;
   const yearTo = filters.year_to ?? 2025;
 
-  const jurisdictionChips = dataset.jurisdictions.filter((j) => j.level !== "CITY");
+  // country-level jurisdictions only; sub-national roll up under their country
+  const jurisdictionChips = dataset.jurisdictions.filter(
+    (j) => j.level === "NATIONAL" || j.level === "SUPRANATIONAL",
+  );
 
   return (
     <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-r border-border bg-card scrollbar-thin">
@@ -182,7 +185,7 @@ export function FilterSidebar() {
             color="#9B7BFF"
             onClick={() => toggleIn("countries", j.country_code)}
           >
-            {j.country_code}
+            <span title={j.name}>{j.country_code}</span>
           </Chip>
         ))}
       </Section>

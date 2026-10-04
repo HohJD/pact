@@ -53,7 +53,11 @@ function hash01(id: string): number {
   return ((h >>> 0) % 10000) / 10000;
 }
 
+// policy cards are ~170×64px rectangles — collide on the half-diagonal
+const POLICY_COLLIDE_RADIUS = Math.hypot(170 / 2, 64 / 2) + 10;
+
 function nodeRadius(node: GraphNode, degree: number): number {
+  if (node.kind === "policy") return POLICY_COLLIDE_RADIUS + Math.min(8, degree);
   return BASE_RADIUS[node.kind] + Math.min(10, degree * 1.5);
 }
 
@@ -88,6 +92,9 @@ export function layoutGraph(
   }));
 
   const sim = forceSimulation(simNodes)
+    // seeded with previous positions → reheat gently so nodes settle rather
+    // than reshuffle
+    .alpha(previous ? 0.3 : 1)
     .force(
       "link",
       forceLink<SimNode, SimulationLinkDatum<SimNode> & { type?: string }>(links)
@@ -98,7 +105,7 @@ export function layoutGraph(
     .force(
       "charge",
       forceManyBody<SimNode>().strength((d) =>
-        d.kind === "technology" || d.kind === "jurisdiction" ? -600 : -260,
+        d.kind === "technology" || d.kind === "jurisdiction" ? -650 : -300,
       ),
     )
     .force(
@@ -111,7 +118,9 @@ export function layoutGraph(
               degree.get(d.id) ?? 0,
             ) + 10,
         )
-        .strength(1)
+        // gentler resolution when seeded — nodes are already near-valid, and
+        // hard collide on the enlarged radii would shove them out of place
+        .strength(previous ? 0.5 : 1)
         .iterations(3),
     )
     .force("center", forceCenter(0, 0))
@@ -133,7 +142,10 @@ export function layoutGraph(
     )
     .stop();
 
-  for (let i = 0; i < 300; i++) sim.tick();
+  // a converged graph only needs a short settle pass; a fresh one needs the
+  // full run to untangle the seeded ring
+  const ticks = previous ? 80 : 300;
+  for (let i = 0; i < ticks; i++) sim.tick();
 
   const byId = new Map(simNodes.map((n) => [n.id, n]));
   return nodes.map((n) => ({

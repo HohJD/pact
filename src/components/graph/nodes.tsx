@@ -37,7 +37,7 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
   return (
     <div
       className={cn(
-        "w-[190px] rounded-md border border-border bg-card px-2.5 py-2 shadow-sm transition-opacity",
+        "w-[170px] rounded-md border border-border bg-card px-2 py-1.5 shadow-sm transition-opacity",
         data.dim && "opacity-40",
         selected && "border-entity-policy",
       )}
@@ -48,7 +48,7 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
     >
       <Handles />
       <div className="flex items-start justify-between gap-1">
-        <span className="line-clamp-2 text-[11px] font-medium leading-tight text-foreground">
+        <span className="line-clamp-2 text-[12px] font-medium leading-tight text-foreground">
           {data.label}
         </span>
         <span className="font-mono text-[9px] text-muted-foreground">
@@ -74,10 +74,13 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
 }
 
 export function JurisdictionNode({ data, selected }: NodeProps<PactFlowNode>) {
+  const national =
+    data.meta.level === "NATIONAL" || data.meta.level === "SUPRANATIONAL";
   return (
     <div
       className={cn(
-        "flex size-14 items-center justify-center rounded-full border-2 bg-card text-center transition-opacity",
+        "flex flex-col items-center justify-center rounded-full border-2 bg-card text-center transition-opacity",
+        national ? "size-20" : "size-14",
         data.dim && "opacity-40",
       )}
       style={{
@@ -88,8 +91,16 @@ export function JurisdictionNode({ data, selected }: NodeProps<PactFlowNode>) {
       title={data.label}
     >
       <Handles />
-      <span className="max-w-[52px] font-mono text-[8px] leading-tight text-foreground">
-        {String(data.meta.country_code ?? data.label)}
+      <span
+        className={cn(
+          "max-w-[68px] px-0.5 leading-tight text-foreground",
+          national ? "text-[10px] font-medium" : "text-[9px]",
+        )}
+      >
+        {data.label}
+      </span>
+      <span className="font-mono text-[8px] text-muted-foreground">
+        {String(data.meta.country_code ?? "")}
       </span>
     </div>
   );

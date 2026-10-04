@@ -64,12 +64,18 @@ export function SimilarityPanel({ edgeId }: { edgeId: string }) {
                 "font-mono text-[10px]",
                 v === true || v === "HIGH"
                   ? "text-entity-outcome"
-                  : v === "MEDIUM"
-                    ? "text-entity-evidence"
-                    : "text-muted-foreground",
+                  : "text-muted-foreground",
               )}
             >
-              {typeof v === "boolean" ? (v ? "✓ same" : "△ different") : v}
+              {typeof v === "boolean"
+                ? v
+                  ? "✓ same"
+                  : "△ different"
+                : v === "HIGH"
+                  ? "✓ same"
+                  : v === "MEDIUM"
+                    ? "△ different (medium)"
+                    : "△ different"}
             </dd>
           </div>
         ))}

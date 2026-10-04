@@ -55,7 +55,12 @@ export function ComparePanel() {
             ),
         )}
       </ul>
-      <Button className="mt-auto" disabled title="Comparison view arrives in a later phase">
+      <Button
+        className="mt-auto"
+        disabled={policies.length < 2}
+        title={policies.length < 2 ? "Select at least two policies" : undefined}
+        onClick={() => openPanel("COMPARE")}
+      >
         Open comparison
       </Button>
     </div>

@@ -27,6 +27,8 @@ export interface BuiltGraph {
   policyCount: number;
   totalPolicyCount: number;
   truncated: number;
+  /** evidence records linked to policies in view (regardless of expansion) */
+  linkedEvidenceCount: number;
 }
 
 const POLICY_NODE_CAP = 70;
@@ -154,6 +156,10 @@ export function buildGraph(
     });
   }
 
+  const linkedEvidenceCount = dataset.evidence.filter((e) =>
+    e.policy_ids.some((pid) => policyIds.has(pid)),
+  ).length;
+
   const edges = deriveEdges(dataset).filter((e) => {
     if (!nodes.has(e.source) || !nodes.has(e.target)) return false;
     if (e.type === "SIMILAR_TO" && (e.weight ?? 0) < 0.65) return false;
@@ -166,5 +172,6 @@ export function buildGraph(
     policyCount: policies.length,
     totalPolicyCount,
     truncated,
+    linkedEvidenceCount,
   };
 }

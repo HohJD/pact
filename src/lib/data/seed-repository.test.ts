@@ -98,13 +98,14 @@ describe("SeedRepository", () => {
       expect(s.summary.join(" ")).toMatch(/experimental/i);
     });
 
-    it("scores BUS from non-CONTEXT evidence only (Joule meta-analysis excluded)", () => {
+    it("scores BUS Limited — CONTEXT and DEMO records do not count", () => {
       const s = repo.getEvidenceStrength("pol_gb_bus");
-      // CONTEXT records (E9, E10, E11, E27 incl. META_ANALYSIS) must not score.
-      // Scoring records: E1/E2/E4 descriptive + demo quasi-experimental → best 4.
-      expect(s.score).toBe(4);
-      expect(s.label).toBe("Strong");
+      // Scoring records: E1/E2/E4/E10 descriptive → ≥2 descriptive → 2.
+      // CONTEXT (E9, E11, E27) and DEMO (ev_demo_bus_evaluation) excluded.
+      expect(s.score).toBe(2);
+      expect(s.label).toBe("Limited");
       expect(s.counts.context).toBe(3);
+      expect(s.counts.demo).toBe(1);
     });
 
     it("excludes CONTEXT from the score but reports counts", () => {

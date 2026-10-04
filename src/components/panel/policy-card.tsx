@@ -46,6 +46,8 @@ export function PolicyCard({ policyId }: { policyId: string }) {
   const expandNode = useWorkspace((s) => s.expandNode);
   const collapseNode = useWorkspace((s) => s.collapseNode);
   const expanded = useWorkspace((s) => s.expanded);
+  const setView = useWorkspace((s) => s.setView);
+  const openEvidence = useWorkspace((s) => s.openEvidence);
 
   if (!policy || !strength) return null;
 
@@ -140,6 +142,20 @@ export function PolicyCard({ policyId }: { policyId: string }) {
                   <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">
                     {o.magnitude ? `${o.magnitude} · ` : ""}{o.period}
                   </p>
+                  {o.evidence_ids.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {o.evidence_ids.map((eid) => (
+                        <button
+                          key={eid}
+                          type="button"
+                          onClick={() => openEvidence(eid)}
+                          className="rounded border border-entity-evidence/30 px-1 font-mono text-[8px] text-entity-evidence hover:bg-entity-evidence/10"
+                        >
+                          source
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -155,14 +171,14 @@ export function PolicyCard({ policyId }: { policyId: string }) {
                 const other = dataset.policies.find((p) => p.id === otherId);
                 if (!other) return null;
                 return (
-                  <li key={s.id}>
+                  <li key={s.id} className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => {
                         select({ kind: "policy", id: otherId });
                         openPanel("DETAILS");
                       }}
-                      className="flex w-full items-center justify-between rounded px-1.5 py-1 text-left hover:bg-secondary"
+                      className="flex min-w-0 flex-1 items-center justify-between rounded px-1.5 py-1 text-left hover:bg-secondary"
                     >
                       <span className="truncate text-[11px] text-foreground">
                         {other.short_name ?? other.name}
@@ -170,6 +186,16 @@ export function PolicyCard({ policyId }: { policyId: string }) {
                       <span className="font-mono text-[9px] text-entity-policy">
                         {Math.round(s.breakdown.overall * 100)}%
                       </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        select({ kind: "edge", id: `e_${s.id}` });
+                        openPanel("SIMILARITY");
+                      }}
+                      className="shrink-0 rounded border border-border px-1 py-0.5 font-mono text-[8px] text-muted-foreground hover:text-foreground"
+                    >
+                      Why?
                     </button>
                   </li>
                 );
@@ -217,7 +243,15 @@ export function PolicyCard({ policyId }: { policyId: string }) {
         <Button size="sm" variant="outline" className="h-7 px-1 text-[9px]" onClick={() => openPanel("EVIDENCE")}>
           Evidence
         </Button>
-        <Button size="sm" variant="outline" className="h-7 px-1 text-[9px]" onClick={() => openPanel("OUTCOMES")}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 px-1 text-[9px]"
+          onClick={() => {
+            openPanel("OUTCOMES");
+            setView("OUTCOMES");
+          }}
+        >
           Outcomes
         </Button>
         <Button

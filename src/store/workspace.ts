@@ -49,6 +49,7 @@ interface WorkspaceState {
   compareIds: string[];
   expanded: Set<string>;
   focusedCountry: CountryCode | null;
+  evidenceDrawerId: string | null;
   savedSearches: SavedSearch[];
 
   setQuery: (q: string) => void;
@@ -62,6 +63,8 @@ interface WorkspaceState {
   expandNode: (policyId: string) => void;
   collapseNode: (policyId: string) => void;
   focusCountry: (c: CountryCode | null) => void;
+  openEvidence: (id: string) => void;
+  closeEvidence: () => void;
   highlight: (ids: string[]) => void;
   clearHighlights: () => void;
   saveCurrentSearch: () => void;
@@ -83,6 +86,7 @@ export const useWorkspace = create<WorkspaceState>()(
       compareIds: [],
       expanded: new Set<string>(),
       focusedCountry: null,
+      evidenceDrawerId: null,
       savedSearches: [],
 
       setQuery: (query) => set({ query }),
@@ -109,6 +113,8 @@ export const useWorkspace = create<WorkspaceState>()(
           return { expanded: next };
         }),
       focusCountry: (focusedCountry) => set({ focusedCountry }),
+      openEvidence: (evidenceDrawerId) => set({ evidenceDrawerId }),
+      closeEvidence: () => set({ evidenceDrawerId: null }),
       highlight: (ids) => set({ highlighted: new Set(ids) }),
       clearHighlights: () => set({ highlighted: new Set() }),
       saveCurrentSearch: () =>

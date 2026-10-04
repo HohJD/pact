@@ -227,7 +227,7 @@ function Canvas() {
           {" · "}
           {built.nodes.filter((n) => n.kind === "jurisdiction").length} jurisdictions
           {" · "}
-          {built.nodes.filter((n) => n.kind === "evidence").length} evidence
+          {built.linkedEvidenceCount} evidence
         </span>
         <button
           type="button"
@@ -274,14 +274,17 @@ function Canvas() {
           className="!border-border !bg-card [&_button]:!border-border [&_button]:!bg-card [&_button]:!fill-foreground"
           position="bottom-left"
         />
-        <MiniMap
-          position="bottom-right"
-          pannable
-          zoomable
-          className="!border !border-border !bg-card"
-          nodeColor={(n) => (n.data as PactNodeData).color ?? "#8B919A"}
-          maskColor="#0b0c0fcc"
-        />
+        {nodes.length > 25 && (
+          <MiniMap
+            position="bottom-right"
+            pannable
+            zoomable
+            style={{ width: 140, height: 90 }}
+            className="!border !border-border !bg-card"
+            nodeColor={(n) => (n.data as PactNodeData).color ?? "#8B919A"}
+            maskColor="#0b0c0fcc"
+          />
+        )}
       </ReactFlow>
 
       {/* tooltip */}
