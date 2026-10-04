@@ -4,6 +4,7 @@ import { ClaimList } from "@/components/claims/claim-list";
 import { SectionTitle } from "./section-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { applyActionsSequenced, submitAnalystQuestion } from "@/lib/ai/client";
+import { renumberCitations } from "@/lib/ai/citations";
 import { useDataset } from "@/components/providers/dataset-provider";
 import type { UIAction } from "@/lib/domain/schema";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,27 @@ export function AnalystPanel() {
   const dataset = useDataset();
   const pending = useWorkspace((s) => s.analystPending);
   const entry = useWorkspace((s) => s.analystResponse);
+  const streamText = useWorkspace((s) => s.analystStreamText);
+
+  // live answer streaming in — typewriter view until `final` arrives
+  if (pending && !entry && streamText !== null)
+    return (
+      <div className="flex h-full flex-col overflow-y-auto scrollbar-thin">
+        <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            Analyst
+          </span>
+          <span className="flex items-center gap-1 rounded border border-entity-policy/40 px-1 font-mono text-[8px] uppercase text-entity-policy">
+            <span className="size-1 animate-pulse rounded-full bg-entity-policy" />
+            LIVE
+          </span>
+        </div>
+        <p className="p-3 text-[12px] leading-relaxed text-foreground">
+          {streamText}
+          <span className="ml-px inline-block h-3 w-[5px] animate-pulse bg-entity-policy/80 align-[-1px]" />
+        </p>
+      </div>
+    );
 
   if (pending && !entry)
     return (
@@ -66,7 +88,7 @@ export function AnalystPanel() {
     );
 
   const r = entry.data;
-  const answerParts = r.answer.split(/(\[\d+\])/g);
+  const numbered = renumberCitations(r);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto scrollbar-thin">
@@ -109,25 +131,24 @@ export function AnalystPanel() {
         )}
 
         <p className="text-[12px] leading-relaxed text-foreground">
-          {answerParts.map((part, i) => {
-            const m = part.match(/^\[(\d+)\]$/);
-            if (!m) return <span key={i}>{part}</span>;
-            const idx = parseInt(m[1], 10) - 1;
-            return (
+          {numbered.answerSegments.map((seg, i) =>
+            seg.type === "text" ? (
+              <span key={i}>{seg.text}</span>
+            ) : (
               <button
                 key={i}
                 type="button"
                 onClick={() =>
                   document
-                    .getElementById(`analyst-claim-${idx}`)
+                    .getElementById(`analyst-claim-${seg.claimIndex}`)
                     ?.scrollIntoView({ behavior: "smooth", block: "center" })
                 }
                 className="mx-px rounded border border-entity-evidence/40 px-0.5 font-mono text-[8px] text-entity-evidence hover:bg-entity-evidence/10"
               >
-                {part}
+                {seg.numbers.map((n) => `[${n}]`).join("")}
               </button>
-            );
-          })}
+            ),
+          )}
         </p>
 
         {r.claims.length > 0 && (

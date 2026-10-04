@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ANALYST_REPAIR_PROMPT } from "./prompts";
+import { createAnswerExtractor, parseSSE } from "./streaming";
 
 export interface ChatJSONOptions<T> {
   system: string;
@@ -13,6 +14,15 @@ export interface ChatJSONOptions<T> {
 
 export interface LLMProvider {
   chatJSON<T>(opts: ChatJSONOptions<T>): Promise<{ data: T; raw: string; model: string }>;
+  /**
+   * Streaming variant: invokes `onDelta` with unescaped fragments of the
+   * response's `"answer"` string field as they arrive, then resolves with the
+   * full validated payload. Optional — providers may omit it.
+   */
+  chatJSONStream?<T>(
+    opts: ChatJSONOptions<T>,
+    onDelta: (text: string) => void,
+  ): Promise<{ data: T; raw: string; model: string }>;
   embed(texts: string[]): Promise<number[][]>;
   isConfigured(): boolean;
 }
@@ -136,6 +146,67 @@ export class OpenRouterProvider implements LLMProvider {
     }
   }
 
+  /** Same request as `call` but with `stream: true` — returns the raw response. */
+  private async callStream(
+    messages: { role: string; content: string }[],
+    opts: {
+      jsonSchema?: object;
+      format: "schema" | "json" | "text";
+      temperature?: number;
+      maxTokens?: number;
+    },
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60_000);
+    try {
+      const res = await fetch(`${BASE}/chat/completions`, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "http://localhost:3001",
+          "X-Title": "PACT",
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages,
+          temperature: opts.temperature ?? 0.2,
+          max_tokens: opts.maxTokens ?? 4000,
+          stream: true,
+          ...(opts.format === "schema"
+            ? {
+                response_format: {
+                  type: "json_schema",
+                  json_schema: {
+                    name: "pact_response",
+                    strict: true,
+                    schema: opts.jsonSchema,
+                  },
+                },
+              }
+            : opts.format === "json"
+              ? { response_format: { type: "json_object" } }
+              : {}),
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        if (
+          res.status >= 400 &&
+          res.status < 500 &&
+          /response_format|json_schema|unsupported|not supported/i.test(body)
+        ) {
+          throw new FormatUnsupportedError(`HTTP ${res.status}`);
+        }
+        throw new Error(`OpenRouter HTTP ${res.status}`);
+      }
+      return res;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   /** Extract the first balanced {…} block — for models that wrap JSON in prose. */
   private extractJson(raw: string): string | null {
     const clean = stripFences(raw);
@@ -222,6 +293,74 @@ export class OpenRouterProvider implements LLMProvider {
       }
     }
     console.warn(`[pact-ai] ${schemaName}: validation failed across all formats`);
+    throw lastErr instanceof Error
+      ? lastErr
+      : new LLMOutputError(`${schemaName}: model output failed schema validation`, raw);
+  }
+
+  /**
+   * Streaming completion over the same format ladder as `chatJSON`. `onDelta`
+   * receives unescaped fragments of the `"answer"` field as they arrive; the
+   * resolved value is the same validated payload `chatJSON` would return.
+   * Validation failure throws — the caller decides whether to fall back.
+   */
+  async chatJSONStream<T>(
+    {
+      system,
+      user,
+      schema,
+      schemaName,
+      temperature,
+      maxTokens,
+    }: ChatJSONOptions<T>,
+    onDelta: (text: string) => void,
+  ) {
+    const jsonSchema = z.toJSONSchema(schema, { io: "input" });
+    const messages = [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ];
+
+    let raw = "";
+    let lastErr: unknown = null;
+    for (const format of ["schema", "json", "text"] as const) {
+      try {
+        const msgs =
+          format === "text"
+            ? [...messages, { role: "user", content: "Return JSON only — no prose." }]
+            : messages;
+        const res = await this.callStream(msgs, {
+          jsonSchema,
+          format,
+          temperature,
+          maxTokens,
+        });
+        if (!res.body) throw new Error("OpenRouter stream has no body");
+        const extract = createAnswerExtractor(onDelta);
+        for await (const payload of parseSSE(res.body)) {
+          let delta = "";
+          try {
+            delta = JSON.parse(payload)?.choices?.[0]?.delta?.content ?? "";
+          } catch {
+            continue;
+          }
+          if (delta) {
+            raw += delta;
+            extract(delta);
+          }
+        }
+        const data = this.parse(raw, schema);
+        if (data !== null) return { data, raw, model: this.model };
+        lastErr = new LLMOutputError(`${schemaName}: validation failed (${format})`, raw);
+      } catch (err) {
+        if (err instanceof FormatUnsupportedError) {
+          console.warn(`[pact-ai] ${schemaName}: ${format} stream unsupported — trying next`);
+          lastErr = err;
+          continue;
+        }
+        throw err;
+      }
+    }
     throw lastErr instanceof Error
       ? lastErr
       : new LLMOutputError(`${schemaName}: model output failed schema validation`, raw);

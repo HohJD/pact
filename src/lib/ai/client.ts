@@ -79,7 +79,8 @@ export async function submitAnalystQuestion(
 
   try {
     const s = useWorkspace.getState();
-    const res = await fetch("/api/analyst", {
+    useWorkspace.getState().setAnalystStreamText("");
+    const res = await fetch("/api/analyst/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -93,9 +94,12 @@ export async function submitAnalystQuestion(
         },
       }),
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = (await res.json()) as AnalystResponse & { model?: string };
-    useWorkspace.getState().setAnalyst({ data, model: data.model });
+    if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+    const streamed = await readAnalystStream(res.body);
+    useWorkspace.getState().setAnalystStreamText(null);
+    if (!streamed) throw new Error("empty analyst stream");
+    const { offline, data } = streamed;
+    useWorkspace.getState().setAnalyst({ data, model: data.model, offline });
     await applyActionsSequenced(data.actions ?? [], dataset);
   } catch (err) {
     console.warn("[pact] analyst request failed — using curated response", err);
@@ -103,6 +107,44 @@ export async function submitAnalystQuestion(
     const data = matchFallback(q);
     useWorkspace.getState().setAnalyst({ data, offline: true });
   } finally {
+    useWorkspace.getState().setAnalystStreamText(null);
     useWorkspace.getState().setAnalystPending(false);
   }
+}
+
+/**
+ * Reads the /api/analyst/stream SSE body: `delta` events append to the store's
+ * streaming text; resolves with the `final` or `fallback` payload.
+ */
+async function readAnalystStream(
+  body: ReadableStream<Uint8Array>,
+): Promise<{ data: AnalystResponse & { model?: string }; offline: boolean } | null> {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let result: (AnalystResponse & { model?: string }) | null = null;
+  let offline = false;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const events = buf.split("\n\n");
+    buf = events.pop() ?? "";
+    for (const ev of events) {
+      const event = ev.split("\n").find((l) => l.startsWith("event:"))?.slice(6).trim();
+      const dataLine = ev.split("\n").find((l) => l.startsWith("data:"))?.slice(5);
+      if (!event || !dataLine) continue;
+      const payload = JSON.parse(dataLine);
+      if (event === "delta") {
+        useWorkspace.getState().appendAnalystStreamText(payload.text ?? "");
+      } else if (event === "final") {
+        result = payload;
+      } else if (event === "fallback") {
+        // server chose the curated path — mark offline so the chip says so
+        result = payload;
+        offline = true;
+      }
+    }
+  }
+  return result ? { data: result, offline } : null;
 }

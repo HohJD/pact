@@ -61,6 +61,8 @@ interface WorkspaceState {
   evidenceDrawerId: string | null;
   analystResponse: { data: AnalystResponse; model?: string; offline?: boolean } | null;
   analystPending: boolean;
+  /** partial answer text while the analyst response streams in */
+  analystStreamText: string | null;
   transferRequest: TransferRequest | null;
   transferResult: TransferAssessment | null;
   transferPending: boolean;
@@ -82,6 +84,8 @@ interface WorkspaceState {
   closeEvidence: () => void;
   setAnalyst: (r: { data: AnalystResponse; model?: string; offline?: boolean } | null) => void;
   setAnalystPending: (b: boolean) => void;
+  setAnalystStreamText: (t: string | null) => void;
+  appendAnalystStreamText: (t: string) => void;
   openTransfer: (req: TransferRequest) => void;
   closeTransfer: () => void;
   setTransferResult: (r: TransferAssessment | null) => void;
@@ -111,6 +115,7 @@ export const useWorkspace = create<WorkspaceState>()(
       evidenceDrawerId: null,
       analystResponse: null,
       analystPending: false,
+      analystStreamText: null,
       transferRequest: null,
       transferResult: null,
       transferPending: false,
@@ -145,6 +150,9 @@ export const useWorkspace = create<WorkspaceState>()(
       closeEvidence: () => set({ evidenceDrawerId: null }),
       setAnalyst: (analystResponse) => set({ analystResponse }),
       setAnalystPending: (analystPending) => set({ analystPending }),
+      setAnalystStreamText: (analystStreamText) => set({ analystStreamText }),
+      appendAnalystStreamText: (t) =>
+        set((s) => ({ analystStreamText: (s.analystStreamText ?? "") + t })),
       openTransfer: (transferRequest) =>
         set({ transferRequest, transferResult: null }),
       closeTransfer: () =>
@@ -179,6 +187,7 @@ export const useWorkspace = create<WorkspaceState>()(
           focusedCountry: null,
           analystResponse: null,
           analystPending: false,
+          analystStreamText: null,
           transferRequest: null,
           transferResult: null,
           transferPending: false,
