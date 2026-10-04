@@ -3,8 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 import { seedDataset } from "@/data/seed";
 import { SeedRepository } from "@/lib/data/seed-repository";
 import type { Evidence } from "@/lib/domain/schema";
-import { runEvidenceAgent, type EvidenceSearchAdapter } from "./evidence-agent";
+import { cleanFindings, runEvidenceAgent, type EvidenceSearchAdapter } from "./evidence-agent";
 import type { LLMProvider } from "./provider";
+import { classifyHost, govLabel } from "./search/publishers";
 import { TavilySearchAdapter } from "./search/tavily";
 
 const nullProvider: LLMProvider = {
@@ -13,7 +14,10 @@ const nullProvider: LLMProvider = {
   embed: () => Promise.reject(new Error("unconfigured")),
 };
 
-function classifyingProvider(): LLMProvider {
+function classifyingProvider(
+  evidenceType = "GOVERNMENT_EVALUATION",
+  causalStrength = "DESCRIPTIVE",
+): LLMProvider {
   return {
     isConfigured: () => true,
     embed: vi.fn(),
@@ -28,7 +32,7 @@ function classifyingProvider(): LLMProvider {
             authors: [],
             publication_date: "2024",
             source_url: null,
-            evidence_type: "GOVERNMENT_EVALUATION",
+            evidence_type: evidenceType,
             methodology: "",
             geography: ["GB"],
             policy_ids: [],
@@ -37,7 +41,7 @@ function classifyingProvider(): LLMProvider {
             findings: ["Applications doubled after the grant increase."],
             limitations: [],
             confidence: "LOW",
-            causal_strength: "DESCRIPTIVE",
+            causal_strength: causalStrength,
           },
         ],
       },
@@ -127,6 +131,35 @@ describe("runEvidenceAgent with a search adapter", () => {
     expect(after.counts.candidate).toBe(before.counts.candidate + 1);
   });
 
+  it("downgrades OFFICIAL_STATISTICS claims from non-government hosts", async () => {
+    const a = adapter([
+      { title: "Boiler Upgrade Scheme statistics roundup", url: "https://homeenergyquotes.co.uk/bus", snippet: "The Boiler Upgrade Scheme saw applications rise." },
+    ]);
+    const provider = classifyingProvider("OFFICIAL_STATISTICS", "CORRELATIONAL");
+    const r = await runEvidenceAgent(
+      { policy_id: "pol_gb_bus", adapter: a },
+      seedDataset,
+      provider,
+    );
+    expect(r.candidates[0].evidence_type).toBe("INDUSTRY_REPORT");
+    expect(r.candidates[0].causal_strength).toBe("DESCRIPTIVE");
+    expect(r.candidates[0].publisher).toBe("homeenergyquotes.co.uk");
+  });
+
+  it("keeps OFFICIAL_STATISTICS from government hosts with a gov label", async () => {
+    const a = adapter([
+      { title: "Boiler Upgrade Scheme statistics", url: "https://www.gov.uk/government/statistics/bus", snippet: "Boiler Upgrade Scheme monthly statistics." },
+    ]);
+    const provider = classifyingProvider("OFFICIAL_STATISTICS", "DESCRIPTIVE");
+    const r = await runEvidenceAgent(
+      { policy_id: "pol_gb_bus", adapter: a },
+      seedDataset,
+      provider,
+    );
+    expect(r.candidates[0].evidence_type).toBe("OFFICIAL_STATISTICS");
+    expect(r.candidates[0].publisher).toBe("GOV.UK (HM Government)");
+  });
+
   it("mentions the policy via short_name too", async () => {
     const a = adapter([
       { title: "Stats", url: "https://s.io/1", snippet: `${busPolicy.short_name} uptake grew.` },
@@ -137,5 +170,54 @@ describe("runEvidenceAgent with a search adapter", () => {
       nullProvider,
     );
     expect(r.candidates_unclassified).toHaveLength(1);
+  });
+});
+
+describe("classifyHost", () => {
+  it("classifies government, academic, institutional and other hosts", () => {
+    expect(classifyHost("www.gov.uk")).toBe("GOVERNMENT");
+    expect(classifyHost("anah.gouv.fr")).toBe("GOVERNMENT");
+    expect(classifyHost("bafa.de")).toBe("GOVERNMENT");
+    expect(classifyHost("ssb.no")).toBe("GOVERNMENT");
+    expect(classifyHost("europa.eu")).toBe("GOVERNMENT");
+    expect(classifyHost("doi.org")).toBe("ACADEMIC");
+    expect(classifyHost("ox.ac.uk")).toBe("ACADEMIC");
+    expect(classifyHost("nber.org")).toBe("ACADEMIC");
+    expect(classifyHost("iea.org")).toBe("INSTITUTIONAL");
+    expect(classifyHost("agora-energiewende.de")).toBe("INSTITUTIONAL");
+    expect(classifyHost("homeenergyquotes.co.uk")).toBe("OTHER");
+    expect(classifyHost("random-blog.example")).toBe("OTHER");
+  });
+
+  it("govLabel maps known hosts and falls back to the hostname", () => {
+    expect(govLabel("www.gov.uk")).toBe("GOV.UK (HM Government)");
+    expect(govLabel("ssb.no")).toBe("Statistics Norway");
+    expect(govLabel("custom.gov.xx")).toBe("custom.gov.xx");
+  });
+});
+
+describe("cleanFindings", () => {
+  it("drops page boilerplate, title-echoing junk and non-sentences", () => {
+    const out = cleanFindings(
+      [
+        "Title: UK Boiler Upgrade Scheme Hits Record Heat Pump Uptake in 2025 Latest Building Products Industry News From BRG Building Solutions. # News & Press.",
+        "Applications doubled after the £7,500 grant uplift in 2023.",
+        "short",
+        "Subscribe to our newsletter for updates on heating policy today now",
+      ],
+      "Boiler Upgrade Scheme statistics",
+    );
+    expect(out).toEqual([
+      "Applications doubled after the £7,500 grant uplift in 2023.",
+    ]);
+  });
+
+  it("strips the hit title out of surviving findings", () => {
+    const out = cleanFindings(
+      ["According to Boiler Upgrade Scheme statistics, uptake rose steadily through 2024."],
+      "Boiler Upgrade Scheme statistics",
+    );
+    expect(out[0]).not.toMatch(/Boiler Upgrade Scheme statistics/);
+    expect(out[0]).toMatch(/uptake rose steadily/);
   });
 });

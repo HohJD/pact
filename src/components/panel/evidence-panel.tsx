@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ArrowLeft, ChevronDown, ExternalLink } from "lucide-react";
 
 import type { Evidence } from "@/lib/domain/schema";
+import { classifyHost } from "@/lib/ai/search/publishers";
 import {
   useDataset,
   useEvidenceStrength,
@@ -226,6 +227,14 @@ function EvidenceDetail({ evidence: e }: { evidence: Evidence }) {
 
 const AGENT_STAGES = ["Search", "Classify", "Link"] as const;
 
+function urlHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 interface AgentResult {
   status: string;
   candidates: Evidence[];
@@ -321,12 +330,29 @@ function EvidenceAgentSection({ policyId }: { policyId: string }) {
                 counted in strength
               </p>
               <ul className="mt-1.5 space-y-1.5">
-                {result.candidates.map((e) => (
+                {result.candidates.map((e) => {
+                  const host = e.source_url ? urlHost(e.source_url) : e.publisher;
+                  const cls = classifyHost(host);
+                  return (
                   <li
                     key={e.id}
                     className="rounded border border-dashed border-entity-mechanism/50 p-2"
                   >
                     <div className="flex flex-wrap items-center gap-1">
+                      <Chip className="border-border font-mono normal-case text-muted-foreground">
+                        {host}
+                      </Chip>
+                      <Chip
+                        className={
+                          cls === "GOVERNMENT"
+                            ? "border-entity-outcome/40 text-entity-outcome"
+                            : cls === "OTHER"
+                              ? "border-border text-muted-foreground"
+                              : "border-entity-policy/40 text-entity-policy"
+                        }
+                      >
+                        {cls === "OTHER" ? "unverified publisher" : cls}
+                      </Chip>
                       <Chip className="border-border text-muted-foreground">
                         {e.evidence_type.replace(/_/g, " ")}
                       </Chip>
@@ -348,9 +374,6 @@ function EvidenceAgentSection({ policyId }: { policyId: string }) {
                     >
                       {e.title}
                     </button>
-                    <p className="mt-0.5 font-mono text-[9px] text-muted-foreground">
-                      {e.publisher}
-                    </p>
                     {e.findings.slice(0, 2).map((f, i) => (
                       <p key={i} className="mt-0.5 text-[10px] text-muted-foreground">
                         · {f}
@@ -362,7 +385,7 @@ function EvidenceAgentSection({ policyId }: { policyId: string }) {
                           href={e.source_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-0.5 text-[9.5px] text-entity-policy hover:underline"
+                          className="inline-flex items-center gap-0.5 rounded border border-entity-policy/40 px-1.5 py-0.5 font-mono text-[8px] uppercase text-entity-policy hover:bg-entity-policy/10"
                         >
                           Open source <ExternalLink className="size-2.5" />
                         </a>
@@ -377,7 +400,8 @@ function EvidenceAgentSection({ policyId }: { policyId: string }) {
                       </button>
                     </div>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </>
           )}

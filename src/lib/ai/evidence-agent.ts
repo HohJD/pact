@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { SeedRepository } from "@/lib/data/seed-repository";
-import type { Dataset, Evidence } from "@/lib/domain/schema";
+import type { CausalStrength, Dataset, Evidence } from "@/lib/domain/schema";
 import { EVIDENCE_EXTRACTION_SYSTEM_PROMPT } from "./prompts";
 import type { LLMProvider } from "./provider";
 import {
@@ -9,6 +9,11 @@ import {
   type EvidenceAgentResult,
   type SearchHit,
 } from "./schemas";
+import {
+  classifyHost,
+  govLabel,
+  type PublisherClass,
+} from "./search/publishers";
 
 export interface SuppliedSource {
   title: string;
@@ -128,13 +133,36 @@ export async function runEvidenceAgent(
       );
 
       if (hits.length && provider.isConfigured()) {
+        const classified: { rec: Evidence; cls: PublisherClass; score: number }[] = [];
         for (const hit of hits) {
           const rec = await classifyHit(hit, policy.id, names, provider);
-          if (rec) candidates.push(rec);
+          if (rec)
+            classified.push({
+              rec,
+              cls: classifyHost(hostname(hit.url)),
+              score: hit.score,
+            });
         }
-        const failed = hits.length - candidates.length;
+        const failed = hits.length - classified.length;
         if (failed > 0)
           notes.push(`${failed} hit(s) could not be classified and were dropped.`);
+
+        // rank: GOVERNMENT → ACADEMIC → INSTITUTIONAL → OTHER, then Tavily score;
+        // unverified publishers are capped at two
+        const ORDER: Record<PublisherClass, number> = {
+          GOVERNMENT: 0,
+          ACADEMIC: 1,
+          INSTITUTIONAL: 2,
+          OTHER: 3,
+        };
+        classified.sort(
+          (a, b) => ORDER[a.cls] - ORDER[b.cls] || b.score - a.score,
+        );
+        let others = 0;
+        for (const c of classified) {
+          if (c.cls === "OTHER" && ++others > 2) continue;
+          candidates.push(c.rec);
+        }
       } else if (hits.length) {
         candidatesUnclassified.push(...hits);
         notes.push(
@@ -191,6 +219,46 @@ async function classifyHit(
     });
     const r = data.records[0];
     if (!r) return null;
+    const host = hostname(hit.url);
+    const cls = classifyHost(host);
+
+    // publisher-type guard: OFFICIAL_STATISTICS / GOVERNMENT_EVALUATION are
+    // only credible from government or public-body hosts — else downgrade to
+    // the publisher class's default record type
+    let evidenceType = r.evidence_type;
+    if (
+      (evidenceType === "OFFICIAL_STATISTICS" ||
+        evidenceType === "GOVERNMENT_EVALUATION") &&
+      cls !== "GOVERNMENT"
+    ) {
+      evidenceType =
+        cls === "ACADEMIC"
+          ? "ACADEMIC_STUDY"
+          : cls === "INSTITUTIONAL"
+            ? "INSTITUTIONAL_REPORT"
+            : "INDUSTRY_REPORT";
+    }
+
+    // unverified publishers can't support more than descriptive claims
+    const STRONGER: CausalStrength[] = [
+      "CORRELATIONAL",
+      "QUASI_EXPERIMENTAL",
+      "EXPERIMENTAL",
+      "META_ANALYSIS",
+    ];
+    const causalStrength =
+      cls === "OTHER" && STRONGER.includes(r.causal_strength)
+        ? "DESCRIPTIVE"
+        : r.causal_strength;
+
+    const findings = cleanFindings(r.findings, hit.title);
+    const confidence =
+      findings.length === 0
+        ? ("LOW" as const)
+        : r.confidence === "HIGH" && mentionsPolicy(hit, names)
+          ? r.confidence
+          : ("LOW" as const);
+
     return {
       ...r,
       id: candidateId(hit.url, policyId),
@@ -198,21 +266,42 @@ async function classifyHit(
       publication_date: r.publication_date || hit.published_date || "undated",
       // real URL from search — the only URL the system may introduce
       source_url: hit.url,
-      publisher: r.publisher || hostname(hit.url),
+      publisher: cls === "GOVERNMENT" ? govLabel(host) : host,
       policy_relevance: r.policy_relevance,
-      // non-LOW only when the extractor is confident AND the policy is named
-      confidence:
-        r.confidence === "HIGH" && mentionsPolicy(hit, names)
-          ? r.confidence
-          : "LOW",
+      evidence_type: evidenceType,
+      causal_strength: causalStrength,
+      confidence,
       data_status: "CANDIDATE",
       title: r.title || hit.title,
       methodology:
         r.methodology ||
         "Web-search result classified from a snippet. Verify at source.",
-      findings: r.findings.length ? r.findings : [hit.snippet.slice(0, 280)],
+      findings: findings.length
+        ? findings
+        : ["No substantive finding in the available snippet."],
     };
   } catch {
     return null;
   }
+}
+
+const FINDING_JUNK =
+  /#|\||News & Press|Latest|Stay informed|Subscribe|Cookie/i;
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** Keep only sentence-shaped findings; strip page boilerplate and the title. */
+export function cleanFindings(findings: string[], title: string): string[] {
+  const titleRe = title ? new RegExp(escapeRegExp(title), "gi") : null;
+  return findings
+    .map((f) => (titleRe ? f.replace(titleRe, "") : f).trim())
+    .filter(
+      (f) =>
+        f.split(/\s+/).filter(Boolean).length >= 8 &&
+        /[.%0-9]$/.test(f) &&
+        !/^Title:/i.test(f) &&
+        !FINDING_JUNK.test(f),
+    );
 }

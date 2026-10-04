@@ -59,7 +59,7 @@ export async function POST(req: Request) {
         send("final", result);
       } catch (err) {
         console.warn(
-          `[pact-ai] analyst stream fell back: ${err instanceof Error ? err.name : "unknown"}`,
+          `[pact-ai] analyst stream fell back: ${err instanceof Error ? `${err.name}: ${err.message}` : "unknown"}`,
         );
         send("fallback", fallbackAnalyse(question));
       } finally {
