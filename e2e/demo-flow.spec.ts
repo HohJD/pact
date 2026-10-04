@@ -75,3 +75,17 @@ test("demo flow: curated analyst, compare, outcomes, evidence drawer", async ({
     timeout: 5000,
   });
 });
+
+/** Guided presenter — Play runs the 12 steps to the end card at fast pacing. */
+test("demo presenter: play reaches step 12 with the evidence drawer open", async ({
+  page,
+}) => {
+  await page.goto("/demo?speed=fast");
+  await expect(page.getByText("DEMO").first()).toBeVisible();
+
+  await page.locator("[data-demo-play]").click();
+  await expect(page.getByText("12 / 12")).toBeVisible({ timeout: 60000 });
+  await expect(page.getByText(/Every claim traces to evidence/)).toBeVisible();
+  // step 11 opened the evidence drawer programmatically
+  await expect(page.getByText(/Open source|No verified link/)).toBeVisible();
+});
