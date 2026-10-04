@@ -7,6 +7,7 @@ import { createJob, ingestJobs } from "@/lib/ingest/jobs";
 import { runPipeline } from "@/lib/ingest/pipeline";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const JsonBody = z.object({
   kind: z.enum(["URL", "TEXT"]),

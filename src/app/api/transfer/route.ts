@@ -7,6 +7,7 @@ import { assessTransfer } from "@/lib/ai/transfer";
 import { CountryCode } from "@/lib/domain/schema";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const Body = z.object({
   target_jurisdiction_id: z.string().min(1),

@@ -6,6 +6,7 @@ import { runEvidenceAgent } from "@/lib/ai/evidence-agent";
 import { getProvider } from "@/lib/ai/provider";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const Body = z.object({
   policy_id: z.string().min(1),

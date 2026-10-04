@@ -7,6 +7,7 @@ import { getProvider } from "@/lib/ai/provider";
 import { CountryCode } from "@/lib/domain/schema";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const Body = z.object({
   question: z.string().min(1).max(2000),
