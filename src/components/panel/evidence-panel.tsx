@@ -48,7 +48,9 @@ export function EvidencePanel({
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
       {policyId && strength && (
         <>
-          <SectionTitle>Evidence strength</SectionTitle>
+          <div className="pr-9 lg:pr-3">
+            <SectionTitle>Evidence strength</SectionTitle>
+          </div>
           <EvidenceStrengthDots strength={strength} showSummary={false} />
           <p className="mb-2 font-mono text-[9px] text-muted-foreground">
             {strength.counts.evaluates} evaluates · {strength.counts.monitors} monitors ·{" "}
@@ -59,7 +61,9 @@ export function EvidencePanel({
         </>
       )}
       {policyId && !hideAgent && <EvidenceAgentSection policyId={policyId} />}
-      <SectionTitle>{list.length} records</SectionTitle>
+      <div className="pr-9 lg:pr-3">
+        <SectionTitle>{list.length} records</SectionTitle>
+      </div>
       <ul className="space-y-2">
         {list.map((e) => (
           <li key={e.id}>
@@ -131,7 +135,7 @@ function EvidenceDetail({ evidence: e }: { evidence: Evidence }) {
         <ArrowLeft className="size-3" /> Back
       </button>
 
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1 pr-9 lg:pr-3">
         <Chip className={RELEVANCE_STYLE[e.policy_relevance]}>{e.policy_relevance}</Chip>
         <Chip className="border-entity-evidence/40 text-entity-evidence">
           {e.causal_strength.replace(/_/g, " ")}

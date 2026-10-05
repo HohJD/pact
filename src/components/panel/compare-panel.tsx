@@ -20,7 +20,9 @@ export function ComparePanel() {
 
   return (
     <div className="flex h-full flex-col p-3">
-      <SectionTitle>Compare ({policies.length}/4)</SectionTitle>
+      <div className="pr-9 lg:pr-3">
+        <SectionTitle>Compare ({policies.length}/4)</SectionTitle>
+      </div>
       {policies.length === 0 && (
         <p className="text-[11px] text-muted-foreground">
           Add policies from their detail card or the graph context menu.

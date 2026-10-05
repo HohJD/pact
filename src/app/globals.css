@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@media (max-width: 639px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 :root {
   --background: #f6f7f9;
   --foreground: #111317;

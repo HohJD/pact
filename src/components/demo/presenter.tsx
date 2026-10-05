@@ -220,7 +220,7 @@ export function DemoPresenter({ dataset }: { dataset: Dataset }) {
   const done = step === STEPS.length - 1 && !playing;
 
   return (
-    <div className="pointer-events-none fixed bottom-4 left-1/2 z-40 -translate-x-1/2">
+    <div className="pointer-events-none fixed bottom-[calc(1rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 -translate-x-1/2 max-sm:left-auto max-sm:right-3 max-sm:max-w-[calc(100vw-4.5rem)] max-sm:translate-x-0">
       <div className="glass pointer-events-auto flex items-center gap-2 rounded-full px-3 py-1.5 shadow-xl">
         <button
           type="button"
@@ -252,7 +252,7 @@ export function DemoPresenter({ dataset }: { dataset: Dataset }) {
         </span>
         <span
           data-demo-caption
-          className="max-w-[240px] truncate border-l border-border pl-2 text-[10px] text-foreground"
+          className="max-w-[38vw] truncate border-l border-border pl-2 text-[10px] text-foreground sm:max-w-[240px]"
         >
           {done ? STEPS[STEPS.length - 1].caption : STEPS[step].caption}
         </span>

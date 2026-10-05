@@ -26,7 +26,7 @@ export function SimilarityPanel({ edgeId }: { edgeId: string }) {
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
-      <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+      <div className="pr-9 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground lg:pr-3">
         {pct}% match — why these policies are similar
       </div>
       <div className="mt-2 space-y-1">

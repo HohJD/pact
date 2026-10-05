@@ -21,7 +21,7 @@ export function OutcomesPanel({ policyId }: { policyId?: string }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-entity-evidence/30 bg-entity-evidence/10 px-3 py-1.5 text-[9.5px] text-entity-evidence">
+      <div className="border-b border-entity-evidence/30 bg-entity-evidence/10 px-3 py-1.5 pr-9 text-[9.5px] text-entity-evidence lg:pr-3">
         Correlation ≠ causation. Inference labels reflect what the cited evidence supports.
       </div>
       <div className="flex-1 overflow-y-auto p-3 scrollbar-thin">

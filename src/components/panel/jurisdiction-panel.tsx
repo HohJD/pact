@@ -19,9 +19,11 @@ export function JurisdictionPanel({ jurisdictionId }: { jurisdictionId: string }
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
-      <span className="rounded bg-entity-jurisdiction/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-entity-jurisdiction">
-        {j.level}
-      </span>
+      <div className="pr-9 lg:pr-3">
+        <span className="rounded bg-entity-jurisdiction/15 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-entity-jurisdiction">
+          {j.level}
+        </span>
+      </div>
       <h2 className="mt-2 text-[15px] font-semibold tracking-tight text-foreground">{j.name}</h2>
 
       {(c.dominant_heating || c.owner_occupier_share || c.electricity_gas_price_ratio) && (

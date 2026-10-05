@@ -142,7 +142,7 @@ export function CompareView() {
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* slim header */}
-      <div className="flex h-10 shrink-0 items-center gap-3 border-b border-border px-3">
+      <div className="flex min-h-10 shrink-0 flex-wrap items-center gap-3 border-b border-border px-3 py-1.5">
         <button
           type="button"
           onClick={() => openPanel(null)}
@@ -171,13 +171,16 @@ export function CompareView() {
       <div className="flex-1 overflow-auto scrollbar-thin">
         {/* comparison table — a single CSS grid so every row shares height */}
         <div
-          className="grid min-w-full"
+          className="grid min-w-full [--cmp-label:104px] [--cmp-col:220px] sm:[--cmp-label:180px] sm:[--cmp-col:260px]"
           style={{
-            gridTemplateColumns: `180px repeat(${policies.length}, minmax(260px, 1fr))`,
+            gridTemplateColumns: `var(--cmp-label) repeat(${policies.length}, minmax(var(--cmp-col), 1fr))`,
+            width: `max(100%, calc(var(--cmp-label) + ${policies
+              .map(() => "var(--cmp-col)")
+              .join(" + ")}))`,
           }}
         >
           {/* header row */}
-          <div className="border-b border-r border-border" />
+          <div className="sticky left-0 z-[1] border-b border-r border-border bg-background" />
           {policies.map((p, i) => (
             <motion.div
               key={p.id}
@@ -223,7 +226,7 @@ export function CompareView() {
             const same = texts.every((t) => t === texts[0]);
             return (
               <div key={r.label} className="contents">
-                <div className="border-b border-r border-border/50 px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <div className="sticky left-0 z-[1] border-b border-r border-border/50 bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   {r.label}
                 </div>
                 {policies.map((p) => (

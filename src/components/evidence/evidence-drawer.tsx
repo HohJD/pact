@@ -32,7 +32,7 @@ export function EvidenceDrawer() {
     <Sheet open={!!e} onOpenChange={(o) => !o && closeEvidence()}>
       <SheetContent
         side="right"
-        className="w-[520px] overflow-y-auto border-l-border bg-card p-5 scrollbar-thin sm:max-w-[520px] [&>button]:text-muted-foreground"
+        className="w-full overflow-y-auto border-l-border bg-card p-5 scrollbar-thin sm:max-w-[520px] sm:w-[520px] [&>button]:text-muted-foreground"
       >
         {e && (
           <>

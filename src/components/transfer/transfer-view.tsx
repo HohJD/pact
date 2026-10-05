@@ -112,7 +112,7 @@ export function TransferView() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex h-10 shrink-0 items-center gap-3 border-b border-border px-3">
+      <div className="flex min-h-10 shrink-0 flex-wrap items-center gap-3 border-b border-border px-3 py-1.5">
         <button
           type="button"
           onClick={closeTransfer}
@@ -176,7 +176,7 @@ export function TransferView() {
                 + Add policy
               </button>
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-[320px] p-0">
+            <PopoverContent align="start" className="w-[min(320px,calc(100vw-2rem))] p-0">
               <Command>
                 <CommandInput placeholder="Search policies…" />
                 <CommandList className="max-h-[280px]">

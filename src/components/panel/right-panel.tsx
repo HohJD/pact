@@ -14,7 +14,15 @@ import { PolicyCard } from "./policy-card";
 import { SimilarityPanel } from "./similarity-panel";
 import { WorkspaceSummary } from "./workspace-summary";
 
-export function RightPanel({ open, demo = false }: { open: boolean; demo?: boolean }) {
+export function RightPanel({
+  open,
+  demo = false,
+  onClose,
+}: {
+  open: boolean;
+  demo?: boolean;
+  onClose?: () => void;
+}) {
   const selection = useWorkspace((s) => s.selection);
   const panel = useWorkspace((s) => s.panel);
   const select = useWorkspace((s) => s.select);
@@ -50,29 +58,45 @@ export function RightPanel({ open, demo = false }: { open: boolean; demo?: boole
     show = show && true;
   }
 
+  const close = () => {
+    select(null);
+    openPanel(null);
+    onClose?.();
+  };
+
   return (
     <AnimatePresence initial={false}>
       {show && (
-        <motion.aside
-          key="right-panel"
-          initial={{ x: 360, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: 360, opacity: 0 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-          className="relative flex h-full w-[360px] shrink-0 flex-col border-l border-border bg-card max-lg:fixed max-lg:inset-y-0 max-lg:right-0 max-lg:z-40 max-lg:w-[min(360px,92vw)] max-lg:shadow-2xl"
-        >
-          <button
-            type="button"
-            onClick={() => {
-              select(null);
-              openPanel(null);
-            }}
-            className="absolute right-2 top-2 z-10 rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+        <>
+          <motion.div
+            key="right-panel-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="fixed inset-0 z-[35] bg-black/40 lg:hidden"
+            aria-hidden="true"
+            onClick={close}
+          />
+          <motion.aside
+            key="right-panel"
+            initial={{ x: 360, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 360, opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="relative flex h-full w-[360px] shrink-0 flex-col border-l border-border bg-card max-lg:fixed max-lg:inset-y-0 max-lg:right-0 max-lg:z-40 max-lg:w-[min(360px,92vw)] max-lg:shadow-2xl"
           >
-            <X className="size-3.5" />
-          </button>
-          {content}
-        </motion.aside>
+            <button
+              type="button"
+              aria-label="Close panel"
+              onClick={close}
+              className="absolute right-2 top-2 z-10 rounded bg-card p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              <X className="size-3.5" />
+            </button>
+            {content}
+          </motion.aside>
+        </>
       )}
     </AnimatePresence>
   );

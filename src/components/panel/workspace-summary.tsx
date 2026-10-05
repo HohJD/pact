@@ -42,12 +42,14 @@ export function WorkspaceSummary() {
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
-      <h2 className="text-[13px] font-semibold tracking-tight text-foreground">
-        Workspace summary
-      </h2>
-      <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
-        {policies.length} policies in view
-      </p>
+      <div className="pr-9 lg:pr-3">
+        <h2 className="text-[13px] font-semibold tracking-tight text-foreground">
+          Workspace summary
+        </h2>
+        <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
+          {policies.length} policies in view
+        </p>
+      </div>
 
       <SectionTitle>By country</SectionTitle>
       <Bars rows={byCountry.map(([k, v]) => [k, v])} color={ENTITY_BAR.country} />

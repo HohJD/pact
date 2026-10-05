@@ -89,6 +89,18 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   const params = useSearchParams();
   const initialised = useRef(false);
 
+  useEffect(
+    () =>
+      useWorkspace.subscribe((s, prev) => {
+        if (window.matchMedia("(min-width: 1024px)").matches) return;
+        if (s.panel && (s.panel !== prev.panel || s.selection !== prev.selection)) {
+          setPanelToggled(true);
+          setSidebarToggled(false);
+        }
+      }),
+    [],
+  );
+
   useEffect(() => {
     if (initialised.current) return;
     initialised.current = true;
@@ -144,13 +156,21 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   }, [select, openPanel, demo, scriptOpen, setSidebarOpen, setPanelOpen]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <TopBar
         demo={demo}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onTogglePanel={() => setPanelOpen((v) => !v)}
       />
       <div className="relative flex min-h-0 flex-1">
+        {sidebarOpen && !isDesktop && (
+          <button
+            type="button"
+            aria-label="Close filters"
+            onClick={() => setSidebarOpen(false)}
+            className="absolute inset-0 z-20 bg-black/40 lg:hidden"
+          />
+        )}
         {sidebarOpen && <FilterSidebar />}
         <main className="flex min-w-0 flex-1 flex-col">
           <div className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
@@ -188,7 +208,13 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
             )}
           </div>
         </main>
-        <RightPanel open={panelOpen && !comparing} demo={demo} />
+        <RightPanel
+          open={panelOpen && !comparing}
+          demo={demo}
+          onClose={() => {
+            if (!isDesktop) setPanelOpen(false);
+          }}
+        />
         <EvidenceDrawer />
         <CommandPalette />
       </div>
@@ -200,14 +226,14 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         <button
           type="button"
           onClick={() => setScriptOpen((v) => !v)}
-          className="glass fixed bottom-3 left-3 z-40 flex size-8 items-center justify-center rounded-full font-mono text-[13px] text-muted-foreground hover:text-foreground"
+          className="glass fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-3 z-40 flex size-8 items-center justify-center rounded-full font-mono text-[13px] text-muted-foreground hover:text-foreground"
           aria-label="Demo script"
         >
           ?
         </button>
       )}
       {demo && scriptOpen && (
-        <div className="glass fixed bottom-14 left-3 z-40 w-80 rounded-lg p-4">
+        <div className="glass fixed bottom-[calc(3.5rem_+_env(safe-area-inset-bottom))] left-3 z-40 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg p-4">
           <div className="mb-2 flex items-center justify-between">
             <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
               Demo script

@@ -266,39 +266,41 @@ function Canvas() {
   return (
     <div className="relative h-full w-full">
       {/* header strip */}
-      <div className="absolute left-3 top-3 z-10">
-      <div className="glass flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px] text-muted-foreground">
-        <span>
-          <b className="font-medium text-foreground">{built.policyCount}</b> policies
-          {built.truncated > 0 && (
-            <span className="text-entity-evidence"> · +{built.truncated} more</span>
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-10 flex flex-wrap items-start justify-between gap-2">
+        <div className="pointer-events-auto">
+          <div className="glass flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[11px] text-muted-foreground">
+            <span>
+              <b className="font-medium text-foreground">{built.policyCount}</b> policies
+              {built.truncated > 0 && (
+                <span className="text-entity-evidence"> · +{built.truncated} more</span>
+              )}
+              {" · "}
+              {built.nodes.filter((n) => n.kind === "jurisdiction").length} jurisdictions
+              {" · "}
+              {built.linkedEvidenceCount} evidence
+            </span>
+            <button
+              type="button"
+              onClick={() => (hasHighlight ? fitHighlights() : fitAll())}
+              className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase hover:text-foreground"
+            >
+              {hasHighlight ? "Fit highlights" : "Fit all"}
+            </button>
+          </div>
+          {!!filters.technology_ids?.length && (
+            <p className="mt-1 max-w-[320px] px-1 font-mono text-[8.5px] leading-snug text-muted-foreground">
+              Policies clustered around{" "}
+              {filters.technology_ids
+                .map((id) => dataset.technologies.find((t) => t.id === id)?.name ?? id)
+                .join(", ")}{" "}
+              · ring = jurisdiction · brightness = evidence strength
+            </p>
           )}
-          {" · "}
-          {built.nodes.filter((n) => n.kind === "jurisdiction").length} jurisdictions
-          {" · "}
-          {built.linkedEvidenceCount} evidence
-        </span>
-        <button
-          type="button"
-          onClick={() => (hasHighlight ? fitHighlights() : fitAll())}
-          className="rounded border border-border px-1.5 py-0.5 font-mono text-[9px] uppercase hover:text-foreground"
-        >
-          {hasHighlight ? "Fit highlights" : "Fit all"}
-        </button>
-      </div>
-      {!!filters.technology_ids?.length && (
-        <p className="mt-1 max-w-[320px] px-1 font-mono text-[8.5px] leading-snug text-muted-foreground">
-          Policies clustered around{" "}
-          {filters.technology_ids
-            .map((id) => dataset.technologies.find((t) => t.id === id)?.name ?? id)
-            .join(", ")}{" "}
-          · ring = jurisdiction · brightness = evidence strength
-        </p>
-      )}
+        </div>
       </div>
 
       {/* legend */}
-      <div className="glass absolute right-3 top-3 z-10 flex items-center gap-2.5 rounded-md px-2.5 py-1.5">
+      <div className="glass pointer-events-auto flex flex-wrap items-center gap-2.5 rounded-md px-2.5 py-1.5">
         {ENTITY_LEGEND.map(([label, color]) => (
           <span key={label} className="flex items-center gap-1 text-[9px] text-muted-foreground">
             <span className="size-1.5 rounded-full" style={{ backgroundColor: color }} />
@@ -331,7 +333,7 @@ function Canvas() {
         <Background variant={BackgroundVariant.Dots} gap={28} size={1} color="#ffffff10" />
         <Controls
           showInteractive={false}
-          className="!border-border !bg-card [&_button]:!border-border [&_button]:!bg-card [&_button]:!fill-foreground"
+          className="!border-border !bg-card max-sm:!hidden [&_button]:!border-border [&_button]:!bg-card [&_button]:!fill-foreground"
           position="bottom-left"
         />
         {nodes.length > 25 && (
@@ -340,7 +342,7 @@ function Canvas() {
             pannable
             zoomable
             style={{ width: 140, height: 90 }}
-            className="!border !border-border !bg-card"
+            className="!border !border-border !bg-card max-sm:!hidden"
             nodeColor={(n) => (n.data as PactNodeData).color ?? "#8B919A"}
             maskColor="#0b0c0fcc"
           />
@@ -350,7 +352,7 @@ function Canvas() {
       {/* tooltip */}
       {tooltip && (
         <div
-          className="glass pointer-events-none fixed z-50 max-w-[260px] rounded-md px-2.5 py-1.5"
+          className="glass pointer-events-none fixed z-50 max-w-[260px] rounded-md px-2.5 py-1.5 [@media(hover:none)]:hidden"
           style={{ left: tooltip.x, top: tooltip.y }}
         >
           <div className="flex items-center gap-1.5">

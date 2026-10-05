@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-import { PanelRight, SlidersHorizontal, Sparkles } from "lucide-react";
+import { PanelRight, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { submitAnalystQuestion } from "@/lib/ai/client";
@@ -44,7 +44,7 @@ export function TopBar({
       <button
         type="button"
         onClick={onToggleSidebar}
-        className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground lg:hidden"
+        className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2 lg:hidden"
         aria-label="Filters"
       >
         <SlidersHorizontal className="size-3.5" />
@@ -74,7 +74,7 @@ export function TopBar({
         <button
           type="button"
           onClick={onTogglePanel}
-          className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground lg:hidden"
+          className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2 lg:hidden"
           aria-label="Panel"
         >
           <PanelRight className="size-3.5" />
@@ -82,11 +82,13 @@ export function TopBar({
         <button
           type="button"
           onClick={() => setPaletteOpen(true)}
-          className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground max-lg:p-2"
+          aria-label="Search"
           title="Command palette"
         >
-          <span className="kbd">⌘</span>
-          <span className="kbd">K</span>
+          <span className="kbd max-sm:hidden">⌘</span>
+          <span className="kbd max-sm:hidden">K</span>
+          <Search className="size-3.5 sm:hidden" />
         </button>
         <ThemeToggle />
       </div>

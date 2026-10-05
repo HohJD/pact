@@ -53,7 +53,7 @@ export function AnalystPanel() {
   if (pending && !entry && streamText !== null)
     return (
       <div className="flex h-full flex-col overflow-y-auto scrollbar-thin">
-        <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
+        <div className="flex items-center gap-1.5 border-b border-border px-3 py-2 pr-9 lg:pr-3">
           <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
             Analyst
           </span>
@@ -81,7 +81,7 @@ export function AnalystPanel() {
 
   if (!entry)
     return (
-      <div className="p-3 text-[11px] text-muted-foreground">
+      <div className="p-3 pr-9 text-[11px] text-muted-foreground lg:pr-3">
         Ask a question in the command bar — the analyst answers from the evidence
         in PACT, with citations and workspace actions.
       </div>
@@ -92,7 +92,7 @@ export function AnalystPanel() {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto scrollbar-thin">
-      <div className="flex items-center gap-1.5 border-b border-border px-3 py-2">
+      <div className="flex items-center gap-1.5 border-b border-border px-3 py-2 pr-9 lg:pr-3">
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           Analyst
         </span>

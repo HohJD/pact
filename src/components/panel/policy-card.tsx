@@ -61,7 +61,7 @@ export function PolicyCard({ policyId }: { policyId: string }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto p-3 scrollbar-thin">
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 pr-9 lg:pr-3">
           <Badge variant="outline" className="border-entity-jurisdiction/40 font-mono text-[9px] text-entity-jurisdiction">
             {policy.country_code}
           </Badge>

@@ -30,12 +30,14 @@ export function EntityPanel({ kind, id }: { kind: "mechanism" | "technology"; id
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
-      <span
-        className="rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider"
-        style={{ backgroundColor: `${color}22`, color }}
-      >
-        {kind}
-      </span>
+      <div className="pr-9 lg:pr-3">
+        <span
+          className="rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider"
+          style={{ backgroundColor: `${color}22`, color }}
+        >
+          {kind}
+        </span>
+      </div>
       <h2 className="mt-2 text-[15px] font-semibold tracking-tight text-foreground">
         {entity.name}
       </h2>
