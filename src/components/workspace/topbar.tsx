@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import Link from "next/link";
+
 import { PanelRight, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -38,9 +40,13 @@ export function TopBar({
 
   return (
     <header className="relative flex h-10 shrink-0 items-center gap-4 border-b border-border bg-card px-3">
-      <span className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground max-sm:hidden">
+      <Link
+        href="/"
+        aria-label="PACT home"
+        className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground transition-colors hover:text-muted-foreground max-sm:hidden"
+      >
         PACT
-      </span>
+      </Link>
       <button
         type="button"
         onClick={onToggleSidebar}
