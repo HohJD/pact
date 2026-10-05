@@ -18,6 +18,7 @@ import "@xyflow/react/dist/style.css";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { buildGraph, type GraphNode } from "@/lib/graph/build";
 import { layoutGraph } from "@/lib/graph/layout";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
 import { edgeTypes } from "./edges";
@@ -77,6 +78,8 @@ function Canvas() {
   const toggleCompare = useWorkspace((s) => s.toggleCompare);
   const focusCountry = useWorkspace((s) => s.focusCountry);
   const focusedCountry = useWorkspace((s) => s.focusedCountry);
+  const phone = useMediaQuery("(max-width: 639px)");
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const { setCenter, fitView } = useReactFlow();
 
   const built = useMemo(
@@ -98,7 +101,9 @@ function Canvas() {
     () => new Map(positioned.map((n) => [n.id, { x: n.x, y: n.y }])),
     [positioned],
   );
-  const positions = useAnimatedPositions(targets);
+  const positions = useAnimatedPositions(targets, {
+    animate: !phone && !reducedMotion,
+  });
 
   const [menu, setMenu] = useState<ContextMenuState | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
@@ -328,20 +333,23 @@ function Canvas() {
         minZoom={0.2}
         maxZoom={2.5}
         colorMode="dark"
+        onlyRenderVisibleElements={phone}
       >
         <Background variant={BackgroundVariant.Dots} gap={28} size={1} color="#ffffff10" />
-        <Controls
-          showInteractive={false}
-          className="!border-border !bg-card max-sm:!hidden [&_button]:!border-border [&_button]:!bg-card [&_button]:!fill-foreground"
-          position="bottom-left"
-        />
-        {nodes.length > 25 && (
+        {!phone && (
+          <Controls
+            showInteractive={false}
+            className="!border-border !bg-card [&_button]:!border-border [&_button]:!bg-card [&_button]:!fill-foreground"
+            position="bottom-left"
+          />
+        )}
+        {!phone && nodes.length > 25 && (
           <MiniMap
             position="bottom-right"
             pannable
             zoomable
             style={{ width: 140, height: 90 }}
-            className="!border !border-border !bg-card max-sm:!hidden"
+            className="!border !border-border !bg-card"
             nodeColor={(n) => (n.data as PactNodeData).color ?? "#8B919A"}
             maskColor="#0b0c0fcc"
           />

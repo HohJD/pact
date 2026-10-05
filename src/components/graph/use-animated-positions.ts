@@ -11,14 +11,22 @@ const DURATION = 450;
 
 /**
  * Tweens node positions toward new targets over ~450ms with ease-out cubic.
- * Returns a live Map of positions (recreated each animation frame).
+ * Returns animated positions, or the target map when animation is disabled.
  */
-export function useAnimatedPositions(targets: Map<string, XY>) {
+export function useAnimatedPositions(
+  targets: Map<string, XY>,
+  { animate = true }: { animate?: boolean } = {},
+) {
   const [positions, setPositions] = useState<Map<string, XY>>(() => new Map(targets));
   // Mirror of the latest emitted positions, readable inside effects.
   const currentRef = useRef<Map<string, XY>>(new Map(targets));
 
   useEffect(() => {
+    if (!animate) {
+      currentRef.current = targets;
+      return;
+    }
+
     const from = currentRef.current;
     const start = performance.now();
     let raf = 0;
@@ -41,7 +49,7 @@ export function useAnimatedPositions(targets: Map<string, XY>) {
 
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [targets]);
+  }, [targets, animate]);
 
-  return positions;
+  return animate ? positions : targets;
 }

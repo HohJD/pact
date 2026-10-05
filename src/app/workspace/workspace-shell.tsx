@@ -33,6 +33,7 @@ if (
 const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
 const DEMO_QUESTION =
   "Which policies have successfully accelerated heat-pump adoption?";
+const MOBILE_HINT_STORAGE_KEY = "pact.mobileHintDismissed";
 
 const DEMO_STEPS = [
   "Open /demo — the heat-pump scenario loads by itself (curated, no network).",
@@ -86,8 +87,22 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
     [isDesktop],
   );
   const [scriptOpen, setScriptOpen] = useState(false);
+  const [showMobileHint, setShowMobileHint] = useState(false);
   const params = useSearchParams();
   const initialised = useRef(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        setShowMobileHint(
+          window.localStorage.getItem(MOBILE_HINT_STORAGE_KEY) !== "true",
+        );
+      } catch {
+        setShowMobileHint(true);
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(
     () =>
@@ -114,6 +129,15 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
     if (q) void submitAnalystQuestion(q, dataset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const dismissMobileHint = () => {
+    setShowMobileHint(false);
+    try {
+      window.localStorage.setItem(MOBILE_HINT_STORAGE_KEY, "true");
+    } catch {
+      setShowMobileHint(false);
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -162,6 +186,21 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onTogglePanel={() => setPanelOpen((v) => !v)}
       />
+      {!demo && showMobileHint && (
+        <div className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border bg-background/90 px-3 py-1.5 text-[11px] text-muted-foreground lg:hidden">
+          <p className="min-w-0 flex-1 leading-snug">
+            Best on a larger screen — on phones some views are simplified.
+          </p>
+          <button
+            type="button"
+            aria-label="Dismiss"
+            onClick={dismissMobileHint}
+            className="flex size-6 shrink-0 items-center justify-center rounded hover:bg-accent hover:text-foreground"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="relative flex min-h-0 flex-1">
         {sidebarOpen && !isDesktop && (
           <button

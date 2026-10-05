@@ -236,8 +236,11 @@
   animation: pact-marker-in 240ms ease-out both;
 }
 
+@media (max-width: 639px), (prefers-reduced-motion: reduce) {
+  .react-flow__node { animation: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .react-flow__node,
   .pact-edge-flow,
   .pact-marker { animation: none; }
 }

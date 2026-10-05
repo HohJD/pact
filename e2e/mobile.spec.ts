@@ -114,6 +114,29 @@ test("mobile topbar input keeps the iOS-safe font size", async ({ page }) => {
     .toBe("16px");
 });
 
+test("mobile graph omits the minimap and the hint dismissal persists", async ({
+  page,
+}) => {
+  await page.goto("/workspace");
+
+  const hint = page.getByText(
+    "Best on a larger screen — on phones some views are simplified.",
+  );
+  await expect(page.locator(".react-flow__minimap")).toHaveCount(0);
+  await expect(hint).toBeVisible();
+  await page.getByRole("button", { name: "Dismiss" }).tap();
+  await expect(hint).toHaveCount(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("pact.mobileHintDismissed")),
+    )
+    .toBe("true");
+
+  await page.reload();
+  await expect(page.locator(".react-flow__node-policy").first()).toBeVisible();
+  await expect(hint).toHaveCount(0);
+});
+
 test("mobile compare row labels stay visible when scrolled sideways", async ({ page }) => {
   await page.goto("/workspace");
   await expect(page.locator(".react-flow__node-policy").first()).toBeVisible();
