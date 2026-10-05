@@ -30,6 +30,10 @@ const ISO_TO_CODE: Record<string, CountryCode> = {
   "578": "NO",
   "840": "US",
   "702": "SG",
+  "392": "JP",
+  "410": "KR",
+  "156": "CN",
+  "356": "IN",
 };
 
 const world = feature(

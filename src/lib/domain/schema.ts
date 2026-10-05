@@ -17,7 +17,21 @@ export const DataStatus = z.enum([
 ]);
 export type DataStatus = z.infer<typeof DataStatus>;
 
-export const CountryCode = z.enum(["GB", "DE", "FR", "NL", "DK", "NO", "US", "SG", "EU"]);
+export const CountryCode = z.enum([
+  "GB",
+  "DE",
+  "FR",
+  "NL",
+  "DK",
+  "NO",
+  "US",
+  "SG",
+  "JP",
+  "KR",
+  "CN",
+  "IN",
+  "EU",
+]);
 export type CountryCode = z.infer<typeof CountryCode>;
 
 export const JurisdictionLevel = z.enum(["NATIONAL", "STATE", "CITY", "SUPRANATIONAL"]);

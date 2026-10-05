@@ -44,6 +44,15 @@ const COUNTRY_KEYWORDS: Array<[RegExp, CountryCode]> = [
   [/\bnorway|norwegian/i, "NO"],
   [/\bus\b|u\.?s\.?\b|united states|america|states?\b/i, "US"],
   [/\bsingapore/i, "SG"],
+  [/\bjapan(ese)?\b|\btokyo\b/i, "JP"],
+  [/\b(south )?korea(n)?\b/i, "KR"],
+  [/\bchina\b|\bchinese\b/i, "CN"],
+  [/\bindia(n)?\b/i, "IN"],
+  [/\basia(n)?\b/i, "JP"],
+  [/\basia(n)?\b/i, "KR"],
+  [/\basia(n)?\b/i, "CN"],
+  [/\basia(n)?\b/i, "IN"],
+  [/\basia(n)?\b/i, "SG"],
   [/\beu\b|europe(an)?\b|european union|europe-wide/i, "EU"],
 ];
 

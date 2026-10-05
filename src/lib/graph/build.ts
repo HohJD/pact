@@ -31,7 +31,7 @@ export interface BuiltGraph {
   linkedEvidenceCount: number;
 }
 
-const POLICY_NODE_CAP = 70;
+const POLICY_NODE_CAP = 100;
 
 const KIND_COLOR: Record<GraphNodeKind, string> = {
   policy: "#4C8DFF",

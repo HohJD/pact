@@ -44,4 +44,21 @@ describe("resolveQuery", () => {
     expect(r.filters.mechanism_ids).toContain("mech_ban");
     expect(r.filters.countries).toContain("NO");
   });
+
+  it("resolves Japan queries to JP", () => {
+    const r = resolveQuery("What has Japan done?", seedDataset);
+    expect(r.filters.countries).toContain("JP");
+  });
+
+  it("resolves Asian building queries to every Asian country in the catalogue", () => {
+    const r = resolveQuery("asian building codes", seedDataset);
+    expect(r.filters.countries).toEqual(
+      expect.arrayContaining(["JP", "KR", "CN", "IN", "SG"]),
+    );
+  });
+
+  it("does not resolve Indiana to India", () => {
+    const r = resolveQuery("Show me building codes in Indiana", seedDataset);
+    expect(r.filters.countries ?? []).not.toContain("IN");
+  });
 });

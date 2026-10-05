@@ -20,7 +20,7 @@ const PURPLE = "#9B7BFF";
 const LAND = "#22252A";
 const STROKE = "#2a2e36";
 
-// initial view frames N. America + Europe (Singapore via the SG chip)
+// Initial view frames North America, Europe, and Asia.
 const VIEW_BBOX: GeoJSON.Feature = {
   type: "Feature",
   properties: {},
@@ -28,11 +28,11 @@ const VIEW_BBOX: GeoJSON.Feature = {
     type: "Polygon",
     coordinates: [
       [
-        [-130, 20],
-        [35, 20],
-        [35, 72],
+        [-130, -5],
+        [150, -5],
+        [150, 72],
         [-130, 72],
-        [-130, 20],
+        [-130, -5],
       ],
     ],
   },
@@ -48,6 +48,10 @@ const ISO_TO_CODE: Record<string, CountryCode> = {
   "578": "NO",
   "840": "US",
   "702": "SG",
+  "392": "JP",
+  "410": "KR",
+  "156": "CN",
+  "356": "IN",
 };
 
 type CountryFeature = GeoJSON.Feature<GeoJSON.MultiPolygon | GeoJSON.Polygon> & {

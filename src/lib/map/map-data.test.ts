@@ -13,6 +13,13 @@ describe("computeMapData", () => {
     expect(de!.policies).toHaveLength(expected.length);
   });
 
+  it("includes Japan in unfiltered country data", () => {
+    const d = computeMapData(seedDataset, {});
+    const jp = d.countries.get("JP");
+    expect(jp).toBeDefined();
+    expect(jp!.count).toBeGreaterThanOrEqual(4);
+  });
+
   it("rolls sub-national US jurisdictions up under US in country data", () => {
     const d = computeMapData(seedDataset, {});
     const us = d.countries.get("US")!;

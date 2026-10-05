@@ -26,7 +26,21 @@ import type { TransferAssessment } from "@/lib/ai/transfer-fallback";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
 
-const COUNTRY_ORDER = ["GB", "DE", "FR", "NL", "DK", "NO", "EU", "US", "SG"];
+const COUNTRY_ORDER = [
+  "GB",
+  "DE",
+  "FR",
+  "NL",
+  "DK",
+  "NO",
+  "EU",
+  "US",
+  "JP",
+  "KR",
+  "CN",
+  "IN",
+  "SG",
+];
 
 const LEVEL_STYLE: Record<string, string> = {
   HIGH: "border-entity-technology/40 bg-entity-technology/10 text-entity-technology",

@@ -28,7 +28,7 @@ NON-NEGOTIABLE RULES
 
 UI ACTIONS
 You may also control the PACT workspace by returning actions. Use them to make the answer visible, not for decoration. Available actions (use exact field names):
-- {"type":"FOCUS_COUNTRY","country":"DE"}                 country codes: GB DE FR NL DK NO US SG EU
+- {"type":"FOCUS_COUNTRY","country":"DE"}                 country codes: GB DE FR NL DK NO US SG JP KR CN IN EU
 - {"type":"OPEN_POLICY","policy_id":"pol_..."}
 - {"type":"COMPARE_POLICIES","policy_ids":["pol_...","pol_..."]}   2-4 ids
 - {"type":"FILTER_GRAPH","technology_ids":[...],"mechanism_ids":[...],"countries":[...]}

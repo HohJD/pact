@@ -63,6 +63,48 @@ const curated: Array<{ a: string; b: string; overall: number; differences: strin
   { a: "pol_dk_skrotningsordning", b: "pol_no_enova_scrappage", overall: 0.85, differences: ["Both subsidise oil/gas boiler scrappage in favour of heat pumps; Denmark channels it through subscription service companies."] },
   { a: "pol_us_heehra", b: "pol_de_beg_em_2024", overall: 0.74, differences: ["Both target lower-income households with heat-pump support; HEEHRA is income-gated rebates, BEG a universal grant with income bonus."] },
   { a: "pol_us_masssave", b: "pol_gb_eco4", overall: 0.7, differences: ["Both are utility/supplier-funded efficiency programmes; Mass Save covers all households, ECO4 targets low-income."] },
+  {
+    a: "pol_sg_meps_ac",
+    b: "pol_jp_top_runner",
+    overall: 0.72,
+    differences: [
+      "Both cover air-conditioner efficiency.",
+      "Japan sets targets at the best product on the market; Singapore sets a minimum floor plus mandatory labels.",
+    ],
+  },
+  {
+    a: "pol_cn_energy_label",
+    b: "pol_in_star_labelling",
+    overall: 0.80,
+    differences: ["Both use mandatory graded appliance labels."],
+  },
+  {
+    a: "pol_jp_tokyo_cap_trade",
+    b: "pol_us_nyc_ll97",
+    overall: 0.74,
+    differences: [
+      "Both cap emissions of large existing buildings.",
+      "Tokyo allows trading; LL97 uses per-building limits with penalties.",
+    ],
+  },
+  {
+    a: "pol_kr_zeb",
+    b: "pol_eu_epbd_2024",
+    overall: 0.62,
+    differences: [
+      "Both push new buildings toward zero energy or emissions.",
+      "Korea phases a certification mandate by building type; the EU sets a directive for member states.",
+    ],
+  },
+  {
+    a: "pol_in_ecbc",
+    b: "pol_sg_green_mark",
+    overall: 0.60,
+    differences: [
+      "Both set mandatory minimum performance for commercial buildings in cooling-dominated climates.",
+      "Green Mark adds a voluntary higher rating tier.",
+    ],
+  },
 ];
 
 export const similarities: Similarity[] = curated.map(({ a, b, overall, differences }) => {
