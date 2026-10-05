@@ -42,7 +42,7 @@ export function WorkspaceSummary() {
 
   return (
     <div className="h-full overflow-y-auto p-3 scrollbar-thin">
-      <div className="pr-9 lg:pr-3">
+      <div className="pr-9">
         <h2 className="text-[13px] font-semibold tracking-tight text-foreground">
           Workspace summary
         </h2>

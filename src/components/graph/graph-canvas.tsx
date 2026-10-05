@@ -297,16 +297,15 @@ function Canvas() {
             </p>
           )}
         </div>
-      </div>
-
-      {/* legend */}
-      <div className="glass pointer-events-auto flex flex-wrap items-center gap-2.5 rounded-md px-2.5 py-1.5">
-        {ENTITY_LEGEND.map(([label, color]) => (
-          <span key={label} className="flex items-center gap-1 text-[9px] text-muted-foreground">
-            <span className="size-1.5 rounded-full" style={{ backgroundColor: color }} />
-            {label}
-          </span>
-        ))}
+        {/* legend */}
+        <div className="glass pointer-events-auto flex flex-wrap items-center gap-2.5 rounded-md px-2.5 py-1.5">
+          {ENTITY_LEGEND.map(([label, color]) => (
+            <span key={label} className="flex items-center gap-1 text-[9px] text-muted-foreground">
+              <span className="size-1.5 rounded-full" style={{ backgroundColor: color }} />
+              {label}
+            </span>
+          ))}
+        </div>
       </div>
 
       <ReactFlow

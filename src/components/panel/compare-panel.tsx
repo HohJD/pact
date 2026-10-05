@@ -20,7 +20,7 @@ export function ComparePanel() {
 
   return (
     <div className="flex h-full flex-col p-3">
-      <div className="pr-9 lg:pr-3">
+      <div className="pr-9">
         <SectionTitle>Compare ({policies.length}/4)</SectionTitle>
       </div>
       {policies.length === 0 && (
