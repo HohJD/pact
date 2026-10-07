@@ -37,7 +37,7 @@ describe("retrieveContext", () => {
     const ids = ctx.policies.slice(0, 8).map((p) => p.id);
     for (const want of [
       "pol_gb_bus",
-      "pol_de_beg_em_2024",
+      "pol_de_beg",
       "pol_fr_maprimerenov",
       "pol_no_oil_ban",
     ])
@@ -47,8 +47,8 @@ describe("retrieveContext", () => {
   it("'loans' retrieves loan instruments", async () => {
     const ctx = await retrieveContext("Which policies offer low-interest loans?", seedDataset);
     const ids = ctx.policies.map((p) => p.id);
-    expect(ids).toContain("pol_fr_eco_ptz");
-    expect(ids).toContain("pol_nl_warmtefonds");
+    expect(ids).toContain("pol_gb_warm_homes_plan");
+    expect(ids).toContain("pol_de_beg_em_2024");
   });
 
   it("context document cites only evidence ids that exist", async () => {

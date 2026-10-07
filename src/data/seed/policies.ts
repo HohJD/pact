@@ -23,21 +23,34 @@ export const policies: Policy[] = [
     target_groups: ["owner-occupiers", "small landlords"],
     eligibility: "Owner-occupiers and small landlords in England & Wales; installations delivered by MCS-certified installers.",
     incentive: "Grant of £5,000 per air-source heat pump at launch, raised to £7,500 from October 2023 (ground-source also £7,500).",
-    funding: "Government funded; budget ~£450m over 2022–25, later extended.",
+    funding: "Government funded; ~£450m for 2022–25, then extended to FY2029/30 with £2.7bn under the Warm Homes Plan (Jan 2026).",
     objectives: [
       "Grow the UK heat-pump market towards the 600,000-per-year ambition",
       "Reduce the upfront cost barrier for households switching from fossil boilers",
       "Support decarbonisation of home heating",
     ],
     description:
-      "Capital grant scheme for heat pumps in England & Wales, paid via the MCS-certified installer. The grant was raised from £5,000 to £7,500 in October 2023, after which monthly applications roughly doubled.",
+      "Capital grant scheme for heat pumps in England & Wales, paid via the MCS-certified installer. The grant was raised from £5,000 to £7,500 in October 2023, after which monthly applications roughly doubled. Extended to 2030 by the Boiler Upgrade Scheme (England and Wales) (Amendment) Regulations 2026; 75,174 grants had been paid by the end of December 2025.",
     implementation_notes: "Voucher-based scheme administered through installers.",
-    limitations: ["Uptake ran well below forecast in the scheme's first years."],
+    limitations: [
+      "Uptake ran well below forecast in the scheme's first years.",
+      "Grant count to end-2025 (75,174) remains far below the pace implied by national heat-pump ambitions.",
+    ],
     sources: [
       {
         label: "Apply for the Boiler Upgrade Scheme",
         url: "https://www.gov.uk/apply-boiler-upgrade-scheme",
         publisher: "GOV.UK",
+      },
+      {
+        label: "Boiler Upgrade Scheme (England and Wales) (Amendment) Regulations 2026",
+        url: "https://www.legislation.gov.uk/uksi/2026/390/made",
+        publisher: "legislation.gov.uk",
+      },
+      {
+        label: "Warm Homes Plan (HTML)",
+        url: "https://www.gov.uk/government/publications/warm-homes-plan/warm-homes-plan-html",
+        publisher: "DESNZ",
       },
     ],
     data_status: "CURATED",
@@ -51,7 +64,7 @@ export const policies: Policy[] = [
     country_code: "GB",
     status: "ACTIVE",
     introduced: "2022-04",
-    ended: "2026-03",
+    ended: "2026-12",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_insulation", "tech_heat_pump", "tech_whole_house_retrofit"],
     mechanism_ids: ["mech_obligation"],
@@ -65,13 +78,18 @@ export const policies: Policy[] = [
       "Cut fuel poverty and household emissions",
     ],
     description:
-      "Fourth phase of the UK's energy supplier obligation (successor to ECO1–3, 2013–2022). Suppliers must fund efficiency and heating upgrades for eligible low-income and fuel-poor households under a whole-house, fabric-first approach.",
+      "Fourth phase of the UK's energy supplier obligation (successor to ECO1–3, 2013–2022). Suppliers must fund efficiency and heating upgrades for eligible low-income and fuel-poor households under a whole-house, fabric-first approach. Extended by nine months to 31 December 2026 (government response, January 2026) to let suppliers complete targets and remediate non-compliant installations. There will be no successor supplier obligation: the Warm Homes Plan replaces the ECO model with £1.5bn of additional public grant funding for low-income households.",
     limitations: [],
     sources: [
       {
         label: "Energy Company Obligation (ECO)",
         url: "https://www.ofgem.gov.uk/environmental-and-social-schemes/energy-company-obligation-eco",
         publisher: "Ofgem",
+      },
+      {
+        label: "Extending the ECO4 end date: government response",
+        url: "https://www.gov.uk/government/consultations/extending-the-eco4-end-date/outcome/extending-the-eco4-end-date-government-response-html",
+        publisher: "DESNZ",
       },
     ],
     data_status: "CURATED",
@@ -83,9 +101,9 @@ export const policies: Policy[] = [
     short_name: "GBIS",
     jurisdiction_id: "jur_gb",
     country_code: "GB",
-    status: "ACTIVE",
+    status: "CLOSED",
     introduced: "2023",
-    ended: null,
+    ended: "2026-03",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_insulation"],
     mechanism_ids: ["mech_obligation"],
@@ -95,9 +113,15 @@ export const policies: Policy[] = [
     funding: "Obligated energy suppliers; ~£1bn to 2026.",
     objectives: ["Deliver low-cost single-measure insulation at scale", "Cut bills in less efficient homes"],
     description:
-      "Supplier obligation scheme funding single insulation measures for homes in lower council-tax bands and with EPC ratings D–G, running alongside ECO4.",
+      "Supplier obligation scheme funding single insulation measures for homes in lower council-tax bands and with EPC ratings D–G, running alongside ECO4. Closed to new installations on 31 March 2026 as planned; no successor obligation.",
     limitations: ["Single-measure design limits depth of retrofit per home."],
-    sources: [{ label: "Great British Insulation Scheme", url: null, publisher: "Ofgem / DESNZ" }],
+    sources: [
+      {
+        label: "Great British Insulation Scheme",
+        url: "https://www.ofgem.gov.uk/environmental-and-social-schemes/great-british-insulation-scheme",
+        publisher: "Ofgem",
+      },
+    ],
     data_status: "CURATED",
     tags: ["insulation", "obligation", "residential"],
   },
@@ -124,7 +148,7 @@ export const policies: Policy[] = [
       "Rushed design (12 weeks) and delivery problems led to early closure.",
       "Achieved roughly 8% of its ambition in homes improved.",
     ],
-    sources: [{ label: "Green Homes Grant Voucher Scheme", url: null, publisher: "DESNZ / BEIS" }],
+    sources: [{ label: "Green Homes Grant Voucher Scheme", url: "https://assets.publishing.service.gov.uk/media/65427a221f1a600010360c16/ghgv-phase-3-final-outcome-evaluation-report.pdf", publisher: "DESNZ / BEIS" }],
     data_status: "CURATED",
     tags: ["grant", "voucher", "insulation", "heat pump", "closed"],
   },
@@ -148,7 +172,7 @@ export const policies: Policy[] = [
     description:
       "Competitive grant waves to social landlords to retrofit social housing towards EPC band C, continued under the Warm Homes: Social Housing Fund.",
     limitations: [],
-    sources: [{ label: "Social Housing Decarbonisation Fund", url: null, publisher: "DESNZ / MHCLG" }],
+    sources: [{ label: "Social Housing Decarbonisation Fund", url: "https://www.gov.uk/government/statistics/social-housing-decarbonisation-fund-statistics-june-2026/summary-of-the-social-housing-decarbonisation-fund-statistics-june-2026", publisher: "DESNZ / MHCLG" }],
     data_status: "CURATED",
     tags: ["social housing", "retrofit", "direct investment"],
   },
@@ -160,7 +184,7 @@ export const policies: Policy[] = [
     country_code: "GB",
     status: "CLOSED",
     introduced: "2021",
-    ended: "2025",
+    ended: "2025-03",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_insulation", "tech_heat_pump"],
     mechanism_ids: ["mech_grant"],
@@ -170,9 +194,15 @@ export const policies: Policy[] = [
     funding: "Government funded via local authorities.",
     objectives: ["Upgrade low-income off-gas-grid homes", "Reduce fuel poverty in rural areas"],
     description:
-      "Local-authority-delivered grant programme for energy upgrades in low-income homes off the gas grid.",
+      "Local-authority-delivered grant programme for energy upgrades in low-income homes off the gas grid. Ended March 2025 and succeeded by the Warm Homes: Local Grant (April 2025–March 2028, £500m, delivered by 271 local authorities and open to on-gas as well as off-gas homes).",
     limitations: [],
-    sources: [{ label: "Home Upgrade Grant", url: null, publisher: "DESNZ" }],
+    sources: [
+      {
+        label: "Warm Homes: Local Grant – guidance for local authorities",
+        url: "https://www.gov.uk/government/publications/warm-homes-local-grant",
+        publisher: "DESNZ",
+      },
+    ],
     data_status: "CURATED",
     tags: ["grant", "low-income", "off-gas-grid"],
   },
@@ -191,13 +221,24 @@ export const policies: Policy[] = [
     target_groups: ["boiler manufacturers"],
     eligibility: "Boiler manufacturers selling into the UK market.",
     incentive:
-      "Manufacturers must achieve heat-pump sales equal to a percentage of boiler sales (6% in year 1) or pay £500 per missed unit (originally proposed at £3,000, reduced).",
+      "Manufacturers must achieve heat-pump sales equal to a percentage of boiler sales (6% in year 1) or pay £500 per missed unit (originally proposed at £3,000, reduced). Year 2 target (from 1 April 2026) raised to 8% of relevant boiler sales; MCS named the sole certification scheme.",
     funding: "Market mechanism; costs borne by manufacturers.",
     objectives: ["Create a market obligation that grows UK heat-pump sales", "Shift the heating market towards low-carbon appliances"],
     description:
-      "Market obligation on boiler manufacturers to sell a rising share of heat pumps relative to boiler sales, with a per-unit penalty for shortfalls. Launch was delayed from 2024 to April 2025.",
+      "Market obligation on boiler manufacturers to sell a rising share of heat pumps relative to boiler sales, with a per-unit penalty for shortfalls. Launch was delayed from 2024 to April 2025. The Clean Heat Market Mechanism (Amendment) Regulations 2025 set the Year 2 (2026/27) target at 8% and named MCS as sole certification scheme; targets beyond Year 2 are subject to further consultation.",
     limitations: ["Start delayed by a year; penalty level reduced after industry pushback."],
-    sources: [{ label: "Clean Heat Market Mechanism", url: null, publisher: "DESNZ" }],
+    sources: [
+      {
+        label: "CHMM: revisions ahead of Scheme Year 2 — government response",
+        url: "https://www.gov.uk/government/consultations/clean-heat-market-mechanism-revisions-ahead-of-scheme-year-2-20262027/outcome/clean-heat-market-mechanism-revisions-ahead-of-scheme-year-2-2026-to-2027-government-response-accessible-webpage",
+        publisher: "DESNZ",
+      },
+      {
+        label: "Clean Heat Market Mechanism Regulations 2025, Part 4",
+        url: "https://www.legislation.gov.uk/uksi/2025/81/part/4",
+        publisher: "legislation.gov.uk",
+      },
+    ],
     data_status: "CURATED",
     tags: ["obligation", "heat pump", "market mechanism", "manufacturers"],
   },
@@ -215,37 +256,53 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_standard"],
     target_groups: ["private landlords"],
     eligibility: "Private rented sector properties.",
-    incentive: "Minimum EPC E required to let (2018 for new tenancies, 2020 for all); proposals to raise to C by 2030.",
+    incentive:
+      "Minimum EPC E to let (2018 new tenancies, 2020 all). Government response of 21 January 2026 confirms an EPC C-equivalent standard for all private tenancies by 1 October 2030, assessed on new dual-metric EPCs (fabric first, then heating-system or smart-readiness), with a £10,000 per-property cost cap.",
     funding: "Compliance costs borne by landlords.",
     objectives: ["Remove the worst-rated homes from the rental market", "Drive fabric improvements in private rented stock"],
     description:
-      "Regulatory floor on the energy performance of let properties: a minimum EPC rating of E has applied since 2018–2020, with proposals to tighten to C by 2030.",
-    limitations: [],
-    sources: [{ label: "Domestic private rented property: minimum energy efficiency standard", url: null, publisher: "DESNZ / MHCLG" }],
+      "Regulatory floor on the energy performance of let properties: a minimum EPC rating of E has applied since 2018–2020, with proposals to tighten to C by 2030. On 21 January 2026 the government confirmed it will raise the standard to EPC C-equivalent for all tenancies by 1 October 2030, with a £10,000 cost cap and 10-year exemptions; homes already at EPC C (EER) before 1 October 2029 are recognised as compliant until the certificate expires.",
+    limitations: ["Legislative changes subject to parliamentary approval."],
+    sources: [
+      {
+        label: "Improving the energy performance of privately rented homes: government response",
+        url: "https://www.gov.uk/government/consultations/improving-the-energy-performance-of-privately-rented-homes-2025-update/outcome/improving-the-energy-performance-of-privately-rented-homes-government-response-html",
+        publisher: "DESNZ",
+      },
+    ],
     data_status: "CURATED",
     tags: ["standard", "rental", "epc", "landlords"],
   },
   {
     id: "pol_gb_fhs",
-    name: "Future Homes Standard",
+    name: "Future Homes and Buildings Standards",
     short_name: "FHS",
     jurisdiction_id: "jur_gb",
     country_code: "GB",
     status: "ANNOUNCED",
-    introduced: "2025",
+    introduced: "2026-03",
     ended: null,
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_heat_pump", "tech_green_building"],
     mechanism_ids: ["mech_standard"],
     target_groups: ["new build", "housebuilders"],
     eligibility: "New homes built to the updated building regulations.",
-    incentive: 'New homes to be "zero-carbon ready"; in practice no new gas boilers.',
+    incentive:
+      "New homes to emit on average ≥75% less carbon than 2013 standards: low-carbon heating as standard (in practice no gas boilers) and solar on the majority of new homes.",
     funding: "Compliance costs borne by developers.",
     objectives: ["Ensure new homes are zero-carbon ready", "Avoid locking gas heating into new stock"],
     description:
-      "Forthcoming building standard requiring new homes to be zero-carbon ready, in practice ruling out new gas boilers. Consulted on through 2023–24.",
-    limitations: ["Announced but not yet in force at seed time."],
-    sources: [{ label: "Future Homes Standard consultation", url: null, publisher: "MHCLG" }],
+      "Government response to the Future Homes and Buildings Standards consultation published 24 March 2026, with the Building Regulations etc. (Amendment) (England) Regulations 2026 (SI 2026/335) laid the same day. The standards come into force on 24 March 2027 for ordinary building work and 24 September 2027 for higher-risk buildings, with a 12-month transitional period: work with a valid application before 24 March 2027 that commences before 24 March 2028 may be built to the 2021 Part L standards.",
+    limitations: [
+      "Legislated but not in force until March 2027; transitional rules mean most homes completing in 2027–28 will still be built to 2021 standards.",
+    ],
+    sources: [
+      {
+        label: "Future Homes and Buildings Standards: Building Circular 01/2026",
+        url: "https://www.gov.uk/government/publications/the-future-homes-and-buildings-standards-building-circular-012026/the-future-homes-and-buildings-standards-building-circular-012026-letter",
+        publisher: "MHCLG",
+      },
+    ],
     data_status: "CURATED",
     tags: ["standard", "new build", "heat pump"],
   },
@@ -255,9 +312,9 @@ export const policies: Policy[] = [
     short_name: "HP target",
     jurisdiction_id: "jur_gb",
     country_code: "GB",
-    status: "ACTIVE",
+    status: "SUPERSEDED",
     introduced: "2020-11",
-    ended: null,
+    ended: "2026-01",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_heat_pump"],
     mechanism_ids: ["mech_target"],
@@ -267,9 +324,23 @@ export const policies: Policy[] = [
     funding: "n/a — political target.",
     objectives: ["Reach 600,000 heat-pump installations per year by 2028"],
     description:
-      "National target of 600,000 heat-pump installations per year by 2028, announced in the Ten Point Plan (November 2020) and carried in the Heat & Buildings Strategy (2021).",
-    limitations: ["Installations remain far below the required trajectory."],
-    sources: [{ label: "Ten Point Plan / Heat & Buildings Strategy", url: null, publisher: "UK Government" }],
+      "National target of 600,000 heat-pump installations per year by 2028, announced in the Ten Point Plan (November 2020) and carried in the Heat & Buildings Strategy (2021). Superseded on 21 January 2026 by the Warm Homes Plan, which replaced it with an aim of over 450,000 heat-pump installations per year by 2030 (a lower number over a longer horizon). In a written answer of 4 June 2026 the government described the 600,000 figure as 'set by the previous government'.",
+    limitations: [
+      "Installations ran far below the required trajectory.",
+      "Target dropped in January 2026 in favour of >450,000/yr by 2030.",
+    ],
+    sources: [
+      {
+        label: "Ten Point Plan / Heat & Buildings Strategy",
+        url: "https://www.gov.uk/government/publications/heat-and-buildings-strategy",
+        publisher: "UK Government",
+      },
+      {
+        label: "Warm Homes Plan (HTML)",
+        url: "https://www.gov.uk/government/publications/warm-homes-plan/warm-homes-plan-html",
+        publisher: "DESNZ",
+      },
+    ],
     data_status: "CURATED",
     tags: ["target", "heat pump"],
   },
@@ -278,21 +349,30 @@ export const policies: Policy[] = [
     name: "Warm Homes Plan",
     jurisdiction_id: "jur_gb",
     country_code: "GB",
-    status: "ANNOUNCED",
-    introduced: "2024",
+    status: "ACTIVE",
+    introduced: "2026-01",
     ended: null,
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_insulation", "tech_heat_pump"],
     mechanism_ids: ["mech_grant", "mech_loan"],
     target_groups: ["households"],
     eligibility: "Households; details to be set out at the 2025 Spending Review.",
-    incentive: "Mix of grants and low-interest loans under a £13.2bn commitment.",
-    funding: "£13.2bn commitment announced in the 2024/25 budget cycle.",
+    incentive:
+      "£15bn programme to 2029/30: ~£5bn grants for low-income homes (£4.4bn capital), £2.7bn Boiler Upgrade Scheme, £2bn zero/low-interest consumer loans, £1.1bn heat networks, £2.7bn Warm Homes Fund finance.",
+    funding: "£15bn capital over 2025/26–2029/30 including Barnett consequentials; published 21 January 2026.",
     objectives: ["Upgrade millions of homes through grants and low-interest finance"],
     description:
-      "Announced programme of grants and low-interest loans for home energy upgrades, backed by a £13.2bn commitment; delivery details were expected at the 2025 Spending Review.",
-    limitations: ["Design details not yet final at seed time."],
-    sources: [{ label: "Warm Homes Plan", url: null, publisher: "UK Government" }],
+      "Published by DESNZ on 21 January 2026: a £15bn plan to upgrade up to 5 million homes by 2030. It funds low-income upgrades through the Warm Homes: Social Housing Fund and Warm Homes: Local Grant (to be consolidated into a single low-income scheme), extends the Boiler Upgrade Scheme to 2030 with £2.7bn, launches a zero/low-interest loan offer backed by £2bn, and funds heat networks. It abolishes the supplier-obligation (ECO) model in favour of public investment, and sets an aim of over 450,000 heat-pump installations per year by 2030.",
+    limitations: [
+      "Most delivery is back-loaded to 2027/28–2029/30; the consolidated low-income scheme is not yet designed.",
+    ],
+    sources: [
+      {
+        label: "Warm Homes Plan",
+        url: "https://www.gov.uk/government/publications/warm-homes-plan",
+        publisher: "DESNZ",
+      },
+    ],
     data_status: "CURATED",
     tags: ["grant", "loan", "announced"],
   },
@@ -345,7 +425,7 @@ export const policies: Policy[] = [
     objectives: ["Grow low-carbon district heat networks"],
     description: "Capital grant fund supporting the development of low-carbon heat networks in England.",
     limitations: [],
-    sources: [{ label: "Green Heat Network Fund", url: null, publisher: "DESNZ" }],
+    sources: [{ label: "Green Heat Network Fund", url: "https://assets.publishing.service.gov.uk/media/6890b6bbdc6688ed508783d7/ghnf-overview-document.pdf", publisher: "DESNZ" }],
     data_status: "CURATED",
     tags: ["district heating", "capital fund"],
   },
@@ -375,7 +455,7 @@ export const policies: Policy[] = [
     description:
       "Unified federal support programme for efficient buildings, successor to the KfW/BAFA programmes including MAP. Delivered by BAFA for single measures and KfW for whole-building renovations.",
     limitations: ["Funding rate and eligibility changes have repeatedly shifted demand."],
-    sources: [{ label: "Bundesförderung für effiziente Gebäude", url: null, publisher: "BAFA / KfW" }],
+    sources: [{ label: "Bundesförderung für effiziente Gebäude", url: "https://www.kfw.de/inlandsfoerderung/Bundesf%C3%B6rderung-f%C3%BCr-effiziente-Geb%C3%A4ude", publisher: "BAFA / KfW" }],
     data_status: "CURATED",
     tags: ["grant", "loan", "heat pump", "retrofit"],
   },
@@ -395,13 +475,29 @@ export const policies: Policy[] = [
     eligibility:
       "Owner-occupiers eligible first (applications from February 2024); landlords followed from mid-2024.",
     incentive:
-      "30% base grant + 20% declining speed bonus + 30% income bonus (household income ≤ €40,000) + 5% efficiency bonus; capped at 70% of max €30,000 eligible cost for the first unit; supplementary low-interest loan.",
+      "From 21 July 2026: 30% base grant on max €28,000 eligible cost for the first unit (cap falls by €750 every six months from 1 Feb 2027); income bonus 40% (taxable household income ≤€30,000), 30% (≤€40,000), 10% (≤€50,000), with thresholds €10,000 higher for families with children; climate-speed bonus 16%, falling 4 points every six months and ending for applications from 1 Aug 2028; maximum 80% for the lowest income band, 70% otherwise. Jan 2024–Jul 2026 design: 30% base + 20% speed + 30% income bonus (≤€40,000) + 5% efficiency bonus, capped at 70% of €30,000; supplementary low-interest loan.",
     funding: "Federal budget via KfW.",
     objectives: ["Restart heat-pump uptake after the 2023 policy shock", "Target support at lower-income owner-occupiers"],
     description:
-      "Redesigned heating-subsidy track of BEG for residential buildings, combining a base grant with income, speed and efficiency bonuses and a supplementary low-interest loan.",
+      "Redesigned heating-subsidy track of BEG for residential buildings, combining a base grant with income, speed and efficiency bonuses and a supplementary low-interest loan. Reformed under the GModG framework: the BEG EM guideline of 17 August 2026 (effective 21 July 2026) keeps the 30% base grant, lowers the cap to €28,000 with a declining schedule, widens and steepens the income bonus, and phases out the speed bonus by August 2028.",
     limitations: [],
-    sources: [{ label: "KfW 458 Heizungsförderung", url: null, publisher: "KfW" }],
+    sources: [
+      {
+        label: "Die neue Bundesförderung für effiziente Gebäude startet jetzt (KfW press release)",
+        url: "https://www.kfw.de/%C3%9Cber-die-KfW/Newsroom/Aktuelles/Pressemitteilungen-Details_901760.html",
+        publisher: "KfW",
+      },
+      {
+        label: "FAQ BEG",
+        url: "https://www.energiewechsel.de/KAENEF/Navigation/DE/Service/FAQ/BEG/faq-beg.html",
+        publisher: "BMWE",
+      },
+      {
+        label: "Merkblatt KfW 458 Heizungsförderung",
+        url: "https://www.kfw.de/PDF/Download-Center/F%C3%B6rderprogramme-%28Inlandsf%C3%B6rderung%29/PDF-Dokumente/6000005131_M_458.pdf",
+        publisher: "KfW",
+      },
+    ],
     data_status: "CURATED",
     tags: ["grant", "heat pump", "income-banded"],
   },
@@ -411,9 +507,9 @@ export const policies: Policy[] = [
     short_name: "GEG 2024",
     jurisdiction_id: "jur_de",
     country_code: "DE",
-    status: "ACTIVE",
+    status: "SUPERSEDED",
     introduced: "2024-01",
-    ended: null,
+    ended: "2026-07",
     sector: "ALL_BUILDINGS",
     technology_ids: ["tech_heat_pump", "tech_district_heating"],
     mechanism_ids: ["mech_standard", "mech_ban"],
@@ -424,11 +520,71 @@ export const policies: Policy[] = [
     funding: "Regulatory requirement; costs borne by building owners.",
     objectives: ["Phase fossil heating out of the building stock", "Anchor the heat transition in regulation"],
     description:
-      "Amendment of the Buildings Energy Act requiring new heating systems to run on at least 65% renewable energy. Passed in September 2023 after a heated public debate that depressed heat-pump demand and drove record gas-boiler purchases in 2023.",
-    limitations: ["The 2023 debate created severe policy uncertainty that depressed the heat-pump market."],
-    sources: [{ label: "Gebäudeenergiegesetz", url: null, publisher: "German Federal Government" }],
+      "Amendment of the Buildings Energy Act requiring new heating systems to run on at least 65% renewable energy. Passed in September 2023 after a heated public debate that depressed heat-pump demand and drove record gas-boiler purchases in 2023. Superseded in July 2026 by the Gebäudemodernisierungsgesetz (GModG): passed by Bundestag and Bundesrat on 10 July 2026 and promulgated on 23 July 2026 (BGBl. 2026 I Nr. 226), it removed the 65%-renewable requirement for new heating systems and renamed the Act.",
+    limitations: [
+      "The 2023 debate created severe policy uncertainty that depressed the heat-pump market.",
+      "Repealed after roughly two and a half years in force.",
+    ],
+    sources: [
+      {
+        label: "Bundestag beschließt Heizungsgesetz-Novelle",
+        url: "https://www.bundestag.de/dokumente/textarchiv/2026/kw28-de-heizungsgesetz-1194534",
+        publisher: "Deutscher Bundestag",
+      },
+      {
+        label: "Gebäudeenergiegesetz (consolidated text)",
+        url: "https://www.gesetze-im-internet.de/geg/",
+        publisher: "Bundesministerium der Justiz",
+      },
+    ],
     data_status: "CURATED",
     tags: ["standard", "ban", "65% renewable", "heating law"],
+  },
+  {
+    id: "pol_de_gmodg",
+    name: "Gebäudemodernisierungsgesetz (GModG)",
+    short_name: "GModG",
+    jurisdiction_id: "jur_de",
+    country_code: "DE",
+    status: "ACTIVE",
+    introduced: "2026-07",
+    ended: null,
+    sector: "ALL_BUILDINGS",
+    technology_ids: ["tech_heat_pump", "tech_district_heating"],
+    mechanism_ids: ["mech_standard", "mech_ban"],
+    target_groups: ["all new heating systems"],
+    eligibility:
+      "All owners installing a new heating system in Germany; fossil boilers permitted subject to a rising green-fuel quota from 1 January 2029.",
+    incentive:
+      "Technology-open rules for new heating systems — heat pumps, district heating, hybrids, biomass, direct electric and, again, new gas and oil boilers, the latter conditional on a rising share of CO2-neutral fuels from 1 January 2029 (a Grüngas-/Grünheizölquote law is to be tabled by 1 December 2026).",
+    funding:
+      "Regulatory measure; accompanied by continued BEG subsidies, strengthened for lower-income households. Government estimates ~€7.4bn relief for citizens and businesses.",
+    objectives: [
+      "Technology-open decarbonisation of building heat",
+      "Reduce compliance cost and bureaucracy for building owners",
+    ],
+    description:
+      "Successor to the 2024 'Heizungsgesetz' under the CDU/CSU–SPD coalition, implementing the coalition agreement's pledge to abolish it. Passed by Bundestag and Bundesrat on 10 July 2026 and promulgated 23 July 2026 (BGBl. 2026 I Nr. 226). It deletes the 65% renewable requirement, re-permits new fossil boilers subject to a phased green-fuel quota, retains municipal heat planning, and is paired with reformed BEG funding.",
+    implementation_notes:
+      "In force on publication in the Bundesgesetzblatt; further amendments scheduled for 1 January 2028 and 1 January 2030.",
+    limitations: [
+      "Effects on heat-pump demand not yet observable at refresh time (October 2026).",
+      "Green-fuel quota not yet legislated.",
+    ],
+    sources: [
+      {
+        label: "Gebäudemodernisierungsgesetz ist Investitionsprogramm für den Wärmemarkt (press release, 10 July 2026)",
+        url: "https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/07/20260710-gebaeudemodernisierungsgesetz.html",
+        publisher: "BMWE",
+      },
+      {
+        label: "BGBl. 2026 I Nr. 226",
+        url: "https://www.recht.bund.de/bgbl/1/2026/226/regelungstext.pdf?__blob=publicationFile&v=1",
+        publisher: "Bundesgesetzblatt",
+      },
+    ],
+    data_status: "CURATED",
+    tags: ["standard", "ban", "technology-open", "heating law"],
   },
   {
     id: "pol_de_map",
@@ -516,11 +672,12 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_standard"],
     target_groups: ["municipalities"],
     eligibility: "Large cities must produce heat plans by mid-2026, other municipalities by mid-2028.",
-    incentive: "Mandatory municipal heat planning that anchors the GEG 65% rule geographically.",
+    incentive:
+      "Mandatory municipal heat planning (large cities by mid-2026, others by mid-2028); originally the geographic trigger for the GEG 65% rule, retained under the 2026 GModG.",
     funding: "Municipal implementation.",
     objectives: ["Plan district-heating expansion and heat-pump zones locally"],
     description:
-      "Law requiring municipalities to draw up heat plans that determine where district heating or decentralised heat pumps will dominate; the GEG 65% requirement binds once local plans are in place.",
+      "Law requiring municipalities to draw up heat plans that determine where district heating or decentralised heat pumps will dominate; under the 2024 GEG the 65% requirement bound once local plans were in place; the planning duty is retained under the 2026 GModG.",
     limitations: [],
     sources: [{ label: "Wärmeplanungsgesetz", url: null, publisher: "German Federal Government" }],
     data_status: "CURATED",
@@ -547,7 +704,7 @@ export const policies: Policy[] = [
     description:
       "Subsidy for independent energy advice and an individual renovation roadmap for residential buildings, linked to BEG implementation support.",
     limitations: [],
-    sources: [{ label: "Energieberatung für Wohngebäude", url: null, publisher: "BAFA" }],
+    sources: [{ label: "Energieberatung für Wohngebäude", url: "https://www.bafa.de/DE/Energie/Energieberatung/Energieberatung_Wohngebaeude/energieberatung_wohngebaeude_node.html", publisher: "BAFA" }],
     data_status: "CURATED",
     tags: ["information", "advice", "renovation roadmap"],
   },
@@ -568,19 +725,25 @@ export const policies: Policy[] = [
     target_groups: ["owner-occupiers", "landlords"],
     eligibility: "Owner-occupiers (all incomes from 2021) and landlords; income-banded grant rates (Bleu/Jaune/Violet/Rose); delivered by ANAH.",
     incentive: "Income-banded grants for single measures and accompanied deep retrofits; ~€2–4bn/yr.",
-    funding: "State budget via ANAH; ~€2–4bn per year.",
+    funding: "State budget via ANAH; €3.6bn for 2026 (targeting ≥120,000 deep and 150,000 single-measure renovations).",
     objectives: [
       "Scale up energy renovation of owner-occupied homes",
       "Shift the programme towards deep renovation (rénovation d'ampleur) via the Parcours accompagné",
     ],
     description:
-      "France's flagship renovation grant, replacing the CITE tax credit from 2020. Income-banded grants are paid by ANAH; a 2024 reform pushed accompanied deep renovation through the Parcours accompagné.",
+      "France's flagship renovation grant, replacing the CITE tax credit from 2020. Income-banded grants are paid by ANAH; a 2024 reform pushed accompanied deep renovation through the Parcours accompagné. The deep-renovation window was suspended in summer 2025 and the whole scheme again from the start of 2026 pending the state budget; it reopened for all pathways on 23 February 2026 with a mandatory France Rénov' adviser meeting before deep-renovation applications. Around 83,000 files were pending at end-2025; average processing time exceeded six months for deep renovations.",
     limitations: [
       "High volume of single-measure grants but few deep renovations.",
       "Fraud risks and weak outcome monitoring noted by the Cour des comptes.",
+      "Repeated suspensions (2025, early 2026) and multi-month processing backlogs.",
     ],
     sources: [
       { label: "MaPrimeRénov'", url: "https://www.maprimerenov.gouv.fr", publisher: "ANAH" },
+      {
+        label: "Réouverture de MaPrimeRénov' (23 February 2026)",
+        url: "https://www.info.gouv.fr/actualite/reouverture-de-maprimerenov",
+        publisher: "Gouvernement (info.gouv.fr)",
+      },
     ],
     data_status: "CURATED",
     tags: ["grant", "income-banded", "retrofit", "heat pump"],
@@ -605,7 +768,7 @@ export const policies: Policy[] = [
     description:
       "White-certificate scheme obliging energy suppliers to deliver certified energy savings across all buildings; operates in multi-year periods and finances bonus offers such as Coup de pouce.",
     limitations: [],
-    sources: [{ label: "Certificats d'économies d'énergie", url: null, publisher: "Ministère de la Transition écologique" }],
+    sources: [{ label: "Certificats d'économies d'énergie", url: "https://www.ecologie.gouv.fr/politiques-publiques/dispositif-certificats-deconomies-denergie", publisher: "Ministère de la Transition écologique" }],
     data_status: "CURATED",
     tags: ["obligation", "white certificates", "supplier"],
   },
@@ -628,7 +791,7 @@ export const policies: Policy[] = [
     description:
       "Bonus incentive for households replacing fossil-fuel boilers, financed through the CEE supplier obligation.",
     limitations: [],
-    sources: [{ label: "Coup de pouce Chauffage", url: null, publisher: "Ministère de la Transition écologique" }],
+    sources: [{ label: "Coup de pouce Chauffage", url: "https://www.ecologie.gouv.fr/politiques-publiques/coup-pouce-chauffage", publisher: "Ministère de la Transition écologique" }],
     data_status: "CURATED",
     tags: ["grant", "bonus", "heat pump", "cee"],
   },
@@ -700,7 +863,7 @@ export const policies: Policy[] = [
     description:
       "Environmental building regulation whose carbon thresholds effectively exclude gas-only heating in new single-family homes from 2022, extending to collective housing from 2025.",
     limitations: [],
-    sources: [{ label: "RE2020", url: null, publisher: "Ministère de la Transition écologique" }],
+    sources: [{ label: "RE2020", url: "https://www.ecologie.gouv.fr/politiques-publiques/reglementation-environnementale-re2020", publisher: "Ministère de la Transition écologique" }],
     data_status: "CURATED",
     tags: ["standard", "new build", "carbon"],
   },
@@ -748,7 +911,7 @@ export const policies: Policy[] = [
     description:
       "ADEME fund supporting renewable heat projects — district heating, large heat pumps, solar thermal — across collective and industrial buildings.",
     limitations: [],
-    sources: [{ label: "Fonds Chaleur", url: null, publisher: "ADEME" }],
+    sources: [{ label: "Fonds Chaleur", url: "https://fondschaleur.ademe.fr", publisher: "ADEME" }],
     data_status: "CURATED",
     tags: ["grant", "district heating", "renewable heat"],
   },
@@ -772,7 +935,7 @@ export const policies: Policy[] = [
     description:
       "Accredited advisory service made mandatory for households undertaking accompanied deep renovation under MaPrimeRénov'.",
     limitations: [],
-    sources: [{ label: "Mon Accompagnateur Rénov'", url: null, publisher: "ANAH" }],
+    sources: [{ label: "Mon Accompagnateur Rénov'", url: "https://www.anah.gouv.fr/actualites/mon-accompagnateur-renov-un-acteur-cle-de-la-renovation", publisher: "ANAH" }],
     data_status: "CURATED",
     tags: ["information", "advice", "deep retrofit"],
   },
@@ -792,7 +955,8 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_grant"],
     target_groups: ["owner-occupiers", "VvEs (homeowner associations)"],
     eligibility: "Owner-occupiers and homeowner associations; delivered by RVO.",
-    incentive: "Roughly 30% grant for heat pumps and insulation (rates raised in 2022).",
+    incentive:
+      "Roughly 30% grant for heat pumps and insulation (rates raised in 2022). 2026: €500m budget; first air-to-water heat pump €1,025 start amount + €225/kW from the first kW + €200 energy-label bonus; second and further units €225/kW only; scheme runs to 2031.",
     funding: "National budget via RVO.",
     objectives: ["Subsidise heat pumps and insulation in existing homes"],
     description:
@@ -800,6 +964,11 @@ export const policies: Policy[] = [
     limitations: [],
     sources: [
       { label: "ISDE", url: "https://www.rvo.nl/subsidies-financiering/isde", publisher: "RVO" },
+      {
+        label: "ISDE: wat is er gewijzigd vanaf 2026?",
+        url: "https://www.rvo.nl/subsidies-financiering/isde/isde-wat-wijzigt-er-2026",
+        publisher: "RVO",
+      },
     ],
     data_status: "CURATED",
     tags: ["grant", "heat pump", "insulation"],
@@ -824,7 +993,7 @@ export const policies: Policy[] = [
     description:
       "National fund offering energy-saving loans to homeowners, with zero-interest terms for lower-income households since 2023.",
     limitations: [],
-    sources: [{ label: "Nationaal Warmtefonds", url: null, publisher: "Nationaal Warmtefonds" }],
+    sources: [{ label: "Nationaal Warmtefonds", url: "https://www.warmtefonds.nl", publisher: "Nationaal Warmtefonds" }],
     data_status: "CURATED",
     tags: ["loan", "low-income", "retrofit"],
   },
@@ -854,11 +1023,11 @@ export const policies: Policy[] = [
   },
   {
     id: "pol_nl_hybrid_norm",
-    name: "Hybrid heat-pump standard for boiler replacement (planned 2026)",
+    name: "Hybrid heat-pump standard at boiler replacement (2026 plan dropped; 2029 plan announced)",
     short_name: "Hybrid norm",
     jurisdiction_id: "jur_nl",
     country_code: "NL",
-    status: "PAUSED",
+    status: "ANNOUNCED",
     introduced: "2022",
     ended: null,
     sector: "RESIDENTIAL_BUILDINGS",
@@ -866,15 +1035,24 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_standard"],
     target_groups: ["existing homes replacing boiler"],
     eligibility: "Would apply to boiler replacements in existing homes from 2026.",
-    incentive: "Would have required at least a hybrid heat pump at boiler replacement.",
+    incentive: "Would require at least a smart hybrid heat pump at boiler replacement from 2029 (outside heat-network areas).",
     funding: "Regulatory measure (not in force).",
     objectives: ["Mandate hybrid heat pumps at the point of boiler replacement"],
     description:
-      "Planned standard announced in 2022 requiring at least a hybrid heat pump when replacing a boiler from 2026; paused under the 2024 coalition agreement.",
-    limitations: ["Paused before entering into force."],
-    sources: [{ label: "Hybrid heat pump standard", url: null, publisher: "Dutch Government" }],
+      "A 2022 plan to require at least a hybrid heat pump at boiler replacement from 2026 was formally dropped on 31 October 2024 under the Schoof coalition (never in force). On 7 October 2026 the new D66–VVD–CDA minority cabinet announced that smart hybrid heat pumps will become the standard at boiler replacement from 2029 for homes not connected, or due to be connected, to a heat network; exemptions and legislation are still to be worked out.",
+    limitations: [
+      "Minority coalition; no parliamentary majority secured.",
+      "The 2026 version never entered into force; hybrid sales fell to ~41,000 in 2025 against >425,000 boiler replacements per year.",
+    ],
+    sources: [
+      {
+        label: "Slimme en hybride warmtepompen vanaf 2029 de nieuwe standaard",
+        url: "https://www.rijksoverheid.nl/actueel/nieuws/2026/10/07/slimme-en-hybride-warmtepompen-vanaf-2029-de-nieuwe-standaard",
+        publisher: "Rijksoverheid",
+      },
+    ],
     data_status: "CURATED",
-    tags: ["standard", "hybrid heat pump", "paused"],
+    tags: ["standard", "hybrid heat pump", "announced"],
   },
   {
     id: "pol_nl_paw",
@@ -1004,9 +1182,9 @@ export const policies: Policy[] = [
     short_name: "Bygningspuljen",
     jurisdiction_id: "jur_dk",
     country_code: "DK",
-    status: "ACTIVE",
+    status: "SUPERSEDED",
     introduced: "2020",
-    ended: null,
+    ended: "2023",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_heat_pump", "tech_insulation"],
     mechanism_ids: ["mech_grant"],
@@ -1016,9 +1194,47 @@ export const policies: Policy[] = [
     funding: "State grant pool.",
     objectives: ["Subsidise renovation and boiler replacement"],
     description:
-      "Grant pool for building energy renovation — including heat pumps replacing oil and gas boilers — created under the 2020 Climate Agreement.",
+      "Grant pool for building energy renovation — including heat pumps replacing oil and gas boilers — created under the 2020 Climate Agreement. Split in summer 2023 into Varmepumpepuljen (heat-pump conversions) and Energirenoveringspuljen (energy renovation). Roughly DKK 2.5bn was allocated across 2020–2026 (2020: 245m; 2021: 675m; 2022: 430m; 2023: 340m; 2024: 405m; 2025: 230m; 2026: 200m); the pool is expected to be wound up after 31 October 2026.",
     limitations: [],
-    sources: [{ label: "Bygningspuljen", url: null, publisher: "Danish Energy Agency" }],
+    sources: [
+      {
+        label: "Bygningspuljen – opsplittet i to puljer",
+        url: "https://ens.dk/tilskud-og-puljer/tilskuds-stoetteordninger/bygningspuljen-opsplittet-i-puljer",
+        publisher: "Danish Energy Agency",
+      },
+    ],
+    data_status: "CURATED",
+    tags: ["grant", "heat pump", "insulation"],
+  },
+  {
+    id: "pol_dk_varmepumpepulje",
+    name: "Varmepumpepuljen",
+    short_name: "Varmepumpepuljen",
+    jurisdiction_id: "jur_dk",
+    country_code: "DK",
+    status: "ACTIVE",
+    introduced: "2023",
+    ended: null,
+    sector: "RESIDENTIAL_BUILDINGS",
+    technology_ids: ["tech_heat_pump"],
+    mechanism_ids: ["mech_grant"],
+    target_groups: ["owner-occupiers"],
+    eligibility:
+      "Owners of year-round homes under 400 m² replacing an oil, gas, electric or biomass boiler with an air-to-water or ground-source heat pump; application and approval before work starts; first-come-first-served.",
+    incentive: "Fixed grant of DKK 27,000 per heat pump regardless of type.",
+    funding:
+      "State grant pool; DKK 116.9m for 2026 plus a DKK 200m top-up; pool closed 11 May 2026 when exhausted and reopened 2 July 2026 until 30 November 2026 or exhaustion.",
+    objectives: ["Replace oil and gas boilers with heat pumps outside district-heating areas"],
+    description:
+      "Successor to Bygningspuljen's heat-pump track from 2023: a fixed DKK 27,000 grant for converting a boiler to a heat pump in a year-round home. Demand regularly exhausts annual rounds — the 2026 round closed on 11 May and reopened on 2 July with DKK 200m of extra funding.",
+    limitations: ["First-come-first-served rounds exhaust quickly, creating stop-go demand."],
+    sources: [
+      {
+        label: "Varmepumpepuljen åbner igen: 200 mio. kr. skal hjælpe flere væk fra olie og gas",
+        url: "https://ens.dk/presse/varmepumpepuljen-aabner-igen-200-mio-kr-skal-hjaelpe-flere-vaek-fra-olie-og-gas",
+        publisher: "Danish Energy Agency",
+      },
+    ],
     data_status: "CURATED",
     tags: ["grant", "heat pump", "insulation"],
   },
@@ -1036,13 +1252,20 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_grant"],
     target_groups: ["households with oil/gas boilers"],
     eligibility: "Households replacing oil or gas boilers via energy-service companies offering heat-pump subscriptions.",
-    incentive: "Subsidy to energy-service companies providing heat pumps on a subscription basis.",
+    incentive:
+      "Up to DKK 25,000 per heat pump (max 45% of eligible cost), paid to pre-qualified energy-service providers who offer heat pumps on subscription and scrap the household's oil, wood-pellet or gas boiler; a new application round opened 7 January 2026 under BEK nr 806 of 18 June 2025.",
     funding: "State subsidy.",
     objectives: ["Lower the barrier to heat-pump adoption through service models"],
     description:
       "Scrappage scheme subsidising energy-service companies that offer households heat pumps on subscription terms instead of boiler ownership.",
     limitations: [],
-    sources: [{ label: "Skrotningsordningen", url: null, publisher: "Danish Energy Agency" }],
+    sources: [
+      {
+        label: "Skrotningsordningen",
+        url: "https://ens.dk/tilskud-og-puljer/tilskuds-stoetteordninger/skrotningsordningen",
+        publisher: "Danish Energy Agency",
+      },
+    ],
     data_status: "CURATED",
     tags: ["scrappage", "subscription", "heat pump"],
   },
@@ -1137,7 +1360,7 @@ export const policies: Policy[] = [
     objectives: ["Set a high efficiency floor for new buildings"],
     description: "Danish building regulations (BR18) setting energy requirements and voluntary low-energy classes for new buildings.",
     limitations: [],
-    sources: [{ label: "Building regulations BR18", url: null, publisher: "Danish Government" }],
+    sources: [{ label: "Building regulations BR18", url: "https://bygningsreglementet.dk", publisher: "Danish Government" }],
     data_status: "CURATED",
     tags: ["standard", "new build", "building code"],
   },
@@ -1181,13 +1404,20 @@ export const policies: Policy[] = [
     mechanism_ids: ["mech_grant"],
     target_groups: ["households"],
     eligibility: "Households installing eligible measures; air-to-air heat-pump support ended earlier as the market matured.",
-    incentive: "Rights-based rebates for liquid-to-water and ground-source heat pumps and efficiency measures.",
+    incentive:
+      "25% of invoiced cost up to NOK 40,000 for liquid-to-water (ground/sea/rock) and NOK 20,000 for air-to-water heat pumps (air-to-water support reinstated when Enova revised its household scheme), NOK 5,000 for heat-pump water heaters; approval required before work starts; combined cap NOK 100,000 per home for 2025–2028.",
     funding: "Enova state enterprise.",
     objectives: ["Support mature-market adoption of efficient heating"],
     description:
       "Rights-based household rebate scheme run by the state enterprise Enova, supporting heat pumps (excluding air-to-air, whose support ended as that market matured), insulation and smart controls.",
     limitations: [],
-    sources: [{ label: "Enova", url: "https://www.enova.no", publisher: "Enova" }],
+    sources: [
+      {
+        label: "Væske-til-vann varmepumpe",
+        url: "https://enova.no/nb/privat/bolig/stotte/vaeske-til-vann-varmepumpe",
+        publisher: "Enova",
+      },
+    ],
     data_status: "CURATED",
     tags: ["grant", "rebate", "heat pump"],
   },
@@ -1247,9 +1477,9 @@ export const policies: Policy[] = [
     short_name: "25C",
     jurisdiction_id: "jur_us",
     country_code: "US",
-    status: "ACTIVE",
+    status: "CLOSED",
     introduced: "2023-01",
-    ended: null,
+    ended: "2025-12",
     sector: "RESIDENTIAL_BUILDINGS",
     technology_ids: ["tech_heat_pump", "tech_insulation"],
     mechanism_ids: ["mech_tax_credit"],
@@ -1259,12 +1489,20 @@ export const policies: Policy[] = [
     funding: "Federal tax expenditure under the Inflation Reduction Act (2022).",
     objectives: ["Use the tax code to drive home electrification and efficiency"],
     description:
-      "Federal tax credit created by the Inflation Reduction Act covering 30% of qualifying home energy improvements, with a dedicated $2,000 annual cap for heat pumps.",
-    limitations: [],
+      "Federal tax credit created by the Inflation Reduction Act covering 30% of qualifying home energy improvements, with a dedicated $2,000 annual cap for heat pumps. Terminated early by the One Big Beautiful Bill Act (Public Law 119-21, 4 July 2025), §70505: no credit for property placed in service after 31 December 2025, against an original sunset of 2032. No federal successor credit was created.",
+    limitations: [
+      "Repealed early; unavailable from 1 January 2026.",
+      "Efficiency Maine reports slower heat-pump rebate demand in 2026, which it attributes partly to the credit's loss.",
+    ],
     sources: [
       {
         label: "Energy Efficient Home Improvement Credit",
         url: "https://www.irs.gov/credits-deductions/energy-efficient-home-improvement-credit",
+        publisher: "IRS",
+      },
+      {
+        label: "FAQs for modification of sections 25C, 25D … under Public Law 119-21 (OBBB)",
+        url: "https://www.irs.gov/newsroom/faqs-for-modification-of-sections-25c-25d-25e-30c-30d-45l-45w-and-179d-under-public-law-119-21-139-stat-72-july-4-2025-commonly-known-as-the-one-big-beautiful-bill-obbb",
         publisher: "IRS",
       },
     ],
@@ -1289,9 +1527,23 @@ export const policies: Policy[] = [
     funding: "$4.5bn federal appropriation, state-administered.",
     objectives: ["Electrify low- and moderate-income homes"],
     description:
-      "Inflation Reduction Act rebate programme for electrification in low- and moderate-income households, administered by states with rebates up to $8,000 per heat pump.",
-    limitations: ["Roll-out proceeds state by state."],
-    sources: [{ label: "Home Energy Rebates", url: null, publisher: "US Department of Energy" }],
+      "Inflation Reduction Act rebate programme for electrification in low- and moderate-income households, administered by states with rebates up to $8,000 per heat pump. Roll-out remains uneven: by mid-2026 roughly half the states had launched; Idaho and South Dakota returned their allocations. DOE Program Notice 26-2 (29 May 2026) removed fuel-switching from the electrification rebate and dropped the Justice40 set-aside. Some state programmes paused — Georgia's HEAR closed on 14 August 2026 and reopens in October 2026 for wiring/panel upgrades only.",
+    limitations: [
+      "State-by-state launch; several states slow or declined.",
+      "2026 federal rule change narrowed the rebate to non-fuel-switching measures.",
+    ],
+    sources: [
+      {
+        label: "Home Energy Rebates",
+        url: null,
+        publisher: "US Department of Energy",
+      },
+      {
+        label: "Georgia HEAR programme update",
+        url: "https://energyrebates.georgia.gov/home-electrification-and-appliance-rebates",
+        publisher: "Georgia Environmental Finance Authority",
+      },
+    ],
     data_status: "CURATED",
     tags: ["rebate", "electrification", "ira", "low-income"],
   },
@@ -1313,9 +1565,15 @@ export const policies: Policy[] = [
     funding: "$4.3bn federal appropriation, state-administered.",
     objectives: ["Reward whole-home efficiency retrofits by measured savings"],
     description:
-      "Inflation Reduction Act rebate programme paying for whole-home retrofits based on modelled or measured energy savings rather than individual measures.",
+      "Inflation Reduction Act rebate programme paying for whole-home retrofits based on modelled or measured energy savings rather than individual measures. By mid-2026 roughly half the states had launched programmes; DOE Program Notice 26-1 (29 May 2026) simplified state blueprint approval and removed the Justice40 set-aside.",
     limitations: [],
-    sources: [{ label: "Home Energy Rebates", url: null, publisher: "US Department of Energy" }],
+    sources: [
+      {
+        label: "Home Energy Rebates",
+        url: null,
+        publisher: "US Department of Energy",
+      },
+    ],
     data_status: "CURATED",
     tags: ["rebate", "whole-house", "ira"],
   },
@@ -1391,9 +1649,15 @@ export const policies: Policy[] = [
     funding: "Regulatory measure.",
     objectives: ["Electrify new construction statewide"],
     description:
-      "Statewide prohibition of fossil-fuel equipment in new buildings, phased from 2026 (≤7 storeys) to 2029; legally challenged.",
-    limitations: ["Facing legal challenge; not yet in force."],
-    sources: [{ label: "All-Electric Buildings Act", url: null, publisher: "New York State" }],
+      "Statewide prohibition of fossil-fuel equipment in new buildings of seven storeys or fewer from 2026, and all new buildings from 1 January 2029, enacted in the FY2024 state budget (2023). On 30 June 2026 the Second Circuit (Mulhern Gas v. Mosley) held that neither the Act nor NYC Local Law 154 is pre-empted by the federal Energy Policy and Conservation Act, splitting from the Ninth Circuit. The state had agreed in November 2025 to delay enforcement pending the ruling; enforcement remains on hold until the 28 October 2026 deadline for a Supreme Court petition.",
+    limitations: ["Enforcement paused pending possible Supreme Court petition (deadline 28 October 2026)."],
+    sources: [
+      {
+        label: "Mulhern Gas v. Mosley — Second Circuit decision (30 June 2026)",
+        url: "https://dos.ny.gov/system/files/documents/2026/07/decision-mulhern-gas-v.-mosley-2d-cir.pdf",
+        publisher: "New York Department of State",
+      },
+    ],
     data_status: "CURATED",
     tags: ["ban", "electrification", "new build", "state"],
   },
@@ -1417,7 +1681,7 @@ export const policies: Policy[] = [
     description:
       "2022 update to California's building energy code making heat pumps the prescriptive baseline for space or water heating in new homes, effective January 2023.",
     limitations: [],
-    sources: [{ label: "Title 24 2022 Energy Code", url: null, publisher: "California Energy Commission" }],
+    sources: [{ label: "Title 24 2022 Energy Code", url: "https://www.energy.ca.gov/programs-and-topics/programs/building-energy-efficiency-standards/2022-building-energy-efficiency-1", publisher: "California Energy Commission" }],
     data_status: "CURATED",
     tags: ["standard", "new build", "heat pump", "state"],
   },
@@ -1439,9 +1703,20 @@ export const policies: Policy[] = [
     funding: "Efficiency Maine Trust.",
     objectives: ["Deploy 100,000 heat pumps by 2025, then a further 175,000 by 2027"],
     description:
-      "State target of 100,000 heat pumps by 2025 backed by Efficiency Maine rebates; reached in 2023, two years early, and succeeded by a target of 175,000 additional installations by 2027.",
+      "State target of 100,000 heat pumps by 2025 backed by Efficiency Maine rebates; reached in 2023, two years early, and succeeded by a target of 175,000 additional installations by 2027. 2026 headwinds: Efficiency Maine reports a more pronounced seasonal slowdown in whole-home heat-pump rebates, citing lower consumer confidence, the loss of the federal tax credit, tariffs and higher electricity prices; it introduced a new ducted rebate structure (1 January 2026) and a limited-time bonus (from 1 March 2026).",
     limitations: [],
-    sources: [{ label: "Efficiency Maine heat pump initiative", url: null, publisher: "Efficiency Maine Trust" }],
+    sources: [
+      {
+        label: "After Maine surpasses 100,000 heat pump goal two years ahead of schedule, Governor Mills sets new target",
+        url: "https://www.maine.gov/governor/mills/news/after-maine-surpasses-100000-heat-pump-goal-two-years-ahead-schedule-governor-mills-sets-new",
+        publisher: "Office of Governor Janet T. Mills",
+      },
+      {
+        label: "Efficiency Maine Executive Director's Summary Report, May 2026",
+        url: "https://www.efficiencymaine.com/docs/ED-Report-5-27-2026.pdf",
+        publisher: "Efficiency Maine Trust",
+      },
+    ],
     data_status: "CURATED",
     tags: ["target", "rebate", "heat pump", "state"],
   },
@@ -1494,7 +1769,7 @@ export const policies: Policy[] = [
     sources: [
       {
         label: "Green Mark Certification Scheme",
-        url: "https://www1.bca.gov.sg/buildsg/sustainability/green-mark-certification-scheme",
+        url: null,
         publisher: "Building and Construction Authority",
       },
     ],
@@ -1521,7 +1796,7 @@ export const policies: Policy[] = [
     description:
       "National green building agenda targeting 80% of gross floor area green-certified, 80% of new developments Super Low Energy, and 80% efficiency improvement for best-in-class buildings by 2030.",
     limitations: [],
-    sources: [{ label: "Green Building Masterplan", url: null, publisher: "Building and Construction Authority" }],
+    sources: [{ label: "Green Building Masterplan", url: "https://www1.bca.gov.sg/sustainability/sgbmp", publisher: "Building and Construction Authority" }],
     data_status: "CURATED",
     tags: ["target", "green building", "80-80-80"],
   },
@@ -1545,7 +1820,7 @@ export const policies: Policy[] = [
     description:
       "Incentive scheme co-funding retrofits of existing buildings to higher Green Mark tiers, focused on cooling and building systems efficiency.",
     limitations: [],
-    sources: [{ label: "GMIS-EB 2.0", url: null, publisher: "Building and Construction Authority" }],
+    sources: [{ label: "GMIS-EB 2.0", url: "https://www1.bca.gov.sg/grants-and-funded-programmes/green-mark-incentive-scheme-for-existing-buildings-2-0", publisher: "Building and Construction Authority" }],
     data_status: "CURATED",
     tags: ["grant", "retrofit", "cooling"],
   },
@@ -1569,7 +1844,7 @@ export const policies: Policy[] = [
     description:
       "Mandatory energy labelling (2008) and minimum energy performance standards (2011) for air-conditioners administered by the National Environment Agency; tightened several times since.",
     limitations: [],
-    sources: [{ label: "Mandatory Energy Labelling Scheme / MEPS", url: null, publisher: "National Environment Agency" }],
+    sources: [{ label: "Mandatory Energy Labelling Scheme / MEPS", url: "https://www.reach.gov.sg/latest-happenings/public-consultation-pages/2026/public-consultation-on-extending-minimum-energy-performance-standards-and-mandatory-energy-labelling-scheme-to-all-regulated-goods-imported-by-end-user-for-their-own-use", publisher: "National Environment Agency" }],
     data_status: "CURATED",
     tags: ["standard", "labelling", "cooling", "appliances"],
   },
@@ -1593,7 +1868,7 @@ export const policies: Policy[] = [
     description:
       "Regime requiring periodic energy audits of cooling systems in large buildings, extended by the 2024 announcement of a Mandatory Energy Improvement regime requiring the worst performers to improve by 10%.",
     limitations: [],
-    sources: [{ label: "Building Control Act environmental sustainability provisions", url: null, publisher: "Building and Construction Authority" }],
+    sources: [{ label: "Building Control Act environmental sustainability provisions", url: "https://www1.bca.gov.sg/sustainability/legislation-on-environmental-sustainability-for-buildings", publisher: "Building and Construction Authority" }],
     data_status: "CURATED",
     tags: ["audit", "standard", "cooling", "existing buildings"],
   },
@@ -1645,7 +1920,7 @@ export const policies: Policy[] = [
     description:
       "The Act on the Improvement of Energy Consumption Performance of Buildings passed in 2015. Compliance with energy standards was mandatory for large non-residential new buildings from April 2017 and extended to all new buildings, including houses, from April 2025.",
     limitations: [],
-    sources: [{ label: "Building Energy Efficiency Act", url: null, publisher: "MLIT" }],
+    sources: [{ label: "Building Energy Efficiency Act", url: "https://www.nilim.go.jp/english/20th_history/pdf_en/1-32en.pdf", publisher: "MLIT" }],
     data_status: "CURATED",
     tags: ["standard", "building code", "new build"],
   },
@@ -1700,7 +1975,7 @@ export const policies: Policy[] = [
     description:
       "The world's first urban cap-and-trade program has mandatory emission-reduction obligations for large commercial buildings and factories over multi-year compliance periods, with trading of excess reductions.",
     limitations: [],
-    sources: [{ label: "Tokyo Cap-and-Trade Program", url: null, publisher: "Tokyo Metropolitan Government" }],
+    sources: [{ label: "Tokyo Cap-and-Trade Program", url: "https://www.english.metro.tokyo.lg.jp/w/021-101-001120", publisher: "Tokyo Metropolitan Government" }],
     data_status: "CURATED",
     tags: ["carbon price", "obligation", "commercial buildings"],
   },
@@ -1725,7 +2000,7 @@ export const policies: Policy[] = [
     description:
       "An ordinance passed in December 2022 requires major housebuilders to install solar PV on new small buildings, including detached houses.",
     limitations: [],
-    sources: [{ label: "Tokyo solar requirement for new buildings", url: null, publisher: "Tokyo Metropolitan Government" }],
+    sources: [{ label: "Tokyo solar requirement for new buildings", url: "https://www.english.metro.tokyo.lg.jp/w/021-101-001016", publisher: "Tokyo Metropolitan Government" }],
     data_status: "CURATED",
     tags: ["standard", "solar", "new build"],
   },
@@ -1950,7 +2225,7 @@ export const policies: Policy[] = [
     sources: [
       {
         label: "Energy Conservation Building Code",
-        url: null,
+        url: "https://beeindia.gov.in/show_content.php?lang=1&level=2&ls_id=201&lid=327",
         publisher: "Bureau of Energy Efficiency (BEE)",
       },
     ],
@@ -1980,7 +2255,7 @@ export const policies: Policy[] = [
     sources: [
       {
         label: "Eco Niwas Samhita (ECBC-Residential)",
-        url: null,
+        url: "https://beeindia.gov.in/show_content.php?lang=1&level=2&ls_id=202&lid=328",
         publisher: "Bureau of Energy Efficiency (BEE)",
       },
     ],
@@ -2063,9 +2338,20 @@ export const policies: Policy[] = [
       "End fossil-boiler subsidies and set minimum performance floors",
     ],
     description:
-      "Recast Energy Performance of Buildings Directive requiring zero-emission new buildings from 2030, phasing out fossil-boiler subsidies from 2025, and introducing minimum performance standards for non-residential buildings.",
-    limitations: ["Effects depend on member-state transposition."],
-    sources: [{ label: "EPBD recast", url: null, publisher: "European Commission" }],
+      "Recast Energy Performance of Buildings Directive requiring zero-emission new buildings from 2030, phasing out fossil-boiler subsidies from 2025, and introducing minimum performance standards for non-residential buildings. The transposition deadline of 29 May 2026 passed with no member state fully notifying; on 15 July 2026 the Commission opened infringement procedures by sending letters of formal notice to all 27 member states.",
+    limitations: ["Effects depend on member-state transposition — incomplete in all 27 as of July 2026."],
+    sources: [
+      {
+        label: "Directive (EU) 2024/1275 — national transposition measures",
+        url: "https://eur-lex.europa.eu/legal-content/EN/NIM/?uri=CELEX:32024L1275",
+        publisher: "EUR-Lex",
+      },
+      {
+        label: "Commission calls on EU countries to transpose the reinforced rules on the energy performance of buildings (15 July 2026)",
+        url: "https://energy.ec.europa.eu/news/commission-calls-eu-countries-transpose-reinforced-rules-energy-performance-buildings-2026-07-15_en",
+        publisher: "European Commission",
+      },
+    ],
     data_status: "CURATED",
     tags: ["directive", "standard", "eu", "zero-emission"],
   },

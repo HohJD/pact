@@ -17,7 +17,7 @@ describe("keyDifferences", () => {
     ).join("\n");
 
     expect(diffs).toMatch(/loan/i);
-    expect(diffs).toMatch(/GEG/);
+    expect(diffs).toMatch(/GEG|GModG/);
     expect(diffs).toMatch(/no equivalent in force/i);
   });
 

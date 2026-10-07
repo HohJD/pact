@@ -26,12 +26,12 @@ export const TRANSFER_FALLBACKS: Array<{
     assessment: {
       transferability: "MEDIUM",
       rationale:
-        "Oxford shares Germany's old, gas-heated housing stock and heating demand, but a city council lacks the fiscal and regulatory powers behind BEG and the GEG; lessons transfer at the level of programme design and delivery, not instrument choice.",
+        "Oxford shares Germany's old, gas-heated housing stock and heating demand, but a city council lacks the fiscal and regulatory powers behind BEG and the (now-repealed) GEG heating rule; lessons transfer at the level of programme design and delivery, not instrument choice.",
       similarities: [
         "Mature, predominantly pre-1980 housing stock with significant retrofit need",
         "Gas is the dominant heating fuel in both contexts",
         "Comparable heating-degree demand in a temperate climate",
-        "Both operate within national heat-pump targets (UK 600,000/yr by 2028; EU/German heat transition)",
+        "Both operate within national heat-pump ambitions (UK >450,000/yr by 2030 under the 2026 Warm Homes Plan; EU/German heat transition)",
       ],
       differences: [
         "Electricity-to-gas price ratio is higher in the UK (~4 vs ~3), weakening heat-pump running-cost economics",

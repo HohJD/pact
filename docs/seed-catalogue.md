@@ -204,3 +204,242 @@ bus↔beg_em_2024 0.82 (both consumer HP grants; DE adds income bonus + loan + r
 Plus compute structured similarity programmatically for all other pairs (the engine), but seed these as curated.
 
 Asia similarity pairs (lead-authored): sg_meps_ac↔jp_top_runner 0.72 (both cover air-conditioner efficiency; Japan sets targets at the best product on the market, Singapore sets a minimum floor plus mandatory labels) · cn_energy_label↔in_star_labelling 0.80 (both mandatory graded appliance labels) · jp_tokyo_cap_trade↔nyc_ll97 0.74 (both cap emissions of large existing buildings; Tokyo allows trading, LL97 uses per-building limits with penalties) · kr_zeb↔epbd_2024 0.62 (both push new buildings toward zero energy/emissions; Korea phases a certification mandate by building type, the EU sets a directive for member states) · in_ecbc↔green_mark 0.60 (both set mandatory minimum performance for commercial buildings in cooling-dominated climates; Green Mark adds a voluntary higher rating tier).
+
+## Refresh — October 2026
+
+## A. United Kingdom
+
+### pol_gb_bus — Boiler Upgrade Scheme
+- status ACTIVE (unchanged). incentive unchanged (£7,500).
+- funding → "Government funded; ~£450m for 2022–25, then extended to FY2029/30 with £2.7bn under the Warm Homes Plan (Jan 2026)."
+- description append: "Extended to 2030 by the Boiler Upgrade Scheme (England and Wales) (Amendment) Regulations 2026; 75,174 grants had been paid by the end of December 2025."
+- limitations: keep existing; add "Grant count to end-2025 (75,174) remains far below the pace implied by national heat-pump ambitions."
+- sources add:
+  - { label: "Boiler Upgrade Scheme (England and Wales) (Amendment) Regulations 2026", url: "https://www.legislation.gov.uk/uksi/2026/390/made", publisher: "legislation.gov.uk" }
+  - { label: "Warm Homes Plan (HTML)", url: "https://www.gov.uk/government/publications/warm-homes-plan/warm-homes-plan-html", publisher: "DESNZ" }
+
+### pol_gb_hp_target — 600,000 heat pumps per year by 2028 target
+- status → SUPERSEDED; ended → "2026-01".
+- description append: "Superseded on 21 January 2026 by the Warm Homes Plan, which replaced it with an aim of over 450,000 heat-pump installations per year by 2030 (a lower number over a longer horizon). In a written answer of 4 June 2026 the government described the 600,000 figure as 'set by the previous government'."
+- limitations → ["Installations ran far below the required trajectory.", "Target dropped in January 2026 in favour of >450,000/yr by 2030."]
+- sources add: { label: "Warm Homes Plan (HTML)", url: "https://www.gov.uk/government/publications/warm-homes-plan/warm-homes-plan-html", publisher: "DESNZ" }
+  and try { label: "Heat and Buildings Strategy", url: "https://www.gov.uk/government/publications/heat-and-buildings-strategy", publisher: "UK Government" } (null if not 200).
+
+### pol_gb_warm_homes_plan — Warm Homes Plan
+- status → ACTIVE; introduced → "2026-01".
+- incentive → "£15bn programme to 2029/30: ~£5bn grants for low-income homes (£4.4bn capital), £2.7bn Boiler Upgrade Scheme, £2bn zero/low-interest consumer loans, £1.1bn heat networks, £2.7bn Warm Homes Fund finance."
+- funding → "£15bn capital over 2025/26–2029/30 including Barnett consequentials; published 21 January 2026."
+- description REWRITE: "Published by DESNZ on 21 January 2026: a £15bn plan to upgrade up to 5 million homes by 2030. It funds low-income upgrades through the Warm Homes: Social Housing Fund and Warm Homes: Local Grant (to be consolidated into a single low-income scheme), extends the Boiler Upgrade Scheme to 2030 with £2.7bn, launches a zero/low-interest loan offer backed by £2bn, and funds heat networks. It abolishes the supplier-obligation (ECO) model in favour of public investment, and sets an aim of over 450,000 heat-pump installations per year by 2030."
+- limitations → ["Most delivery is back-loaded to 2027/28–2029/30; the consolidated low-income scheme is not yet designed."]
+- sources → [{ label: "Warm Homes Plan", url: "https://www.gov.uk/government/publications/warm-homes-plan", publisher: "DESNZ" }]
+
+### pol_gb_fhs — Future Homes Standard
+- status stays ANNOUNCED (legislated, not yet in force). introduced → "2026-03".
+- name → "Future Homes and Buildings Standards"
+- incentive → "New homes to emit on average ≥75% less carbon than 2013 standards: low-carbon heating as standard (in practice no gas boilers) and solar on the majority of new homes."
+- description REWRITE: "Government response to the Future Homes and Buildings Standards consultation published 24 March 2026, with the Building Regulations etc. (Amendment) (England) Regulations 2026 (SI 2026/335) laid the same day. The standards come into force on 24 March 2027 for ordinary building work and 24 September 2027 for higher-risk buildings, with a 12-month transitional period: work with a valid application before 24 March 2027 that commences before 24 March 2028 may be built to the 2021 Part L standards."
+- limitations → ["Legislated but not in force until March 2027; transitional rules mean most homes completing in 2027–28 will still be built to 2021 standards."]
+- sources → [{ label: "Future Homes and Buildings Standards: Building Circular 01/2026", url: "https://www.gov.uk/government/publications/the-future-homes-and-buildings-standards-building-circular-012026/the-future-homes-and-buildings-standards-building-circular-012026-letter", publisher: "MHCLG" }]
+
+### pol_gb_eco4 — Energy Company Obligation 4
+- ended → "2026-12".
+- description append: "Extended by nine months to 31 December 2026 (government response, January 2026) to let suppliers complete targets and remediate non-compliant installations. There will be no successor supplier obligation: the Warm Homes Plan replaces the ECO model with £1.5bn of additional public grant funding for low-income households."
+- sources add: { label: "Extending the ECO4 end date: government response", url: "https://www.gov.uk/government/consultations/extending-the-eco4-end-date/outcome/extending-the-eco4-end-date-government-response-html", publisher: "DESNZ" }
+
+### pol_gb_gbis — Great British Insulation Scheme
+- status → CLOSED; ended → "2026-03".
+- description append: "Closed to new installations on 31 March 2026 as planned; no successor obligation."
+- sources → [{ label: "Great British Insulation Scheme", url: "https://www.ofgem.gov.uk/environmental-and-social-schemes/great-british-insulation-scheme", publisher: "Ofgem" }]
+
+### pol_gb_hug — Home Upgrade Grant
+- ended → "2025-03".
+- description append: "Ended March 2025 and succeeded by the Warm Homes: Local Grant (April 2025–March 2028, £500m, delivered by 271 local authorities and open to on-gas as well as off-gas homes)."
+- sources → [{ label: "Warm Homes: Local Grant – guidance for local authorities", url: "https://www.gov.uk/government/publications/warm-homes-local-grant", publisher: "DESNZ" }]
+
+### pol_gb_chmm — Clean Heat Market Mechanism
+- incentive append: " Year 2 target (from 1 April 2026) raised to 8% of relevant boiler sales; MCS named the sole certification scheme."
+- description append: "The Clean Heat Market Mechanism (Amendment) Regulations 2025 set the Year 2 (2026/27) target at 8% and named MCS as sole certification scheme; targets beyond Year 2 are subject to further consultation."
+- sources → [
+  { label: "CHMM: revisions ahead of Scheme Year 2 — government response", url: "https://www.gov.uk/government/consultations/clean-heat-market-mechanism-revisions-ahead-of-scheme-year-2-20262027/outcome/clean-heat-market-mechanism-revisions-ahead-of-scheme-year-2-2026-to-2027-government-response-accessible-webpage", publisher: "DESNZ" },
+  { label: "Clean Heat Market Mechanism Regulations 2025, Part 4", url: "https://www.legislation.gov.uk/uksi/2025/81/part/4", publisher: "legislation.gov.uk" } ]
+
+### pol_gb_mees — Minimum Energy Efficiency Standards (PRS)
+- incentive → "Minimum EPC E to let (2018 new tenancies, 2020 all). Government response of 21 January 2026 confirms an EPC C-equivalent standard for all private tenancies by 1 October 2030, assessed on new dual-metric EPCs (fabric first, then heating-system or smart-readiness), with a £10,000 per-property cost cap."
+- description append: "On 21 January 2026 the government confirmed it will raise the standard to EPC C-equivalent for all tenancies by 1 October 2030, with a £10,000 cost cap and 10-year exemptions; homes already at EPC C (EER) before 1 October 2029 are recognised as compliant until the certificate expires."
+- limitations → ["Legislative changes subject to parliamentary approval."]
+- sources → [{ label: "Improving the energy performance of privately rented homes: government response", url: "https://www.gov.uk/government/consultations/improving-the-energy-performance-of-privately-rented-homes-2025-update/outcome/improving-the-energy-performance-of-privately-rented-homes-government-response-html", publisher: "DESNZ" }]
+
+## B. Germany
+
+### pol_de_geg_2024 — GEG 2024 amendment (Heizungsgesetz)
+- status → SUPERSEDED; ended → "2026-07".
+- description append: "Superseded in July 2026 by the Gebäudemodernisierungsgesetz (GModG): passed by Bundestag and Bundesrat on 10 July 2026 and promulgated on 23 July 2026 (BGBl. 2026 I Nr. 226), it removed the 65%-renewable requirement for new heating systems and renamed the Act."
+- limitations add: "Repealed after roughly two and a half years in force."
+- sources → [
+  { label: "Bundestag beschließt Heizungsgesetz-Novelle", url: "https://www.bundestag.de/dokumente/textarchiv/2026/kw28-de-heizungsgesetz-1194534", publisher: "Deutscher Bundestag" },
+  { label: "Gebäudeenergiegesetz (consolidated text)", url: "https://www.gesetze-im-internet.de/geg/", publisher: "Bundesministerium der Justiz" } ]  (null if not 200)
+
+### NEW pol_de_gmodg — Gebäudemodernisierungsgesetz (GModG)
+- country DE (jurisdiction = same as pol_de_geg_2024); short_name "GModG"; status ACTIVE; introduced "2026-07"; ended null.
+- sector, technology_ids, mechanism_ids, target_groups, tags-style: copy from pol_de_geg_2024, replacing tag "65% renewable" with "technology-open" and "heating law" kept.
+- eligibility: "All owners installing a new heating system in Germany; fossil boilers permitted subject to a rising green-fuel quota from 1 January 2029."
+- incentive: "Technology-open rules for new heating systems — heat pumps, district heating, hybrids, biomass, direct electric and, again, new gas and oil boilers, the latter conditional on a rising share of CO2-neutral fuels from 1 January 2029 (a Grüngas-/Grünheizölquote law is to be tabled by 1 December 2026)."
+- funding: "Regulatory measure; accompanied by continued BEG subsidies, strengthened for lower-income households. Government estimates ~€7.4bn relief for citizens and businesses."
+- objectives: ["Technology-open decarbonisation of building heat", "Reduce compliance cost and bureaucracy for building owners"]
+- description: "Successor to the 2024 'Heizungsgesetz' under the CDU/CSU–SPD coalition, implementing the coalition agreement's pledge to abolish it. Passed by Bundestag and Bundesrat on 10 July 2026 and promulgated 23 July 2026 (BGBl. 2026 I Nr. 226). It deletes the 65% renewable requirement, re-permits new fossil boilers subject to a phased green-fuel quota, retains municipal heat planning, and is paired with reformed BEG funding."
+- implementation_notes: "In force on publication in the Bundesgesetzblatt; further amendments scheduled for 1 January 2028 and 1 January 2030."
+- limitations: ["Effects on heat-pump demand not yet observable at refresh time (October 2026).", "Green-fuel quota not yet legislated."]
+- sources: [
+  { label: "Gebäudemodernisierungsgesetz ist Investitionsprogramm für den Wärmemarkt (press release, 10 July 2026)", url: "https://www.bundeswirtschaftsministerium.de/Redaktion/DE/Pressemitteilungen/2026/07/20260710-gebaeudemodernisierungsgesetz.html", publisher: "BMWE" },
+  { label: "BGBl. 2026 I Nr. 226", url: "https://www.recht.bund.de/bgbl/1/2026/226/regelungstext.pdf?__blob=publicationFile&v=1", publisher: "Bundesgesetzblatt" } ]
+- similarity pair to add: a pol_de_geg_2024, b pol_de_gmodg, overall 0.86, differences ["GModG removes the 65% renewable mandate and re-permits fossil boilers under a green-fuel quota."]
+- Also add pair a pol_de_gmodg, b pol_no_oil_ban, overall 0.45, differences ["Norway bans fossil oil outright; GModG permits fossil boilers with a rising green-fuel share."]
+
+### pol_de_beg_em_2024 — BEG Heizungsförderung (KfW 458)
+- incentive REWRITE: "From 21 July 2026: 30% base grant on max €28,000 eligible cost for the first unit (cap falls by €750 every six months from 1 Feb 2027); income bonus 40% (taxable household income ≤€30,000), 30% (≤€40,000), 10% (≤€50,000), with thresholds €10,000 higher for families with children; climate-speed bonus 16%, falling 4 points every six months and ending for applications from 1 Aug 2028; maximum 80% for the lowest income band, 70% otherwise. Jan 2024–Jul 2026 design: 30% base + 20% speed + 30% income bonus (≤€40,000) + 5% efficiency bonus, capped at 70% of €30,000; supplementary low-interest loan."
+- description append: "Reformed under the GModG framework: the BEG EM guideline of 17 August 2026 (effective 21 July 2026) keeps the 30% base grant, lowers the cap to €28,000 with a declining schedule, widens and steepens the income bonus, and phases out the speed bonus by August 2028."
+- sources → [
+  { label: "Die neue Bundesförderung für effiziente Gebäude startet jetzt (KfW press release)", url: "https://www.kfw.de/%C3%9Cber-die-KfW/Newsroom/Aktuelles/Pressemitteilungen-Details_901760.html", publisher: "KfW" },
+  { label: "FAQ BEG", url: "https://www.energiewechsel.de/KAENEF/Navigation/DE/Service/FAQ/BEG/faq-beg.html", publisher: "BMWE" },
+  { label: "Merkblatt KfW 458 Heizungsförderung", url: "https://www.kfw.de/PDF/Download-Center/F%C3%B6rderprogramme-%28Inlandsf%C3%B6rderung%29/PDF-Dokumente/6000005131_M_458.pdf", publisher: "KfW" } ]
+
+### pol_de_waermeplanung — Wärmeplanungsgesetz
+- incentive → "Mandatory municipal heat planning (large cities by mid-2026, others by mid-2028); originally the geographic trigger for the GEG 65% rule, retained under the 2026 GModG."
+- description: replace "the GEG 65% requirement binds once local plans are in place" with "under the 2024 GEG the 65% requirement bound once local plans were in place; the planning duty is retained under the 2026 GModG".
+
+## C. France
+
+### pol_fr_maprimerenov — MaPrimeRénov'
+- funding → "State budget via ANAH; €3.6bn for 2026 (targeting ≥120,000 deep and 150,000 single-measure renovations)."
+- description append: "The deep-renovation window was suspended in summer 2025 and the whole scheme again from the start of 2026 pending the state budget; it reopened for all pathways on 23 February 2026 with a mandatory France Rénov' adviser meeting before deep-renovation applications. Around 83,000 files were pending at end-2025; average processing time exceeded six months for deep renovations."
+- limitations add: "Repeated suspensions (2025, early 2026) and multi-month processing backlogs."
+- sources add: { label: "Réouverture de MaPrimeRénov' (23 February 2026)", url: "https://www.info.gouv.fr/actualite/reouverture-de-maprimerenov", publisher: "Gouvernement (info.gouv.fr)" }
+
+## D. Netherlands
+
+### pol_nl_hybrid_norm
+- name → "Hybrid heat-pump standard at boiler replacement (2026 plan dropped; 2029 plan announced)"
+- status → ANNOUNCED; introduced stays "2022".
+- description REWRITE: "A 2022 plan to require at least a hybrid heat pump at boiler replacement from 2026 was formally dropped on 31 October 2024 under the Schoof coalition (never in force). On 7 October 2026 the new D66–VVD–CDA minority cabinet announced that smart hybrid heat pumps will become the standard at boiler replacement from 2029 for homes not connected, or due to be connected, to a heat network; exemptions and legislation are still to be worked out."
+- incentive → "Would require at least a smart hybrid heat pump at boiler replacement from 2029 (outside heat-network areas)."
+- limitations → ["Minority coalition; no parliamentary majority secured.", "The 2026 version never entered into force; hybrid sales fell to ~41,000 in 2025 against >425,000 boiler replacements per year."]
+- tags: replace "paused" with "announced".
+- sources → [{ label: "Slimme en hybride warmtepompen vanaf 2029 de nieuwe standaard", url: "https://www.rijksoverheid.nl/actueel/nieuws/2026/10/07/slimme-en-hybride-warmtepompen-vanaf-2029-de-nieuwe-standaard", publisher: "Rijksoverheid" }]
+- similarities.ts: pair (pol_gb_chmm, pol_nl_hybrid_norm) difference → "CHMM obliges manufacturers; the Dutch norm would oblige households at boiler replacement (now planned for 2029)."
+
+### pol_nl_isde
+- incentive append: " 2026: €500m budget; first air-to-water heat pump €1,025 start amount + €225/kW from the first kW + €200 energy-label bonus; second and further units €225/kW only; scheme runs to 2031."
+- sources add: { label: "ISDE: wat is er gewijzigd vanaf 2026?", url: "https://www.rvo.nl/subsidies-financiering/isde/isde-wat-wijzigt-er-2026", publisher: "RVO" }
+
+## E. Denmark
+
+### pol_dk_bygningspulje
+- status → SUPERSEDED; ended → "2023".
+- description append: "Split in summer 2023 into Varmepumpepuljen (heat-pump conversions) and Energirenoveringspuljen (energy renovation). Roughly DKK 2.5bn was allocated across 2020–2026 (2020: 245m; 2021: 675m; 2022: 430m; 2023: 340m; 2024: 405m; 2025: 230m; 2026: 200m); the pool is expected to be wound up after 31 October 2026."
+- sources → [{ label: "Bygningspuljen – opsplittet i to puljer", url: "https://ens.dk/tilskud-og-puljer/tilskuds-stoetteordninger/bygningspuljen-opsplittet-i-puljer", publisher: "Danish Energy Agency" }]
+
+### NEW pol_dk_varmepumpepulje — Varmepumpepuljen
+- country DK; short_name "Varmepumpepuljen"; status ACTIVE; introduced "2023"; sector/tech/mechanisms/target_groups copied from pol_dk_bygningspulje (technology: heat pumps only).
+- eligibility: "Owners of year-round homes under 400 m² replacing an oil, gas, electric or biomass boiler with an air-to-water or ground-source heat pump; application and approval before work starts; first-come-first-served."
+- incentive: "Fixed grant of DKK 27,000 per heat pump regardless of type."
+- funding: "State grant pool; DKK 116.9m for 2026 plus a DKK 200m top-up; pool closed 11 May 2026 when exhausted and reopened 2 July 2026 until 30 November 2026 or exhaustion."
+- objectives: ["Replace oil and gas boilers with heat pumps outside district-heating areas"]
+- description: "Successor to Bygningspuljen's heat-pump track from 2023: a fixed DKK 27,000 grant for converting a boiler to a heat pump in a year-round home. Demand regularly exhausts annual rounds — the 2026 round closed on 11 May and reopened on 2 July with DKK 200m of extra funding."
+- limitations: ["First-come-first-served rounds exhaust quickly, creating stop-go demand."]
+- sources: [{ label: "Varmepumpepuljen åbner igen: 200 mio. kr. skal hjælpe flere væk fra olie og gas", url: "https://ens.dk/presse/varmepumpepuljen-aabner-igen-200-mio-kr-skal-hjaelpe-flere-vaek-fra-olie-og-gas", publisher: "Danish Energy Agency" }]
+- similarity pair: a pol_dk_varmepumpepulje, b pol_gb_bus, overall 0.78, differences ["Both are flat per-unit heat-pump grants; the Danish grant is smaller (DKK 27,000) and rationed by annual rounds."]
+
+### pol_dk_skrotningsordning
+- incentive → "Up to DKK 25,000 per heat pump (max 45% of eligible cost), paid to pre-qualified energy-service providers who offer heat pumps on subscription and scrap the household's oil, wood-pellet or gas boiler; a new application round opened 7 January 2026 under BEK nr 806 of 18 June 2025."
+- sources → [{ label: "Skrotningsordningen", url: "https://ens.dk/tilskud-og-puljer/tilskuds-stoetteordninger/skrotningsordningen", publisher: "Danish Energy Agency" }]
+
+## F. Norway
+
+### pol_no_enova_hp
+- incentive → "25% of invoiced cost up to NOK 40,000 for liquid-to-water (ground/sea/rock) and NOK 20,000 for air-to-water heat pumps (air-to-water support reinstated when Enova revised its household scheme), NOK 5,000 for heat-pump water heaters; approval required before work starts; combined cap NOK 100,000 per home for 2025–2028."
+- sources → [{ label: "Væske-til-vann varmepumpe", url: "https://enova.no/nb/privat/bolig/stotte/vaeske-til-vann-varmepumpe", publisher: "Enova" }]
+
+## G. United States
+
+### pol_us_25c
+- status → CLOSED; ended → "2025-12".
+- description append: "Terminated early by the One Big Beautiful Bill Act (Public Law 119-21, 4 July 2025), §70505: no credit for property placed in service after 31 December 2025, against an original sunset of 2032. No federal successor credit was created."
+- limitations → ["Repealed early; unavailable from 1 January 2026.", "Efficiency Maine reports slower heat-pump rebate demand in 2026, which it attributes partly to the credit's loss."]
+- sources add: { label: "FAQs for modification of sections 25C, 25D … under Public Law 119-21 (OBBB)", url: "https://www.irs.gov/newsroom/faqs-for-modification-of-sections-25c-25d-25e-30c-30d-45l-45w-and-179d-under-public-law-119-21-139-stat-72-july-4-2025-commonly-known-as-the-one-big-beautiful-bill-obbb", publisher: "IRS" }
+- similarities.ts pair (25C, BUS) difference → "25C was a tax credit claimed after spend (repealed end-2025); BUS is an upfront grant."
+
+### pol_us_heehra
+- description append: "Roll-out remains uneven: by mid-2026 roughly half the states had launched; Idaho and South Dakota returned their allocations. DOE Program Notice 26-2 (29 May 2026) removed fuel-switching from the electrification rebate and dropped the Justice40 set-aside. Some state programmes paused — Georgia's HEAR closed on 14 August 2026 and reopens in October 2026 for wiring/panel upgrades only."
+- limitations → ["State-by-state launch; several states slow or declined.", "2026 federal rule change narrowed the rebate to non-fuel-switching measures."]
+- sources → [
+  { label: "Home Energy Rebates", url: "https://www.energy.gov/save/rebates", publisher: "US Department of Energy" } (null if not 200),
+  { label: "Georgia HEAR programme update", url: "https://energyrebates.georgia.gov/home-electrification-and-appliance-rebates", publisher: "Georgia Environmental Finance Authority" } ]
+
+### pol_us_homes
+- description append: "By mid-2026 roughly half the states had launched programmes; DOE Program Notice 26-1 (29 May 2026) simplified state blueprint approval and removed the Justice40 set-aside."
+- sources → same DOE source as above.
+
+### pol_us_ny_all_electric
+- status stays ANNOUNCED.
+- description REWRITE: "Statewide prohibition of fossil-fuel equipment in new buildings of seven storeys or fewer from 2026, and all new buildings from 1 January 2029, enacted in the FY2024 state budget (2023). On 30 June 2026 the Second Circuit (Mulhern Gas v. Mosley) held that neither the Act nor NYC Local Law 154 is pre-empted by the federal Energy Policy and Conservation Act, splitting from the Ninth Circuit. The state had agreed in November 2025 to delay enforcement pending the ruling; enforcement remains on hold until the 28 October 2026 deadline for a Supreme Court petition."
+- limitations → ["Enforcement paused pending possible Supreme Court petition (deadline 28 October 2026)."]
+- sources → [{ label: "Mulhern Gas v. Mosley — Second Circuit decision (30 June 2026)", url: "https://dos.ny.gov/system/files/documents/2026/07/decision-mulhern-gas-v.-mosley-2d-cir.pdf", publisher: "New York Department of State" }]
+
+### pol_us_me_hp_target
+- description append: "2026 headwinds: Efficiency Maine reports a more pronounced seasonal slowdown in whole-home heat-pump rebates, citing lower consumer confidence, the loss of the federal tax credit, tariffs and higher electricity prices; it introduced a new ducted rebate structure (1 January 2026) and a limited-time bonus (from 1 March 2026)."
+- sources → [
+  { label: "After Maine surpasses 100,000 heat pump goal two years ahead of schedule, Governor Mills sets new target", url: "https://www.maine.gov/governor/mills/news/after-maine-surpasses-100000-heat-pump-goal-two-years-ahead-schedule-governor-mills-sets-new", publisher: "Office of Governor Janet T. Mills" },
+  { label: "Efficiency Maine Executive Director's Summary Report, May 2026", url: "https://www.efficiencymaine.com/docs/ED-Report-5-27-2026.pdf", publisher: "Efficiency Maine Trust" } ]
+
+## H. EU
+
+### pol_eu_epbd_2024
+- description append: "The transposition deadline of 29 May 2026 passed with no member state fully notifying; on 15 July 2026 the Commission opened infringement procedures by sending letters of formal notice to all 27 member states."
+- limitations → ["Effects depend on member-state transposition — incomplete in all 27 as of July 2026."]
+- sources → [
+  { label: "Directive (EU) 2024/1275 — national transposition measures", url: "https://eur-lex.europa.eu/legal-content/EN/NIM/?uri=CELEX:32024L1275", publisher: "EUR-Lex" },
+  { label: "Commission calls on EU countries to transpose the reinforced rules on the energy performance of buildings (15 July 2026)", url: "https://energy.ec.europa.eu/news/commission-calls-eu-countries-transpose-reinforced-rules-energy-performance-buildings-2026-07-15_en", publisher: "European Commission" } ]
+
+---
+
+## I. Evidence — URL fixes and new records
+
+### Fix
+- ev_efficiency_maine_2023 → source_url "https://www.maine.gov/governor/mills/news/after-maine-surpasses-100000-heat-pump-goal-two-years-ahead-schedule-governor-mills-sets-new"
+- pol_sg_green_mark source url → "https://www1.bca.gov.sg/buildsg/sustainability/green-mark-certification-scheme/" (trailing slash; currently 404 without it).
+
+### NEW ev_bus_extension_ia_2026
+- title "Boiler Upgrade Scheme (England and Wales) (Amendment) Regulations 2026 — Impact Assessment"
+- publisher "DESNZ"; publication_date "2026"
+- source_url "https://www.legislation.gov.uk/ukia/2026/67/pdfs/ukia_20260067_en.pdf"
+- evidence_type GOVERNMENT_EVALUATION; causal_strength DESCRIPTIVE; confidence HIGH; geography GB
+- policy_ids ["pol_gb_bus"]; metrics: the existing heat-pump-installations metric id used by pol_gb_bus outcomes
+- methodology "Ex-ante impact assessment using scheme administrative data"
+- findings "75,174 BUS grants paid from launch to end December 2025; scheme extended to FY2029/30 with ~£2.7bn, budget rising each year; 90–95% of surveyed property owners satisfied with their installation."
+- limitations "Ex-ante assessment; the installation figure is an administrative count, not an impact estimate."
+
+### NEW ev_efficiency_maine_ed_2026
+- title "Efficiency Maine Executive Director's Summary Report (May 2026)"
+- publisher "Efficiency Maine Trust"; publication_date "2026-05"
+- source_url "https://www.efficiencymaine.com/docs/ED-Report-5-27-2026.pdf"
+- evidence_type OFFICIAL_STATISTICS; causal_strength DESCRIPTIVE; confidence MEDIUM; geography US (Maine)
+- policy_ids ["pol_us_me_hp_target", "pol_us_25c"]; metrics: heat-pump installations metric
+- methodology "Programme administrative reporting to the Trust's board"
+- findings "3,714 standard whole-home heat-pump rebates issued fiscal-year-to-date (≈81/week); the seasonal slowdown in early 2026 was more pronounced than in prior years, which the Trust attributes to lower consumer confidence, the loss of the federal tax credit, tariffs and higher electricity prices; demand picked up in spring with rising heating-oil prices."
+- limitations "Programme self-reporting; attribution of the slowdown is the Trust's qualitative judgement, not an evaluation."
+
+### NEW ev_efficiency_maine_whhp_2026
+- title "Assessment of Heat Pumps in Maine Homes (2026)"
+- publisher "Efficiency Maine Trust"; publication_date "2026"
+- source_url "https://www.efficiencymaine.com/docs/Efficiency_Maine_Whole_Home_Heat_Pump_Study_2026.pdf"
+- evidence_type GOVERNMENT_EVALUATION; causal_strength DESCRIPTIVE; confidence MEDIUM; geography US (Maine)
+- policy_ids ["pol_us_me_hp_target"]; metrics: heat-pump installations and (if it exists) energy-consumption metric
+- methodology "Analysis of utility AMI interval electricity data for whole-home heat-pump installations from the programme's first six months (Sept 2023–Feb 2024)"
+- findings "As of September 2025, ~98% of rebated whole-home heat pumps were ductless; the study isolates cold-weather-dependent electricity use to estimate heat-pump usage in rebated homes."
+- limitations "Early cohort; descriptive usage analysis without a control group."
+
+### NEW outcome (mirror the existing pol_gb_bus outcome record shape)
+- policy pol_gb_bus; metric heat-pump installations; value 75174; unit "grants paid"; period "2022-05 to 2025-12"; inference DESCRIPTIVE/administrative; evidence_ids ["ev_bus_extension_ia_2026"]; note "Cumulative BUS grants paid to end December 2025 (administrative count)."
+
+---
+

@@ -23,6 +23,7 @@ function boxesIntersect(
 
 test("mobile analyst opens from a question and closes with its X", async ({ page }) => {
   const question = "Which policies have successfully accelerated heat-pump adoption?";
+  await page.route("**/api/analyst**", (route) => route.abort());
   await page.goto(`/workspace?q=${encodeURIComponent(question)}`);
 
   await expect(page.getByText(/CURATED RESPONSE/)).toBeVisible({ timeout: 12000 });

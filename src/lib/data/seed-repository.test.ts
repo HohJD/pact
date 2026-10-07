@@ -59,7 +59,7 @@ describe("SeedRepository", () => {
 
   it("getOutcomesForPolicy returns linked outcomes", () => {
     const outs = repo.getOutcomesForPolicy("pol_gb_bus");
-    expect(outs.length).toBe(2);
+    expect(outs.length).toBe(3);
   });
 
   it("getTimeSeries filters by country and metric", () => {
