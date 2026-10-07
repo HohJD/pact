@@ -137,7 +137,7 @@ export async function retrieveContext(
   });
 
   scored.sort((a, b) => b.score - a.score);
-  const top = scored.slice(0, 10).map((s) => s.p);
+  const top = scored.slice(0, 12).map((s) => s.p);
   // always include selected/compared policies
   for (const id of pinned) {
     const p = dataset.policies.find((x) => x.id === id);
