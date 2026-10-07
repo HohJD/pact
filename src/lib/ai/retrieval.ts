@@ -4,6 +4,7 @@ import path from "node:path";
 import type { Dataset, Evidence, Outcome, Policy } from "@/lib/domain/schema";
 import type { WorkspaceFilter } from "@/store/workspace";
 import { resolveQuery } from "@/lib/query/resolve";
+import { searchCatalogue } from "@/lib/search/catalogue";
 import type { LLMProvider } from "./provider";
 
 export interface WorkspaceContext {
@@ -27,33 +28,9 @@ export interface RetrievalContext {
   policyIds: Set<string>;
 }
 
-const STOP = new Set(
-  "the a an and or of to in for on with by is are was were be been what which how have has do does did it its that this from as at not no but can could should would will".split(
-    " ",
-  ),
-);
-
-function tokenize(s: string): string[] {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9äöüéè\s]/g, " ")
-    .split(/\s+/)
-    .filter((t) => t.length > 1 && !STOP.has(t))
-    .map((t) => (t.length > 3 && t.endsWith("s") ? t.slice(0, -1) : t));
-}
-
-function lexicalScore(policy: Policy, qTokens: string[]): number {
-  if (qTokens.length === 0) return 0;
-  const doc = `${policy.name} ${policy.short_name ?? ""} ${policy.description} ${policy.incentive} ${policy.eligibility} ${policy.tags.join(" ")}`.toLowerCase();
-  let score = 0;
-  for (const t of qTokens) {
-    const matches = doc.split(t).length - 1;
-    if (matches > 0) score += Math.min(3, matches);
-  }
-  return score;
-}
-
 interface EmbeddingsFile {
+  model: string;
+  dims: number;
   policies: Record<string, number[]>;
   evidence: Record<string, number[]>;
 }
@@ -86,7 +63,16 @@ export async function retrieveContext(
   provider?: LLMProvider,
 ): Promise<RetrievalContext> {
   const resolved = resolveQuery(question, dataset);
-  const qTokens = tokenize(question);
+  const catalogueResults = searchCatalogue(dataset, question);
+  const maxLexicalScore = Math.max(0, ...catalogueResults.scores.values());
+  let documentPolicyIds = new Set<string>();
+  try {
+    const { searchDocuments } = await import("@/lib/search/documents");
+    const documents = await searchDocuments(question, 10);
+    documentPolicyIds = new Set(documents.map((document) => document.policy_id));
+  } catch {
+    documentPolicyIds = new Set();
+  }
 
   const hintTech = new Set(resolved.filters.technology_ids ?? []);
   const hintMech = new Set(resolved.filters.mechanism_ids ?? []);
@@ -102,21 +88,32 @@ export async function retrieveContext(
   if (provider?.isConfigured() && embFile) {
     try {
       const [qv] = await provider.embed([question]);
-      emb = Object.fromEntries(
-        Object.entries(embFile.policies).map(([id, v]) => [id, cosine(qv, v)]),
-      );
+      if (qv?.length) {
+        const compatible = Object.entries(embFile.policies).filter(
+          ([, vector]) => vector.length === qv.length,
+        );
+        if (compatible.length > 0) {
+          emb = Object.fromEntries(
+            compatible.map(([id, vector]) => [id, cosine(qv, vector)]),
+          );
+        }
+      }
     } catch {
       emb = null; // embeddings unavailable → lexical only
     }
   }
 
   const scored = dataset.policies.map((p) => {
-    const lex = lexicalScore(p, qTokens);
+    const lex =
+      maxLexicalScore > 0
+        ? (6 * (catalogueResults.scores.get(p.id) ?? 0)) / maxLexicalScore
+        : 0;
     let score = lex * 0.5;
     if (p.technology_ids.some((t) => hintTech.has(t))) score += 2;
     if (p.mechanism_ids.some((m) => hintMech.has(m))) score += 2;
     if (hintCountry.has(p.country_code)) score += 2;
     if (pinned.has(p.id)) score += 3;
+    if (documentPolicyIds.has(p.id)) score += 2;
     // popularity nudge: policies with observed outcomes / evaluating evidence
     // surface above obscure records at equal relevance
     const nOutcomes = dataset.outcomes.filter((o) => o.policy_id === p.id).length;
@@ -140,7 +137,7 @@ export async function retrieveContext(
   });
 
   scored.sort((a, b) => b.score - a.score);
-  const top = scored.slice(0, 8).map((s) => s.p);
+  const top = scored.slice(0, 10).map((s) => s.p);
   // always include selected/compared policies
   for (const id of pinned) {
     const p = dataset.policies.find((x) => x.id === id);

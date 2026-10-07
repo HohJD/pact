@@ -51,6 +51,23 @@ describe("retrieveContext", () => {
     expect(ids).toContain("pol_de_beg_em_2024");
   });
 
+  it("falls back to lexical ranking when query embeddings have incompatible dimensions", async () => {
+    const question = "Which policies offer low-interest loans?";
+    const baseline = await retrieveContext(question, seedDataset);
+    const provider: LLMProvider = {
+      ...nullProvider,
+      isConfigured: () => true,
+      embed: vi.fn(async () => [new Array(1536).fill(0.001)]),
+    };
+
+    const result = await retrieveContext(question, seedDataset, undefined, provider);
+
+    expect(result.policies.map((policy) => policy.id)).toEqual(
+      baseline.policies.map((policy) => policy.id),
+    );
+    expect(provider.embed).toHaveBeenCalledOnce();
+  });
+
   it("context document cites only evidence ids that exist", async () => {
     const ctx = await retrieveContext(FLAGSHIP, seedDataset);
     const doc = formatContextDocument(ctx, seedDataset);

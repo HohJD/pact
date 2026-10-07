@@ -7,18 +7,19 @@ import {
   type Policy,
   type Similarity,
 } from "@/lib/domain/schema";
+import { semanticScores } from "@/data/seed/semantic";
 
 type SimilarityBreakdownT = z.infer<typeof SimilarityBreakdown>;
 
 const EUROPEAN = new Set(["GB", "DE", "FR", "NL", "DK", "NO"]);
 
 const WEIGHTS = {
-  technology: 0.3,
-  mechanism: 0.3,
+  technology: 0.25,
+  mechanism: 0.25,
   sector: 0.1,
   target: 0.1,
   jurisdiction: 0.1,
-  semantic: 0.1,
+  semantic: 0.2,
 } as const;
 
 const JURISDICTION_SCORE = { HIGH: 1, MEDIUM: 0.5, LOW: 0 } as const;
@@ -110,6 +111,10 @@ function similarityId(a: string, b: string): string {
   return `sim_${[a, b].sort().join("_")}`;
 }
 
+function semanticPairKey(a: string, b: string): string {
+  return [a, b].sort().join("|");
+}
+
 /**
  * Top-N similar policies: curated seed similarities first (preferred), then
  * computed structured pairs to fill the remainder.
@@ -133,7 +138,12 @@ export function topSimilar(policyId: string, dataset: Dataset, n = 5): Similarit
       id: similarityId(policyId, p.id),
       policy_a: policyId,
       policy_b: p.id,
-      breakdown: structuredSimilarity(me, p, dataset.jurisdictions),
+      breakdown: structuredSimilarity(
+        me,
+        p,
+        dataset.jurisdictions,
+        semanticScores[semanticPairKey(me.id, p.id)],
+      ),
     }))
     .sort((x, y) => y.breakdown.overall - x.breakdown.overall);
 

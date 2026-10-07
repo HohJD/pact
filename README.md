@@ -44,7 +44,7 @@ src/app (Next.js App Router)
 
 AI layer
   provider (OpenRouter, response_format ladder)
-    → retrieval (lexical + optional embeddings blend)
+    → retrieval (MiniSearch + optional local-embedding blend)
     → analyst / evidence-agent / transfer
     → guardrails (citation pruning, causal-language guard, DEMO tagging)
     → UIActions applied to the workspace store
@@ -153,9 +153,9 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 
 | Variable                       | Purpose                                             | Required |
 | ------------------------------ | --------------------------------------------------- | -------- |
-| `OPENROUTER_API_KEY`           | LLM + embeddings (absent → curated fallback mode)   | no       |
+| `OPENROUTER_API_KEY`           | live LLM (absent → curated fallback mode)            | no       |
 | `OPENROUTER_MODEL`             | chat model (default `anthropic/claude-sonnet-4.5`, or free default under FREE_ONLY) | no |
-| `OPENROUTER_EMBEDDING_MODEL`   | embedding model (default `openai/text-embedding-3-small`) | no  |
+| `OPENROUTER_EMBEDDING_MODEL`   | optional live query embedding model                 | no       |
 | `OPENROUTER_FREE_ONLY`         | `true` → refuse non-`:free` models, disable embeddings | no    |
 | `PACT_ANALYST_MODE`            | `live` (default with key) or `fallback` (always curated) | no  |
 | `PACT_DATA_SOURCE`             | `supabase` to read from Supabase, else seed         | no       |
@@ -168,14 +168,16 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 ## OpenRouter configuration
 
 `OPENROUTER_API_KEY` unlocks the live analyst. With `OPENROUTER_FREE_ONLY=true`
-the provider refuses any non-`:free` model and disables embeddings (OpenRouter
-has no free embedding models — `pnpm embed` exits cleanly with a message).
+the provider refuses any non-`:free` model and disables OpenRouter embeddings.
+`pnpm embed` is separate: it generates the seed vectors locally with the free
+`Xenova/all-MiniLM-L6-v2` model and does not need an API key.
 The provider retries `json_schema` → `json_object` → plain text, then a single
 repair turn; failures fall back to curated responses with `source: "FALLBACK"`.
 
 ## Supabase setup
 
-1. Create a project, run `supabase/migrations/0001_init.sql` (SQL editor or
+1. Create a project and run `supabase/migrations/0001_init.sql` through
+   `0003_search_and_local_embeddings.sql` in order (SQL editor or
    `supabase db push`).
 2. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
    `SUPABASE_SERVICE_ROLE_KEY`, `PACT_DATA_SOURCE=supabase` in `.env.local`.
@@ -201,10 +203,25 @@ no auth on the admin route (internal use).
 ## Similarity engine
 
 `structuredSimilarity` scores technology/mechanism/sector/target overlap,
-jurisdiction proximity and a semantic component (embeddings when present,
-lexical Jaccard otherwise). Curated pairs always override computed values.
+jurisdiction proximity and semantic similarity with weights of technology 0.25,
+mechanism 0.25, sector 0.1, target 0.1, jurisdiction 0.1 and semantic 0.2.
+`pnpm embed` uses the local
+`Xenova/all-MiniLM-L6-v2` model to write 384-dimensional vectors to
+`embeddings.json` and semantic scores for every policy pair to `semantic.ts`.
+Computed semantic scores stay separate from graph similarities, and curated
+pairs always override computed values. Runtime-published policies fall back to
+lexical Jaccard when no generated pair score exists.
 `explainSimilarity` renders the 7-row breakdown used in the SIMILARITY panel,
 the ingest review and similarity tooling.
+
+## Search
+
+Catalogue search uses a cached MiniSearch BM25 index with fuzzy and prefix
+matching over policies, evidence, jurisdictions, technologies and mechanisms.
+Published source documents are searchable by their extracted full text in the
+command palette and through `GET /api/search?q=...`. Supabase uses the
+full-text search function and GIN index from migration 0003. In seed mode,
+source documents are held in memory and are lost when the server restarts.
 
 ## Testing
 

@@ -6,6 +6,7 @@ import {
   type Policy,
   type Similarity,
 } from "@/lib/domain/schema";
+import { semanticScores } from "@/data/seed/semantic";
 import { structuredSimilarity } from "./structured";
 
 const FINANCING_KINDS = new Set<z.infer<typeof MechanismKind>>([
@@ -60,7 +61,11 @@ export function computeAllSimilarities(
       if (curated.has(key)) continue;
       const ea = embeddings?.get(a.id);
       const eb = embeddings?.get(b.id);
-      const semantic = ea && eb ? Math.max(0, Math.min(1, (cosine(ea, eb) + 1) / 2)) : undefined;
+      const semantic = embeddings
+        ? ea && eb && ea.length === eb.length
+          ? Math.max(0, Math.min(1, (cosine(ea, eb) + 1) / 2))
+          : undefined
+        : semanticScores[key];
       const breakdown = structuredSimilarity(a, b, dataset.jurisdictions, semantic);
       if (breakdown.overall < 0.5) continue;
       computed.push({ id: similarityId(a.id, b.id), policy_a: a.id, policy_b: b.id, breakdown });

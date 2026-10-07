@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { seedDataset } from "@/data/seed";
+import { semanticScores } from "@/data/seed/semantic";
 import {
   jurisdictionSimilarity,
   structuredSimilarity,
@@ -76,5 +77,21 @@ describe("topSimilar", () => {
 
   it("returns empty for unknown policy", () => {
     expect(topSimilar("pol_nowhere", seedDataset, 3)).toEqual([]);
+  });
+
+  it("uses generated semantic scores for computed pairs", () => {
+    const curatedPairs = new Set(
+      seedDataset.similarities.map((similarity) =>
+        [similarity.policy_a, similarity.policy_b].sort().join("|"),
+      ),
+    );
+    const computed = topSimilar("pol_jp_top_runner", seedDataset, 10).find((similarity) => {
+      const key = [similarity.policy_a, similarity.policy_b].sort().join("|");
+      return !curatedPairs.has(key) && semanticScores[key] !== undefined;
+    });
+
+    expect(computed).toBeDefined();
+    const key = [computed!.policy_a, computed!.policy_b].sort().join("|");
+    expect(computed!.breakdown.semantic).toBe(semanticScores[key]);
   });
 });

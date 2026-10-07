@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useTheme } from "next-themes";
 
@@ -31,6 +31,14 @@ const QUESTIONS = [
 
 const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
 
+interface SearchDocumentHit {
+  id: string;
+  policy_id: string;
+  label: string;
+  url: string | null;
+  snippet: string;
+}
+
 export function CommandPalette() {
   const open = useWorkspace((s) => s.paletteOpen);
   const setOpen = useWorkspace((s) => s.setPaletteOpen);
@@ -42,11 +50,52 @@ export function CommandPalette() {
   const setView = useWorkspace((s) => s.setView);
   const { setTheme, resolvedTheme } = useTheme();
   const [q, setQ] = useState("");
+  const [documentResults, setDocumentResults] = useState<{
+    query: string;
+    hits: SearchDocumentHit[];
+  } | null>(null);
+  const normalizedQuery = q.trim().toLowerCase();
+  const visibleViews = VIEWS.filter((view) => {
+    const label = `${view.charAt(0) + view.slice(1).toLowerCase()} view`;
+    return !normalizedQuery || label.toLowerCase().includes(normalizedQuery);
+  });
+  const showThemeToggle =
+    !normalizedQuery || "toggle theme".includes(normalizedQuery);
 
   const results = useMemo(
     () => (q.trim() ? repo.searchText(q) : null),
     [q, repo],
   );
+
+  useEffect(() => {
+    const query = q.trim();
+    if (query.length < 3) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      void fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+        signal: controller.signal,
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Document search failed");
+          return response.json() as Promise<{ documents?: SearchDocumentHit[] }>;
+        })
+        .then((result) => {
+          if (!controller.signal.aborted) {
+            setDocumentResults({
+              query,
+              hits: Array.isArray(result.documents) ? result.documents : [],
+            });
+          }
+        })
+        .catch(() => {});
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [q]);
 
   const close = () => {
     setOpen(false);
@@ -64,7 +113,11 @@ export function CommandPalette() {
   };
 
   return (
-    <CommandDialog open={open} onOpenChange={(o) => (o ? setOpen(true) : close())}>
+    <CommandDialog
+      open={open}
+      onOpenChange={(o) => (o ? setOpen(true) : close())}
+      shouldFilter={false}
+    >
       <CommandInput
         placeholder="Search policies, evidence, jurisdictions — or ask a question…"
         value={q}
@@ -103,29 +156,33 @@ export function CommandPalette() {
 
         <CommandSeparator />
 
-        <CommandGroup heading="Views">
-          {VIEWS.map((v) => (
-            <CommandItem
-              key={v}
-              value={`view-${v}`}
-              onSelect={() => {
-                setView(v);
-                close();
-              }}
-            >
-              {v.charAt(0) + v.slice(1).toLowerCase()} view
-            </CommandItem>
-          ))}
-          <CommandItem
-            value="toggle-theme"
-            onSelect={() => {
-              setTheme(resolvedTheme === "dark" ? "light" : "dark");
-              close();
-            }}
-          >
-            Toggle theme
-          </CommandItem>
-        </CommandGroup>
+        {(visibleViews.length > 0 || showThemeToggle) && (
+          <CommandGroup heading="Views">
+            {visibleViews.map((v) => (
+              <CommandItem
+                key={v}
+                value={`view-${v}`}
+                onSelect={() => {
+                  setView(v);
+                  close();
+                }}
+              >
+                {v.charAt(0) + v.slice(1).toLowerCase()} view
+              </CommandItem>
+            ))}
+            {showThemeToggle && (
+              <CommandItem
+                value="toggle-theme"
+                onSelect={() => {
+                  setTheme(resolvedTheme === "dark" ? "light" : "dark");
+                  close();
+                }}
+              >
+                Toggle theme
+              </CommandItem>
+            )}
+          </CommandGroup>
+        )}
 
         {results && (
           <>
@@ -201,6 +258,26 @@ export function CommandPalette() {
                 ))}
               </CommandGroup>
             )}
+            {documentResults?.query === q.trim() &&
+              documentResults.hits.length > 0 && (
+                <CommandGroup heading="Documents">
+                  {documentResults.hits.map((hit) => (
+                    <CommandItem
+                      key={hit.id}
+                      value={`document ${hit.label} ${hit.snippet}`}
+                      onSelect={() => pick("policy", hit.policy_id)}
+                      className="block min-w-0 max-w-full overflow-hidden text-left"
+                    >
+                      <span className="block break-words font-medium">
+                        {hit.label}
+                      </span>
+                      <span className="mt-1 line-clamp-2 block whitespace-normal break-words text-xs text-muted-foreground">
+                        {hit.snippet}
+                      </span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
           </>
         )}
       </CommandList>

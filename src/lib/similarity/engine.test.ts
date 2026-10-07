@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { seedDataset } from "@/data/seed";
+import { semanticScores } from "@/data/seed/semantic";
 import {
   computeAllSimilarities,
   cosine,
@@ -39,6 +40,18 @@ describe("computeAllSimilarities", () => {
     );
     const all = computeAllSimilarities(seedDataset, emb);
     expect(all.length).toBeGreaterThan(0);
+  });
+
+  it("uses generated semantic scores when no embedding map is passed", () => {
+    const curatedIds = new Set(seedDataset.similarities.map((similarity) => similarity.id));
+    const computed = computeAllSimilarities(seedDataset).find((similarity) => {
+      const key = [similarity.policy_a, similarity.policy_b].sort().join("|");
+      return !curatedIds.has(similarity.id) && semanticScores[key] !== undefined;
+    });
+
+    expect(computed).toBeDefined();
+    const key = [computed!.policy_a, computed!.policy_b].sort().join("|");
+    expect(computed!.breakdown.semantic).toBe(semanticScores[key]);
   });
 });
 

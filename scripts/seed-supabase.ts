@@ -52,10 +52,12 @@ async function main() {
   const embFile = path.join(process.cwd(), "src/data/seed/embeddings.json");
   if (existsSync(embFile)) {
     const emb = JSON.parse(readFileSync(embFile, "utf8")) as {
+      model: string;
+      dims: number;
       policies?: Record<string, number[]>;
       evidence?: Record<string, number[]>;
     };
-    const model = process.env.OPENROUTER_EMBEDDING_MODEL ?? "openai/text-embedding-3-small";
+    const model = emb.model;
     if (emb.policies) {
       await upsert(
         "policy_embeddings",

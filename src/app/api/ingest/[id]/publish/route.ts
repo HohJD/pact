@@ -5,7 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 
 import { invalidateDataset } from "@/lib/data";
 import { addRuntimePolicy } from "@/lib/data/runtime";
-import { ingestJobs } from "@/lib/ingest/jobs";
+import { ingestJobs, ingestSourceTexts } from "@/lib/ingest/jobs";
+import { storeDocument } from "@/lib/search/documents";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,7 @@ export async function POST(
 
   if (parsed.data.decision === "reject") {
     job.status = "REJECTED";
+    ingestSourceTexts().delete(job.id);
     return NextResponse.json({ id: job.id, status: job.status });
   }
 
@@ -55,6 +57,30 @@ export async function POST(
     invalidateDataset();
   }
 
+  let document_stored = false;
+  const sourceText = ingestSourceTexts().get(job.id);
+  if (sourceText) {
+    try {
+      await storeDocument({
+        policy_id: policy.id,
+        label: job.source.label,
+        url: sourceText.url,
+        kind: sourceText.kind,
+        text: sourceText.text,
+      });
+      document_stored = true;
+    } catch {
+      document_stored = false;
+    } finally {
+      ingestSourceTexts().delete(job.id);
+    }
+  }
+
   job.status = "PUBLISHED";
-  return NextResponse.json({ id: job.id, status: job.status, policy_id: policy.id });
+  return NextResponse.json({
+    id: job.id,
+    status: job.status,
+    policy_id: policy.id,
+    document_stored,
+  });
 }

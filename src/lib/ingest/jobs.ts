@@ -20,9 +20,22 @@ export interface IngestJob {
 }
 
 const store = globalThis as unknown as { __pactIngestJobs?: Map<string, IngestJob> };
+const sourceTextStore = globalThis as unknown as {
+  __pactIngestSourceTexts?: Map<
+    string,
+    { text: string; url: string | null; kind: "URL" | "PDF" | "TEXT" }
+  >;
+};
 
 export function ingestJobs(): Map<string, IngestJob> {
   return (store.__pactIngestJobs ??= new Map());
+}
+
+export function ingestSourceTexts(): Map<
+  string,
+  { text: string; url: string | null; kind: "URL" | "PDF" | "TEXT" }
+> {
+  return (sourceTextStore.__pactIngestSourceTexts ??= new Map());
 }
 
 export function createJob(source: IngestJob["source"]): IngestJob {

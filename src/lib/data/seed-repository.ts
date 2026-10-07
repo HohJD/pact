@@ -13,6 +13,7 @@ import type {
   PolicyFilter,
   SearchResults,
 } from "./repository";
+import { searchCatalogue } from "@/lib/search/catalogue";
 
 const STRENGTH_SCORE: Record<string, number> = {
   META_ANALYSIS: 5,
@@ -143,40 +144,7 @@ export class SeedRepository implements PactRepository {
   }
 
   searchText(q: string): SearchResults {
-    const tokens = tokenize(q);
-    if (tokens.length === 0) {
-      return { policies: [], evidence: [], jurisdictions: [], technologies: [], mechanisms: [] };
-    }
-
-    const ranked = <T>(items: T[], fields: (item: T) => Array<string | undefined>): T[] =>
-      items
-        .map((item) => ({ item, score: scoreTokens(tokens, fields(item)) }))
-        .filter((r) => r.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .map((r) => r.item);
-
-    return {
-      policies: ranked(this.dataset.policies, (p) => [
-        p.name,
-        p.short_name,
-        p.description,
-        p.incentive,
-        ...p.tags,
-      ]),
-      evidence: ranked(this.dataset.evidence, (e) => [
-        e.title,
-        e.publisher,
-        e.methodology,
-        ...e.findings,
-      ]),
-      jurisdictions: ranked(this.dataset.jurisdictions, (j) => [
-        j.name,
-        j.context.housing_stock_note,
-        j.context.dominant_heating,
-      ]),
-      technologies: ranked(this.dataset.technologies, (t) => [t.name, t.description]),
-      mechanisms: ranked(this.dataset.mechanisms, (m) => [m.name, m.description, m.kind]),
-    };
+    return searchCatalogue(this.dataset, q);
   }
 
   getEvidenceStrength(policyId: string): EvidenceStrength {

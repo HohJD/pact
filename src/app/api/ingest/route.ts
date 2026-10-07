@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { loadDataset } from "@/lib/data";
 import { getProvider } from "@/lib/ai/provider";
-import { createJob, ingestJobs } from "@/lib/ingest/jobs";
+import { createJob, ingestJobs, ingestSourceTexts } from "@/lib/ingest/jobs";
 import { runPipeline } from "@/lib/ingest/pipeline";
 
 export const runtime = "nodejs";
@@ -62,6 +62,11 @@ export async function POST(req: Request) {
         if (j && !j.stagesDone.includes(stage)) j.stagesDone.push(stage);
       },
     );
+    ingestSourceTexts().set(job.id, {
+      text: result.text,
+      url: url ?? null,
+      kind,
+    });
     job.status = result.status;
     job.draft = result.draft;
     job.stagesDone = [...result.stagesDone];
