@@ -42,6 +42,12 @@ const world = feature(
 ) as unknown as GeoJSON.FeatureCollection;
 
 /** Mapbox implementation — only mounted when NEXT_PUBLIC_MAPBOX_TOKEN is set. */
+// populated latitudes — the default zoom-0 world is a small tile in a large frame
+const WORLD_BOUNDS: [[number, number], [number, number]] = [
+  [-180, -50],
+  [180, 72],
+];
+
 export function MapboxMap({ data }: { data: MapData }) {
   const dataset = useDataset();
   const mapRef = useRef<MapRef>(null);
@@ -63,9 +69,12 @@ export function MapboxMap({ data }: { data: MapData }) {
     }),
   };
 
-  // fly to focused country
+  // fly to focused country; back out to the whole world when it clears
   useEffect(() => {
-    if (!focusedCountry) return;
+    if (!focusedCountry) {
+      mapRef.current?.fitBounds(WORLD_BOUNDS, { padding: 32, duration: 600 });
+      return;
+    }
     const f = geojson.features.find(
       (x) => x.properties?.code === focusedCountry,
     );
@@ -116,6 +125,9 @@ export function MapboxMap({ data }: { data: MapData }) {
       mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       mapStyle="mapbox://styles/mapbox/dark-v11"
       projection={{ name: "naturalEarth" }}
+      onLoad={(e) => {
+        if (!focusedCountry) e.target.fitBounds(WORLD_BOUNDS, { padding: 32, duration: 0 });
+      }}
       interactiveLayerIds={["countries"]}
       onClick={onClick}
       style={{ width: "100%", height: "100%" }}

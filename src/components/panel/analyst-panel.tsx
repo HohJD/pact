@@ -4,7 +4,7 @@ import { ClaimList } from "@/components/claims/claim-list";
 import { SectionTitle } from "./section-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { applyActionsSequenced, submitAnalystQuestion } from "@/lib/ai/client";
-import { renumberCitations } from "@/lib/ai/citations";
+import { renumberCitations, stripRecordIds } from "@/lib/ai/citations";
 import { useDataset } from "@/components/providers/dataset-provider";
 import type { UIAction } from "@/lib/domain/schema";
 import { cn } from "@/lib/utils";
@@ -62,22 +62,18 @@ export function AnalystPanel() {
             LIVE
           </span>
         </div>
-        <p className="p-3 text-[12px] leading-relaxed text-foreground">
-          {streamText}
-          <span className="ml-px inline-block h-3 w-[5px] animate-pulse bg-entity-policy/80 align-[-1px]" />
-        </p>
+        {streamText.trim() ? (
+          <p className="p-3 text-[12px] leading-relaxed text-foreground">
+            {stripRecordIds(streamText)}
+            <span className="ml-px inline-block h-3 w-[5px] animate-pulse bg-entity-policy/80 align-[-1px]" />
+          </p>
+        ) : (
+          <AnalystThinking />
+        )}
       </div>
     );
 
-  if (pending && !entry)
-    return (
-      <div className="space-y-3 p-3">
-        <Skeleton className="h-4 w-24 bg-secondary" />
-        <Skeleton className="h-24 w-full bg-secondary" />
-        <Skeleton className="h-16 w-full bg-secondary" />
-        <Skeleton className="h-16 w-full bg-secondary" />
-      </div>
-    );
+  if (pending && !entry) return <AnalystThinking />;
 
   if (!entry)
     return (
@@ -195,6 +191,21 @@ export function AnalystPanel() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Shown until the first streamed words arrive — live models can take ~10s. */
+function AnalystThinking() {
+  return (
+    <div className="space-y-3 p-3" role="status" aria-live="polite">
+      <p className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <span className="size-1.5 animate-pulse rounded-full bg-entity-policy" />
+        Searching the evidence base…
+      </p>
+      <Skeleton className="h-24 w-full bg-secondary" />
+      <Skeleton className="h-16 w-full bg-secondary" />
+      <Skeleton className="h-16 w-full bg-secondary" />
     </div>
   );
 }

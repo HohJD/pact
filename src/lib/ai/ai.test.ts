@@ -124,6 +124,35 @@ describe("guardrails", () => {
     expect(res.claims[0].inference_type).toBe("INFERRED");
   });
 
+  it("resolves cited outcome ids to the evidence behind them", () => {
+    const ctx = makeCtx("pol_de_beg");
+    const outcome = seedDataset.outcomes.find((o) => o.policy_id === "pol_de_beg")!;
+    const res = guardAnalystResponse(
+      {
+        answer: "",
+        claims: [
+          {
+            text: "Sales rose.",
+            evidence_ids: [outcome.id],
+            confidence: "MEDIUM",
+            inference_type: "DIRECTLY_SUPPORTED",
+          },
+        ],
+        citations: [],
+        confidence: "MEDIUM",
+        actions: [],
+        insufficient_evidence: false,
+      },
+      ctx,
+      seedDataset,
+    );
+    expect(res.claims[0].evidence_ids.length).toBeGreaterThan(0);
+    expect(res.claims[0].evidence_ids).toEqual(
+      outcome.evidence_ids.filter((id) => seedDataset.evidence.some((e) => e.id === id && e.policy_ids.includes("pol_de_beg"))),
+    );
+    expect(res.claims[0].inference_type).toBe("DIRECTLY_SUPPORTED");
+  });
+
   it("rewrites causal wording without causal evidence", () => {
     const ctx = makeCtx("pol_gb_bus");
     const res = guardAnalystResponse(

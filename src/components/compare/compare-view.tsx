@@ -228,6 +228,11 @@ export function CompareView() {
               <div key={r.label} className="contents">
                 <div className="sticky left-0 z-[1] border-b border-r border-border/50 bg-background px-3 py-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   {r.label}
+                  {same && (
+                    <span className="mt-0.5 block text-[8px] normal-case tracking-normal text-muted-foreground/70">
+                      same for all
+                    </span>
+                  )}
                 </div>
                 {policies.map((p) => (
                   <div
@@ -237,9 +242,6 @@ export function CompareView() {
                       !same && "border-l-2 border-l-entity-mechanism/50",
                     )}
                   >
-                    {same && (
-                      <span className="mr-1 font-mono text-[8px] text-muted-foreground">≡</span>
-                    )}
                     {r.values(p)}
                   </div>
                 ))}

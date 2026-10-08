@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { ExternalLink, GitCompareArrows } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -236,7 +237,13 @@ export function PolicyCard({ policyId }: { policyId: string }) {
           size="sm"
           variant={inCompare ? "default" : "outline"}
           className="h-7 px-1 text-[9px]"
-          onClick={() => toggleCompare(policyId)}
+          onClick={() => {
+            if (!inCompare && compareIds.length >= 4) {
+              toast("Compare holds up to 4 policies. Remove one first.");
+              return;
+            }
+            toggleCompare(policyId);
+          }}
         >
           <GitCompareArrows className="size-3" />
           Compare{compareIds.length > 0 ? ` ${compareIds.length}` : ""}

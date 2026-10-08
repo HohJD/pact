@@ -159,6 +159,17 @@ function Canvas() {
     return () => clearTimeout(t);
   }, [highlightKey, hasHighlight, fitHighlights, fitAll]);
 
+  // selections made outside the canvas (⌘K, policy cards, the analyst) pan
+  // to the node; clicks on the canvas centre it themselves
+  const centeredId = useRef<string | undefined>(selectionId);
+  useEffect(() => {
+    if (selectionId === centeredId.current) return;
+    centeredId.current = selectionId;
+    if (!selectionId) return;
+    const n = positionedById.get(selectionId);
+    if (n) setCenter(n.x + 95, n.y + 30, { zoom: 1.15, duration: 500 });
+  }, [selectionId, positionedById, setCenter]);
+
   const nodes: Node<PactNodeData>[] = useMemo(
     () =>
       positioned.map((n) => {
@@ -173,6 +184,10 @@ function Canvas() {
           id: n.id,
           type: n.kind,
           position: pos,
+          // nodes are never measured back (no onNodesChange) — give the
+          // minimap an approximate footprint so it can draw them
+          initialWidth: MINIMAP_SIZE[n.kind][0],
+          initialHeight: MINIMAP_SIZE[n.kind][1],
           selected: selectionId === n.id,
           data: {
             label: n.label,
@@ -211,7 +226,8 @@ function Canvas() {
     (_: unknown, node: Node) => {
       const kind = node.type ?? "policy";
       select({ kind: kind as never, id: node.id });
-      openPanel(kind === "policy" ? "DETAILS" : "DETAILS");
+      openPanel("DETAILS");
+      centeredId.current = node.id;
       setCenter(node.position.x + 95, node.position.y + 30, {
         zoom: 1.15,
         duration: 500,
@@ -461,6 +477,15 @@ function MenuItem({ onClick, children }: { onClick: () => void; children: React.
     </button>
   );
 }
+
+const MINIMAP_SIZE: Record<string, [number, number]> = {
+  policy: [170, 44],
+  jurisdiction: [80, 80],
+  technology: [72, 40],
+  mechanism: [72, 24],
+  evidence: [110, 48],
+  outcome: [110, 48],
+};
 
 export function GraphCanvas() {
   return (

@@ -38,8 +38,26 @@ export function renumberCitations(
   });
 
   const answerSegments: AnswerSegment[] = [];
-  const parts = response.answer.split(/(\[\d+\])/g);
+  const parts = response.answer.split(/(\[\d+\]|\s*\([^()]*\))/g);
   for (const part of parts) {
+    const ids = idGroup(part);
+    if (ids) {
+      // live models sometimes cite raw record ids in prose — show the
+      // evidence ones as numbered chips, drop the rest
+      const remaining = ids.rest.length ? ` (${ids.rest.join(", ")})` : "";
+      if (remaining) answerSegments.push({ type: "text", text: remaining });
+      const ns = [
+        ...new Set(
+          ids.ids.map((id) => numbers.get(id)).filter((n): n is number => !!n),
+        ),
+      ];
+      const claimIndex = claims.findIndex((c) =>
+        c.numbers.some((n) => ns.includes(n)),
+      );
+      if (ns.length && claimIndex >= 0)
+        answerSegments.push({ type: "cite", claimIndex, numbers: ns });
+      continue;
+    }
     const m = part.match(/^\[(\d+)\]$/);
     if (!m) {
       if (part) answerSegments.push({ type: "text", text: part });
@@ -55,4 +73,28 @@ export function renumberCitations(
   }
 
   return { answerSegments, claims, evidenceOrder };
+}
+
+const RECORD_ID = /^(pol|ev|out|jur|tech|mech|ts|metric|sim)_[a-z0-9_]+$/;
+
+/**
+ * A parenthetical containing record ids, e.g. " (pol_gb_bus)" or
+ * " (IRC §25C, pol_us_25c)" — returns the ids and any non-id remainder.
+ */
+function idGroup(part: string): { ids: string[]; rest: string[] } | null {
+  const m = part.match(/^\s*\(([^()]*)\)$/);
+  if (!m) return null;
+  const tokens = m[1].split(/[,;]\s*/).map((t) => t.trim()).filter(Boolean);
+  const ids = tokens.filter((t) => RECORD_ID.test(t));
+  if (!ids.length) return null;
+  return { ids, rest: tokens.filter((t) => !RECORD_ID.test(t)) };
+}
+
+/** Strips raw record-id parentheticals from partially streamed prose. */
+export function stripRecordIds(text: string): string {
+  return text.replace(/\s*\([^()]*\)/g, (g) => {
+    const ids = idGroup(g);
+    if (!ids) return g;
+    return ids.rest.length ? ` (${ids.rest.join(", ")})` : "";
+  });
 }

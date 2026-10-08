@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
@@ -20,6 +20,12 @@ export default function Home() {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [leaving, setLeaving] = useState(false);
+
+  // every route out of the landing page goes to the workspace — warm it so
+  // the fade-out isn't followed by a blank wait
+  useEffect(() => {
+    router.prefetch("/workspace");
+  }, [router]);
 
   const go = (path: string) => {
     setLeaving(true);

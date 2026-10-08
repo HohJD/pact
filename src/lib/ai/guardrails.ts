@@ -26,9 +26,12 @@ export function guardAnalystResponse(
   dataset: Dataset,
 ): Omit<AnalystResponse, "source"> {
   const evById = new Map(dataset.evidence.map((e) => [e.id, e]));
+  const outById = new Map(dataset.outcomes.map((o) => [o.id, o]));
 
   const claims: Claim[] = response.claims.map((c) => {
-    const ids = c.evidence_ids.filter((id) => ctx.evidenceIds.has(id));
+    // models often cite an outcome id — resolve it to the evidence behind it
+    const resolved = c.evidence_ids.flatMap((id) => outById.get(id)?.evidence_ids ?? [id]);
+    const ids = [...new Set(resolved)].filter((id) => ctx.evidenceIds.has(id));
     let text = c.text;
     let inference_type = c.inference_type;
 

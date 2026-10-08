@@ -58,7 +58,9 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   const openPanel = useWorkspace((s) => s.openPanel);
   const panel = useWorkspace((s) => s.panel);
   const compareIds = useWorkspace((s) => s.compareIds);
+  const toggleCompare = useWorkspace((s) => s.toggleCompare);
   const transferRequest = useWorkspace((s) => s.transferRequest);
+  const closeTransfer = useWorkspace((s) => s.closeTransfer);
   const comparing = panel === "COMPARE" && compareIds.length >= 2;
 
   // sidebar and panel start closed below lg — they render as overlays there.
@@ -217,10 +219,16 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
               <button
                 key={v}
                 type="button"
-                onClick={() => setView(v)}
+                onClick={() => {
+                  // tabs always land on the chosen view, even from compare/transfer
+                  if (transferRequest) closeTransfer();
+                  if (comparing) openPanel(null);
+                  setView(v);
+                }}
+                aria-pressed={view === v && !comparing && !transferRequest}
                 className={cn(
                   "rounded px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
-                  view === v
+                  view === v && !comparing && !transferRequest
                     ? "bg-secondary text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
@@ -228,6 +236,13 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
                 {v}
               </button>
             ))}
+            {compareIds.length > 0 && !comparing && !transferRequest && (
+              <CompareTray
+                count={compareIds.length}
+                onOpen={() => openPanel("COMPARE")}
+                onClear={() => compareIds.forEach(toggleCompare)}
+              />
+            )}
           </div>
           <div className="min-h-0 flex-1">
             {transferRequest ? (
@@ -306,6 +321,39 @@ function PlaceholderView({ name }: { name: string }) {
           This view arrives in a later phase.
         </p>
       </div>
+    </div>
+  );
+}
+
+/** Shows what's queued for comparison and the way into it. */
+function CompareTray({
+  count,
+  onOpen,
+  onClear,
+}: {
+  count: number;
+  onOpen: () => void;
+  onClear: () => void;
+}) {
+  return (
+    <div className="ml-auto flex shrink-0 items-center gap-1 pl-2">
+      <button
+        type="button"
+        onClick={onOpen}
+        disabled={count < 2}
+        title={count < 2 ? "Add one more policy to compare" : undefined}
+        className="rounded border border-entity-policy/40 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-entity-policy transition-colors hover:bg-entity-policy/10 disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent"
+      >
+        {count < 2 ? "Compare 1/2" : `Compare ${count} →`}
+      </button>
+      <button
+        type="button"
+        aria-label="Clear comparison"
+        onClick={onClear}
+        className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        ×
+      </button>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { AnalystResponse, Dataset } from "@/lib/domain/schema";
+import type { AnalystResponse, Dataset, UIAction } from "@/lib/domain/schema";
 import { matchFallback } from "@/lib/ai/fallback-content";
 import { resolveQuery } from "@/lib/query/resolve";
 import { applyUIActions } from "@/lib/ui-actions/apply";
@@ -12,7 +12,11 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function applyActionsSequenced(
   actions: AnalystResponse["actions"],
   dataset: Dataset,
+  opts: { keepAnswer?: boolean } = {},
 ) {
+  // straight after an answer, actions that would replace the answer in the
+  // right panel only highlight their target — "Replay actions" opens them
+  if (opts.keepAnswer) actions = mergeHighlights(actions.map(keepAnswerVisible));
   const store = useWorkspace.getState();
   const first = actions.filter((a) => a.type === "CHANGE_VIEW" || a.type === "FILTER_GRAPH");
   const focus = actions.filter((a) => a.type === "FOCUS_COUNTRY");
@@ -39,6 +43,28 @@ export async function applyActionsSequenced(
   }
 }
 
+
+/** Highlights replace each other — fold them into one, in order. */
+function mergeHighlights(actions: UIAction[]): UIAction[] {
+  const ids = actions.flatMap((a) => (a.type === "HIGHLIGHT_NODES" ? a.node_ids : []));
+  const rest = actions.filter((a) => a.type !== "HIGHLIGHT_NODES");
+  return ids.length ? [...rest, { type: "HIGHLIGHT_NODES", node_ids: [...new Set(ids)] }] : rest;
+}
+
+function keepAnswerVisible(a: UIAction): UIAction {
+  switch (a.type) {
+    case "OPEN_POLICY":
+      return { type: "HIGHLIGHT_NODES", node_ids: [a.policy_id] };
+    case "SHOW_OUTCOMES":
+      return a.policy_id ? { type: "HIGHLIGHT_NODES", node_ids: [a.policy_id] } : a;
+    case "SHOW_EVIDENCE": {
+      const ids = [a.policy_id, a.evidence_id].filter((id): id is string => !!id);
+      return ids.length ? { type: "HIGHLIGHT_NODES", node_ids: ids } : a;
+    }
+    default:
+      return a;
+  }
+}
 /**
  * The command-bar flow: instant query/filter response, then POST /api/analyst
  * and apply the returned actions sequentially.
@@ -72,7 +98,7 @@ export async function submitAnalystQuestion(
     // brief pause so the staged actions read as "thinking"
     await wait(300);
     useWorkspace.getState().setAnalyst({ data });
-    await applyActionsSequenced(data.actions ?? [], dataset);
+    await applyActionsSequenced(data.actions ?? [], dataset, { keepAnswer: true });
     useWorkspace.getState().setAnalystPending(false);
     return;
   }
@@ -100,7 +126,7 @@ export async function submitAnalystQuestion(
     if (!streamed) throw new Error("empty analyst stream");
     const { offline, data } = streamed;
     useWorkspace.getState().setAnalyst({ data, model: data.model, offline });
-    await applyActionsSequenced(data.actions ?? [], dataset);
+    await applyActionsSequenced(data.actions ?? [], dataset, { keepAnswer: true });
   } catch (err) {
     console.warn("[pact] analyst request failed — using curated response", err);
     // offline → curated fallback so the UI never dead-ends
