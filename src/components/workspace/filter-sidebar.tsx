@@ -178,6 +178,38 @@ export function FilterSidebar() {
         Filters
       </div>
 
+      {importedCount > 0 && (
+        <Section
+          title="Sources"
+          count={filters.include_imported ? 1 : 0}
+          onClear={() => patchFilters({ include_imported: undefined })}
+        >
+          <div className="w-full">
+            <Chip
+              active={!!filters.include_imported}
+              color="#8B919A"
+              onClick={() =>
+                patchFilters({ include_imported: filters.include_imported ? undefined : true })
+              }
+            >
+              + Climate Policy Database ({importedCount})
+            </Chip>
+            <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
+              Real policies from{" "}
+              <a
+                href="https://climatepolicydatabase.org/"
+                target="_blank"
+                rel="noreferrer"
+                className="underline hover:text-foreground"
+              >
+                NewClimate Institute
+              </a>{" "}
+              (CC BY-NC 4.0). Not reviewed and not linked to evidence.
+            </p>
+          </div>
+        </Section>
+      )}
+
       <Section
         title="Jurisdictions"
         count={filters.countries?.length}
@@ -304,37 +336,6 @@ export function FilterSidebar() {
         ))}
       </Section>
 
-      {importedCount > 0 && (
-        <Section
-          title="Sources"
-          count={filters.include_imported ? 1 : 0}
-          onClear={() => patchFilters({ include_imported: undefined })}
-        >
-          <div className="w-full">
-            <Chip
-              active={!!filters.include_imported}
-              color="#8B919A"
-              onClick={() =>
-                patchFilters({ include_imported: filters.include_imported ? undefined : true })
-              }
-            >
-              + Climate Policy Database ({importedCount})
-            </Chip>
-            <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
-              Real policies from{" "}
-              <a
-                href="https://climatepolicydatabase.org/"
-                target="_blank"
-                rel="noreferrer"
-                className="underline hover:text-foreground"
-              >
-                NewClimate Institute
-              </a>{" "}
-              (CC BY-NC 4.0). Not reviewed and not linked to evidence.
-            </p>
-          </div>
-        </Section>
-      )}
     </aside>
   );
 }

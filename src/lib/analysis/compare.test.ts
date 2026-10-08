@@ -30,6 +30,15 @@ describe("keyDifferences", () => {
     expect(diffs.length).toBeLessThanOrEqual(6);
     for (const d of diffs) expect(d.startsWith("**")).toBe(true);
   });
+
+  it("never reads an imported policy's missing detail as fact", () => {
+    // KfW Ecological Construction (CPDB): no incentive, eligibility or technology data
+    const imported = policy("pol_cpdb_211001583");
+    const diffs = keyDifferences([imported, policy("pol_de_beg_em_2024")], seedDataset).join("\n");
+
+    expect(diffs).not.toMatch(/KfW Ecological Construction[^.;]*(no equivalent|open to all)/);
+    expect(diffs).not.toMatch(/KfW Ecological Construction: ·/);
+  });
 });
 
 describe("lessons", () => {

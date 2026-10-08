@@ -65,6 +65,7 @@ export function CompareView() {
       text: (p) => p.mechanism_ids.map(mechName).join("|"),
       values: (p) => (
         <span className="flex flex-wrap gap-1">
+          {p.mechanism_ids.length === 0 && "Not specified"}
           {p.mechanism_ids.map((m) => (
             <span key={m} className="rounded bg-entity-mechanism/15 px-1 text-[9px] text-entity-mechanism">
               {mechName(m)}
@@ -78,6 +79,7 @@ export function CompareView() {
       text: (p) => p.technology_ids.map(techName).join("|"),
       values: (p) => (
         <span className="flex flex-wrap gap-1">
+          {p.technology_ids.length === 0 && "Not specified"}
           {p.technology_ids.map((t) => (
             <span key={t} className="rounded bg-entity-technology/15 px-1 text-[9px] text-entity-technology">
               {techName(t)}

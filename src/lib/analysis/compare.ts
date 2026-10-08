@@ -27,21 +27,25 @@ export function keyDifferences(policies: Policy[], dataset: Dataset): string[] {
     out.push(`**Mechanism mix.** ${parts.join("; ")}.`);
   }
 
+  // imported (CPDB) records carry no eligibility, targeting or incentive
+  // detail, so they are left out of comparisons that would read absence as fact
+  const detailed = policies.filter((p) => p.data_status !== "IMPORTED");
+
   // 2. Targeting: income-banded vs universal
   const isIncomeTargeted = (p: Policy) =>
     /income|low-income|moderate-income|means-tested/i.test(
       `${p.incentive} ${p.eligibility} ${p.target_groups.join(" ")}`,
     );
-  const incomeYes = policies.filter(isIncomeTargeted);
-  if (incomeYes.length > 0 && incomeYes.length < policies.length) {
+  const incomeYes = detailed.filter(isIncomeTargeted);
+  if (incomeYes.length > 0 && incomeYes.length < detailed.length) {
     out.push(
       `**Targeting.** ${incomeYes.map(name).join(", ")} ${
         incomeYes.length > 1 ? "are" : "is"
-      } income-targeted; ${policies
+      } income-targeted; ${detailed
         .filter((p) => !isIncomeTargeted(p))
         .map(name)
         .join(", ")} ${
-        policies.length - incomeYes.length > 1 ? "are" : "is"
+        detailed.length - incomeYes.length > 1 ? "are" : "is"
       } open to all eligible households.`,
     );
   }
@@ -65,7 +69,7 @@ export function keyDifferences(policies: Policy[], dataset: Dataset): string[] {
       return { p, partner };
     })
     .filter(({ partner }) => partner);
-  const without = policies.filter(
+  const without = detailed.filter(
     (p) => !regulatoryPairs.find((r) => r.p.id === p.id),
   );
   if (regulatoryPairs.length > 0 && without.length > 0) {
@@ -89,10 +93,11 @@ export function keyDifferences(policies: Policy[], dataset: Dataset): string[] {
   }
 
   // 5. Incentive magnitude text
-  const incentives = new Set(policies.map((p) => p.incentive));
+  const withIncentive = policies.filter((p) => p.incentive);
+  const incentives = new Set(withIncentive.map((p) => p.incentive));
   if (incentives.size > 1) {
     out.push(
-      `**Incentive design.** ${policies
+      `**Incentive design.** ${withIncentive
         .map((p) => `${name(p)}: ${p.incentive}`)
         .join(" · ")}`,
     );

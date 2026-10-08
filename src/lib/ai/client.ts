@@ -80,7 +80,8 @@ export async function submitAnalystQuestion(
 
   store.setQuery(q);
   const resolved = resolveQuery(q, dataset);
-  store.setFilters(resolved.filters);
+  // a new question resets query-derived filters but keeps the Sources choice
+  store.setFilters({ ...resolved.filters, include_imported: store.filters.include_imported });
   store.highlight([
     ...resolved.highlightTechnologyIds,
     ...dataset.jurisdictions

@@ -42,3 +42,24 @@ test("command palette finds an imported policy and its card shows the CPDB label
     "https://climatepolicydatabase.org/",
   );
 });
+
+test("asking the analyst keeps the CPDB toggle on", async ({ page }) => {
+  await page.route("**/api/analyst**", (route) => route.abort());
+  await page.goto("/workspace");
+  await page.waitForFunction(() => !!(window as unknown as { __pact?: unknown }).__pact);
+
+  await page.getByRole("button", { name: /\+ Climate Policy Database/ }).click();
+  await page.getByPlaceholder(/Ask the analyst/).fill("Which German policies support heat pumps?");
+  await page.keyboard.press("Enter");
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (window as unknown as {
+            __pact: { getState: () => { filters: { include_imported?: boolean } } };
+          }).__pact.getState().filters.include_imported,
+      ),
+    )
+    .toBe(true);
+});
