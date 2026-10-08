@@ -191,7 +191,7 @@ export function TimelineView() {
                         initial={{ width: 0 }}
                         animate={{ width: bw }}
                         transition={{
-                          delay: i * 0.015,
+                          delay: Math.min(i * 0.015, 0.5),
                           duration: 0.35,
                           ease: "easeOut",
                         }}

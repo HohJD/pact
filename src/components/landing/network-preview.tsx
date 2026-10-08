@@ -12,7 +12,7 @@ import {
   type SimulationLinkDatum,
 } from "d3-force";
 
-import { seedDataset } from "@/data/seed";
+import { curatedDataset as seedDataset } from "@/data/seed/curated";
 import { ENTITY_COLORS } from "@/lib/theme/entity";
 
 type Node = {

@@ -86,10 +86,10 @@ export function CompareView() {
         </span>
       ),
     },
-    { label: "Target population", text: (p) => p.target_groups.join("|"), values: (p) => p.target_groups.join(", ") },
-    { label: "Incentive", text: (p) => p.incentive, values: (p) => p.incentive },
-    { label: "Eligibility", text: (p) => p.eligibility, values: (p) => p.eligibility },
-    { label: "Funding mechanism", text: (p) => p.funding, values: (p) => p.funding },
+    { label: "Target population", text: (p) => p.target_groups.join("|"), values: (p) => p.target_groups.join(", ") || "Not specified" },
+    { label: "Incentive", text: (p) => p.incentive, values: (p) => p.incentive || "Not specified" },
+    { label: "Eligibility", text: (p) => p.eligibility, values: (p) => p.eligibility || "Not specified" },
+    { label: "Funding mechanism", text: (p) => p.funding, values: (p) => p.funding || "Not specified" },
     {
       label: "Implementation",
       text: (p) => p.implementation_notes ?? "",
@@ -214,6 +214,14 @@ export function CompareView() {
                 {p.data_status === "DEMO" && (
                   <span className="rounded bg-entity-evidence/20 px-1 font-mono text-[8px] text-entity-evidence">
                     DEMO
+                  </span>
+                )}
+                {p.data_status === "IMPORTED" && (
+                  <span
+                    title="Imported from the Climate Policy Database. Not reviewed and not linked to evidence."
+                    className="rounded border border-border px-1 font-mono text-[8px] text-muted-foreground"
+                  >
+                    CPDB
                   </span>
                 )}
               </div>

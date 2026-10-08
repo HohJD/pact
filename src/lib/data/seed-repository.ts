@@ -81,6 +81,8 @@ export class SeedRepository implements PactRepository {
   listPolicies(filter: PolicyFilter = {}): Policy[] {
     let out = this.dataset.policies;
 
+    if (!filter.include_imported) out = out.filter((p) => p.data_status !== "IMPORTED");
+
     if (filter.countries?.length) {
       const set = new Set(filter.countries);
       out = out.filter((p) => set.has(p.country_code));

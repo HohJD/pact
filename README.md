@@ -68,7 +68,9 @@ Defined in `src/lib/domain/schema.ts` (Zod — the single source of truth).
 SUPPORTED_BY, ASSOCIATED_WITH, EVALUATED_BY, SUPERSEDES.
 
 **`data_status` on every record:** `CURATED` (from public information, verify
-before citing) or `DEMO` (synthetic placeholder — never a real citation).
+before citing), `DEMO` (synthetic placeholder — never a real citation) or
+`IMPORTED` (policy metadata bulk-imported from the Climate Policy Database;
+unreviewed and never linked to evidence).
 
 **Evidence types:** GOVERNMENT_EVALUATION, ACADEMIC_STUDY, OFFICIAL_STATISTICS,
 INDUSTRY_REPORT, INSTITUTIONAL_REPORT.
@@ -178,7 +180,7 @@ repair turn; failures fall back to curated responses with `source: "FALLBACK"`.
 ## Supabase setup
 
 1. Create a project and run `supabase/migrations/0001_init.sql` through
-   `0003_search_and_local_embeddings.sql` in order (SQL editor or
+   `0004_imported_policies.sql` in order (SQL editor or
    `supabase db push`).
 2. Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
    `SUPABASE_SERVICE_ROLE_KEY`, `PACT_DATA_SOURCE=supabase` in `.env.local`.
@@ -200,6 +202,19 @@ PUBLISH. URL/PDF/text inputs; per-chunk extraction with provenance quotes; a
 human reviews every field before publish. Limitations: no background queue
 (jobs are in-memory, lost on restart), publish in seed mode is in-memory only,
 no auth on the admin route (internal use).
+
+### Climate Policy Database import
+
+`pnpm import:cpdb` pulls building and heating policies for PACT's 13
+jurisdictions from NewClimate Institute's free public
+[Climate Policy Database](https://climatepolicydatabase.org/) API (no key) and
+writes `src/data/seed/cpdb.json`. National records only (sub-national ones
+rarely match a PACT jurisdiction), with records PACT already curates dropped.
+Mechanisms map from CPDB instrument types; technologies come only from each
+record's own name and description. Imported policies are hidden until the
+workspace **Sources** filter includes them. Afterwards run `pnpm embed`
+(local, free) and, for Supabase, `pnpm seed:supabase`. CPDB data is
+CC BY-NC 4.0: attribute NewClimate Institute and keep use non-commercial.
 
 ## Similarity engine
 
@@ -241,7 +256,10 @@ Set all env vars in the host. `pnpm build` produces the production build.
 
 The seed catalogue lives in `docs/seed-catalogue.md`. `CURATED` records are
 assembled from public information — **verify figures before citing**.
-`DEMO` records are synthetic and labelled everywhere they appear. PACT never
+`DEMO` records are synthetic and labelled everywhere they appear. `IMPORTED`
+policies come from the Climate Policy Database (NewClimate Institute,
+CC BY-NC 4.0), carry a CPDB label and source links, and never count as
+evidence. PACT never
 presents an estimate as a measurement; if there's no record, the product says
 "insufficient evidence".
 

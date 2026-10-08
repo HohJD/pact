@@ -26,6 +26,8 @@ export interface PolicyFilter {
   min_evidence_strength?: CausalStrength[];
   status?: PolicyStatusT;
   query?: string;
+  /** include data_status IMPORTED (CPDB) policies; hidden by default */
+  include_imported?: boolean;
 }
 
 export interface SearchResults {

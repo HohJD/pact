@@ -7,7 +7,9 @@ import { layoutGraph } from "./layout";
 describe("buildGraph", () => {
   it("includes all policies unfiltered", () => {
     const g = buildGraph(seedDataset);
-    expect(g.policyCount).toBe(seedDataset.policies.length);
+    expect(g.policyCount).toBe(
+      seedDataset.policies.filter((p) => p.data_status !== "IMPORTED").length,
+    );
     // every policy, its jurisdiction, and ≥1 tech/mech nodes present
     expect(g.nodes.filter((n) => n.kind === "jurisdiction").length).toBeGreaterThan(5);
     expect(g.nodes.find((n) => n.id === "tech_heat_pump")).toBeDefined();

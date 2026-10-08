@@ -85,12 +85,26 @@ describe("seed dataset", () => {
     }
   });
 
-  it("records with non-null URLs are CURATED", () => {
+  it("records with non-null URLs are CURATED (or real IMPORTED policies)", () => {
     for (const e of dataset.evidence)
       if (e.source_url) expect(e.data_status, e.id).toBe("CURATED");
     for (const p of dataset.policies)
       for (const s of p.sources)
-        if (s.url) expect(p.data_status, p.id).toBe("CURATED");
+        if (s.url) expect(["CURATED", "IMPORTED"], p.id).toContain(p.data_status);
+  });
+
+  it("imported policies are CPDB records with no linked evidence or outcomes", () => {
+    const imported = dataset.policies.filter((p) => p.data_status === "IMPORTED");
+    expect(imported.length).toBeGreaterThan(0);
+    const importedIds = new Set(imported.map((p) => p.id));
+    for (const p of imported) {
+      expect(p.id, p.id).toMatch(/^pol_cpdb_\d+$/);
+      expect(p.tags, p.id).toContain("cpdb");
+      expect(p.sources[0]?.publisher, p.id).toBe("NewClimate Institute");
+    }
+    for (const e of dataset.evidence)
+      for (const pid of e.policy_ids) expect(importedIds.has(pid), e.id).toBe(false);
+    for (const o of dataset.outcomes) expect(importedIds.has(o.policy_id), o.id).toBe(false);
   });
 
   it("DEMO evidence uses the demo publisher and null URL", () => {

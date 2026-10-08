@@ -74,6 +74,15 @@ export function PolicyCard({ policyId }: { policyId: string }) {
               DEMO DATA
             </Badge>
           )}
+          {policy.data_status === "IMPORTED" && (
+            <Badge
+              variant="outline"
+              title="Imported from the Climate Policy Database (NewClimate Institute). Not reviewed and not linked to evidence."
+              className="font-mono text-[9px] text-muted-foreground"
+            >
+              CPDB
+            </Badge>
+          )}
         </div>
 
         <h2 className="mt-2 text-[15px] font-semibold leading-tight tracking-tight text-foreground">
@@ -85,6 +94,7 @@ export function PolicyCard({ policyId }: { policyId: string }) {
           <Meta label="Sector">{policy.sector.toLowerCase().replace(/_/g, " ")}</Meta>
           <Meta label="Technologies">
             <span className="flex flex-wrap gap-1">
+              {techs.length === 0 && <span className="text-muted-foreground">Not specified</span>}
               {techs.map((t) => (
                 <span key={t.id} className="rounded bg-entity-technology/15 px-1 text-[9px] text-entity-technology">
                   {t.name}
@@ -94,6 +104,7 @@ export function PolicyCard({ policyId }: { policyId: string }) {
           </Meta>
           <Meta label="Mechanisms">
             <span className="flex flex-wrap gap-1">
+              {mechs.length === 0 && <span className="text-muted-foreground">Not specified</span>}
               {mechs.map((m) => (
                 <span key={m.id} className="rounded bg-entity-mechanism/15 px-1 text-[9px] text-entity-mechanism">
                   {m.name}
@@ -101,10 +112,12 @@ export function PolicyCard({ policyId }: { policyId: string }) {
               ))}
             </span>
           </Meta>
-          <Meta label="Target population">{policy.target_groups.join(", ")}</Meta>
-          <Meta label="Eligibility">{policy.eligibility}</Meta>
-          <Meta label="Financial incentive">{policy.incentive}</Meta>
-          <Meta label="Funding">{policy.funding}</Meta>
+          {policy.target_groups.length > 0 && (
+            <Meta label="Target population">{policy.target_groups.join(", ")}</Meta>
+          )}
+          {policy.eligibility && <Meta label="Eligibility">{policy.eligibility}</Meta>}
+          {policy.incentive && <Meta label="Financial incentive">{policy.incentive}</Meta>}
+          {policy.funding && <Meta label="Funding">{policy.funding}</Meta>}
         </dl>
 
         <p className="mt-3 text-dense text-muted-foreground">{policy.description}</p>
@@ -227,6 +240,11 @@ export function PolicyCard({ policyId }: { policyId: string }) {
                 </li>
               ))}
             </ul>
+            {policy.data_status === "IMPORTED" && (
+              <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
+                Record from the Climate Policy Database, NewClimate Institute (CC BY-NC 4.0).
+              </p>
+            )}
           </>
         )}
       </div>

@@ -14,6 +14,7 @@ export const DataStatus = z.enum([
   "CURATED", // curated from public information; details believed accurate but should be verified before citing
   "DEMO", // synthetic / illustrative sample data; never a real-world citation
   "CANDIDATE", // machine-found (web search + extraction), unreviewed; shown with a label, never counted toward evidence strength
+  "IMPORTED", // bulk-imported from an external policy database (e.g. CPDB); real metadata, unreviewed, no linked evidence
 ]);
 export type DataStatus = z.infer<typeof DataStatus>;
 

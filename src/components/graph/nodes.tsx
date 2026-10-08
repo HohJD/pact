@@ -34,6 +34,8 @@ const STATUS_COLOR: Record<string, string> = {
 export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
   const status = String(data.meta.status ?? "");
   const demo = data.meta.data_status === "DEMO";
+  // imported (CPDB) policies: dashed border, same convention as candidate evidence
+  const imported = data.meta.data_status === "IMPORTED";
   // border brightness scales with evidence strength (0–5)
   const score = Math.max(0, Math.min(5, Number(data.meta.evidenceScore ?? 0)));
   const borderAlpha = Math.round(((0.25 + score * 0.15) * 255)).toString(16).padStart(2, "0");
@@ -45,7 +47,7 @@ export function PolicyNode({ data, selected }: NodeProps<PactFlowNode>) {
         selected && "border-entity-policy",
       )}
       style={{
-        borderStyle: "solid",
+        borderStyle: imported ? "dashed" : "solid",
         borderWidth: 1,
         borderTopColor: `${data.color}${borderAlpha}`,
         borderRightColor: `${data.color}${borderAlpha}`,

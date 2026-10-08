@@ -20,7 +20,10 @@ describe("searchCatalogue", () => {
     const policies = searchCatalogue(seedDataset, "Japan").policies;
     expect(policies.length).toBeGreaterThan(0);
     expect(policies[0].country_code).toBe("JP");
-    expect(policies.every((policy) => policy.country_code === "JP")).toBe(true);
+    // Japanese policies rank first; others only match on text that mentions Japan
+    const firstOther = policies.findIndex((policy) => policy.country_code !== "JP");
+    if (firstOther !== -1)
+      expect(policies.slice(firstOther).every((policy) => policy.country_code !== "JP")).toBe(true);
   });
 
   it("indexes policy funding and eligibility text", () => {

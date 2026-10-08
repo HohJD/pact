@@ -3,12 +3,15 @@ import { describe, expect, it } from "vitest";
 import { seedDataset } from "@/data/seed";
 import { computeMapData } from "./map-data";
 
+// imported (CPDB) policies are hidden unless the filter includes them
+const curated = seedDataset.policies.filter((p) => p.data_status !== "IMPORTED");
+
 describe("computeMapData", () => {
   it("counts DE policies under the DE roll-up", () => {
     const d = computeMapData(seedDataset, {});
     const de = d.countries.get("DE");
     expect(de).toBeDefined();
-    const expected = seedDataset.policies.filter((p) => p.country_code === "DE");
+    const expected = curated.filter((p) => p.country_code === "DE");
     expect(de!.count).toBe(expected.length);
     expect(de!.policies).toHaveLength(expected.length);
   });
@@ -23,7 +26,7 @@ describe("computeMapData", () => {
   it("rolls sub-national US jurisdictions up under US in country data", () => {
     const d = computeMapData(seedDataset, {});
     const us = d.countries.get("US")!;
-    const usPolicies = seedDataset.policies.filter((p) => p.country_code === "US");
+    const usPolicies = curated.filter((p) => p.country_code === "US");
     expect(us.count).toBe(usPolicies.length);
     // sub-national jurisdictions appear as markers, not countries
     const subIds = seedDataset.jurisdictions
@@ -36,13 +39,18 @@ describe("computeMapData", () => {
 
   it("respects technology filters", () => {
     const d = computeMapData(seedDataset, { technology_ids: ["tech_heat_pump"] });
-    const expected = seedDataset.policies.filter((p) =>
-      p.technology_ids.includes("tech_heat_pump"),
-    );
+    const expected = curated.filter((p) => p.technology_ids.includes("tech_heat_pump"));
     expect(d.totalPolicies).toBe(expected.length);
     expect([...d.countries.values()].reduce((a, c) => a + c.count, 0)).toBe(
       expected.length,
     );
+  });
+
+  it("adds imported policies when include_imported is on", () => {
+    const d = computeMapData(seedDataset, { include_imported: true });
+    expect(d.totalPolicies).toBe(seedDataset.policies.length);
+    const de = d.countries.get("DE")!;
+    expect(de.policies.some((p) => p.data_status === "IMPORTED")).toBe(true);
   });
 
   it("intensity is normalised to the max country", () => {

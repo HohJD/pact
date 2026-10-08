@@ -10,6 +10,7 @@ import { seedDataset } from "../src/data/seed";
 const MODEL = "Xenova/all-MiniLM-L6-v2";
 const DIMS = 384;
 const BATCH_SIZE = 16;
+const IMPORTED_NEIGHBOURS = 8;
 
 type FeatureExtractionOutput = { tolist(): number[][] };
 type FeatureExtractionPipeline = (
@@ -82,15 +83,29 @@ async function main() {
     `wrote ${embeddingsFile} (${Object.keys(policies).length} policies, ${Object.keys(evidence).length} evidence)`,
   );
 
+  const pairScore = (a: string, b: string) =>
+    Number(Math.max(0, Math.min(1, (cosine(policies[a], policies[b]) + 1) / 2)).toFixed(3));
+  const pairKey = (a: string, b: string) => [a, b].sort().join("|");
+
+  // every curated pair; imported (CPDB) policies keep only their nearest
+  // neighbours so the client-side score table stays small
   const scores: Record<string, number> = {};
-  for (let i = 0; i < seedDataset.policies.length; i++) {
-    const a = seedDataset.policies[i];
-    for (let j = i + 1; j < seedDataset.policies.length; j++) {
-      const b = seedDataset.policies[j];
-      const key = [a.id, b.id].sort().join("|");
-      const similarity = (cosine(policies[a.id], policies[b.id]) + 1) / 2;
-      scores[key] = Number(Math.max(0, Math.min(1, similarity)).toFixed(3));
+  const curated = seedDataset.policies.filter((p) => p.data_status !== "IMPORTED");
+  const imported = seedDataset.policies.filter((p) => p.data_status === "IMPORTED");
+  for (let i = 0; i < curated.length; i++) {
+    for (let j = i + 1; j < curated.length; j++) {
+      scores[pairKey(curated[i].id, curated[j].id)] = pairScore(curated[i].id, curated[j].id);
     }
+  }
+  for (const p of imported) {
+    seedDataset.policies
+      .filter((q) => q.id !== p.id)
+      .map((q) => ({ id: q.id, score: pairScore(p.id, q.id) }))
+      .sort((x, y) => y.score - x.score)
+      .slice(0, IMPORTED_NEIGHBOURS)
+      .forEach(({ id, score }) => {
+        scores[pairKey(p.id, id)] = score;
+      });
   }
 
   const semanticFile = path.join(process.cwd(), "src/data/seed/semantic.ts");
