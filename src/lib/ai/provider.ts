@@ -55,6 +55,9 @@ const BASE = "https://openrouter.ai/api/v1";
 const TIMEOUT_MS = 20_000;
 const FREE_ONLY = process.env.OPENROUTER_FREE_ONLY === "true";
 const FREE_DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
+// Free models may emit hidden reasoning by default; disabling it keeps responses
+// under TIMEOUT_MS. Set OPENROUTER_REASONING=true to let the model reason.
+const REASONING_DISABLED = process.env.OPENROUTER_REASONING !== "true";
 
 function stripFences(s: string): string {
   return s
@@ -109,6 +112,7 @@ export class OpenRouterProvider implements LLMProvider {
           messages,
           temperature: opts.temperature ?? 0.2,
           max_tokens: opts.maxTokens ?? 4000,
+          ...(REASONING_DISABLED ? { reasoning: { enabled: false } } : {}),
           ...(opts.format === "schema"
             ? {
                 response_format: {
@@ -174,6 +178,7 @@ export class OpenRouterProvider implements LLMProvider {
           temperature: opts.temperature ?? 0.2,
           max_tokens: opts.maxTokens ?? 4000,
           stream: true,
+          ...(REASONING_DISABLED ? { reasoning: { enabled: false } } : {}),
           ...(opts.format === "schema"
             ? {
                 response_format: {

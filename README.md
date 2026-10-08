@@ -157,6 +157,7 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 | `OPENROUTER_MODEL`             | chat model (default `anthropic/claude-sonnet-4.5`, or free default under FREE_ONLY) | no |
 | `OPENROUTER_EMBEDDING_MODEL`   | optional live query embedding model                 | no       |
 | `OPENROUTER_FREE_ONLY`         | `true` → refuse non-`:free` models, disable embeddings | no    |
+| `OPENROUTER_REASONING`         | `true` → let the model emit reasoning (default off — keeps free models under the timeout) | no |
 | `PACT_ANALYST_MODE`            | `live` (default with key) or `fallback` (always curated) | no  |
 | `PACT_DATA_SOURCE`             | `supabase` to read from Supabase, else seed         | no       |
 | `NEXT_PUBLIC_SUPABASE_URL`     | Supabase project URL                                | supabase |
