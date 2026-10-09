@@ -6,7 +6,7 @@ import {
 } from "./transfer-fallback";
 import { guardAnalystResponse } from "./guardrails";
 import { TRANSFER_SYSTEM_PROMPT } from "./prompts";
-import type { LLMProvider } from "./provider";
+import { LLMOutputError, type LLMProvider } from "./provider";
 import {
   formatContextDocument,
   retrieveContext,
@@ -108,7 +108,9 @@ export async function assessTransfer(
     return { ...data, lessons: guarded.claims, actions: guarded.actions, source: "LLM" };
   } catch (err) {
     console.warn(
-      `[pact-ai] transfer fell back: ${err instanceof Error ? err.name : "unknown"}`,
+      `[pact-ai] transfer fell back: ${err instanceof Error ? `${err.name}: ${err.message}` : "unknown"}${
+        err instanceof LLMOutputError && err.raw ? ` raw=${err.raw.slice(0, 400)}` : ""
+      }`,
     );
     return fallbackTransfer(req.target_jurisdiction_id, sourceIds);
   }

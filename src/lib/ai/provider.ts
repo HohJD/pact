@@ -1,53 +1,30 @@
 import { z } from "zod";
 
+import { AnthropicProvider } from "./anthropic-provider";
 import { ANALYST_REPAIR_PROMPT } from "./prompts";
+import {
+  LLMOutputError,
+  parseWithSchema,
+  ProviderUnavailableError,
+  type ChatJSONOptions,
+  type LLMProvider,
+} from "./provider-core";
 import { createAnswerExtractor, parseSSE } from "./streaming";
 
-export interface ChatJSONOptions<T> {
-  system: string;
-  user: string;
-  schema: z.ZodType<T>;
-  schemaName: string;
-  temperature?: number;
-  maxTokens?: number;
-}
-
-export interface LLMProvider {
-  chatJSON<T>(opts: ChatJSONOptions<T>): Promise<{ data: T; raw: string; model: string }>;
-  /**
-   * Streaming variant: invokes `onDelta` with unescaped fragments of the
-   * response's `"answer"` string field as they arrive, then resolves with the
-   * full validated payload. Optional — providers may omit it.
-   */
-  chatJSONStream?<T>(
-    opts: ChatJSONOptions<T>,
-    onDelta: (text: string) => void,
-  ): Promise<{ data: T; raw: string; model: string }>;
-  embed(texts: string[]): Promise<number[][]>;
-  isConfigured(): boolean;
-}
-
-export class ProviderUnavailableError extends Error {
-  constructor(msg = "LLM provider is not configured") {
-    super(msg);
-    this.name = "ProviderUnavailableError";
-  }
-}
+export {
+  extractJsonBlock,
+  LLMOutputError,
+  parseWithSchema,
+  ProviderUnavailableError,
+  stripFences,
+  type ChatJSONOptions,
+  type LLMProvider,
+} from "./provider-core";
 
 class FormatUnsupportedError extends Error {
   constructor(msg: string) {
     super(msg);
     this.name = "FormatUnsupportedError";
-  }
-}
-
-export class LLMOutputError extends Error {
-  constructor(
-    message: string,
-    public readonly raw?: string,
-  ) {
-    super(message);
-    this.name = "LLMOutputError";
   }
 }
 
@@ -58,13 +35,6 @@ const FREE_DEFAULT_MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 // Free models may emit hidden reasoning by default; disabling it keeps responses
 // under TIMEOUT_MS. Set OPENROUTER_REASONING=true to let the model reason.
 const REASONING_DISABLED = process.env.OPENROUTER_REASONING !== "true";
-
-function stripFences(s: string): string {
-  return s
-    .replace(/^\s*```(?:json)?\s*/i, "")
-    .replace(/\s*```\s*$/, "")
-    .trim();
-}
 
 export class OpenRouterProvider implements LLMProvider {
   constructor(
@@ -212,46 +182,6 @@ export class OpenRouterProvider implements LLMProvider {
     }
   }
 
-  /** Extract the first balanced {…} block — for models that wrap JSON in prose. */
-  private extractJson(raw: string): string | null {
-    const clean = stripFences(raw);
-    const start = clean.indexOf("{");
-    if (start < 0) return null;
-    let depth = 0;
-    let inStr = false;
-    let esc = false;
-    for (let i = start; i < clean.length; i++) {
-      const c = clean[i];
-      if (esc) {
-        esc = false;
-        continue;
-      }
-      if (c === "\\" && inStr) {
-        esc = true;
-        continue;
-      }
-      if (c === '"') inStr = !inStr;
-      if (inStr) continue;
-      if (c === "{") depth++;
-      if (c === "}") {
-        depth--;
-        if (depth === 0) return clean.slice(start, i + 1);
-      }
-    }
-    return null;
-  }
-
-  private parse<T>(raw: string, schema: z.ZodType<T>): T | null {
-    const candidate = this.extractJson(raw);
-    if (!candidate) return null;
-    try {
-      const parsed = schema.safeParse(JSON.parse(candidate));
-      return parsed.success ? parsed.data : null;
-    } catch {
-      return null;
-    }
-  }
-
   async chatJSON<T>({
     system,
     user,
@@ -277,14 +207,14 @@ export class OpenRouterProvider implements LLMProvider {
             ? [...messages, { role: "user", content: "Return JSON only — no prose." }]
             : messages;
         raw = await this.call(msgs, { jsonSchema, format, temperature, maxTokens });
-        let data = this.parse(raw, schema);
+        let data = parseWithSchema(raw, schema);
         if (data === null) {
           console.warn(`[pact-ai] ${schemaName}: invalid JSON (${format}) — repair turn`);
           raw = await this.call(
             [...msgs, { role: "assistant", content: raw }, { role: "user", content: ANALYST_REPAIR_PROMPT }],
             { jsonSchema, format, temperature, maxTokens },
           );
-          data = this.parse(raw, schema);
+          data = parseWithSchema(raw, schema);
         }
         if (data !== null) return { data, raw, model: this.model };
         lastErr = new LLMOutputError(`${schemaName}: validation failed (${format})`, raw);
@@ -354,7 +284,7 @@ export class OpenRouterProvider implements LLMProvider {
             extract(delta);
           }
         }
-        const data = this.parse(raw, schema);
+        const data = parseWithSchema(raw, schema);
         if (data !== null) return { data, raw, model: this.model };
         lastErr = new LLMOutputError(`${schemaName}: validation failed (${format})`, raw);
       } catch (err) {
@@ -413,6 +343,15 @@ export class NullProvider implements LLMProvider {
 }
 
 export function getProvider(): LLMProvider {
-  const key = process.env.OPENROUTER_API_KEY;
-  return key ? new OpenRouterProvider(key) : new NullProvider();
+  const forced = process.env.PACT_LLM_PROVIDER; // "anthropic" | "openrouter" | unset
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  if (forced === "anthropic")
+    return anthropicKey ? new AnthropicProvider(anthropicKey) : new NullProvider();
+  if (forced === "openrouter")
+    return openRouterKey
+      ? new OpenRouterProvider(openRouterKey)
+      : new NullProvider();
+  if (anthropicKey) return new AnthropicProvider(anthropicKey);
+  return openRouterKey ? new OpenRouterProvider(openRouterKey) : new NullProvider();
 }

@@ -156,6 +156,9 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 | Variable                       | Purpose                                             | Required |
 | ------------------------------ | --------------------------------------------------- | -------- |
 | `OPENROUTER_API_KEY`           | live LLM (absent → curated fallback mode)            | no       |
+| `ANTHROPIC_API_KEY`            | live LLM via the Anthropic Messages API (takes precedence over OpenRouter when set) | no |
+| `ANTHROPIC_MODEL`              | Claude model (default `claude-sonnet-4-5`)           | no       |
+| `PACT_LLM_PROVIDER`            | force `anthropic` or `openrouter`                    | no       |
 | `OPENROUTER_MODEL`             | chat model (default `anthropic/claude-sonnet-4.5`, or free default under FREE_ONLY) | no |
 | `OPENROUTER_EMBEDDING_MODEL`   | optional live query embedding model                 | no       |
 | `OPENROUTER_FREE_ONLY`         | `true` → refuse non-`:free` models, disable embeddings | no    |
@@ -167,6 +170,14 @@ Node 22+, pnpm 10+. Port 3000 is intentionally avoided.
 | `SUPABASE_SERVICE_ROLE_KEY`    | seeding + ingest publish                            | server-only |
 | `NEXT_PUBLIC_MAPBOX_TOKEN`     | enables the Mapbox GL map (else SVG)                | no       |
 | `TAVILY_API_KEY`               | Evidence Agent live web search (Tavily free tier)   | no       |
+
+## LLM provider
+
+`ANTHROPIC_API_KEY` selects the direct Anthropic Messages API (structured output
+via forced tool use, `ANTHROPIC_MODEL` to override the default). If
+`ANTHROPIC_API_KEY` is absent, `OPENROUTER_API_KEY` is used; `PACT_LLM_PROVIDER`
+forces one or the other. Anthropic has no embeddings endpoint — local MiniLM
+embeddings are always used.
 
 ## OpenRouter configuration
 

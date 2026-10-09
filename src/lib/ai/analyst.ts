@@ -115,7 +115,7 @@ export async function analyse(
   } catch (err) {
     // provider/validation failure → deterministic fallback, never throw
     console.warn(
-      `[pact-ai] analyst fell back: ${err instanceof Error ? err.name : "unknown"}`,
+      `[pact-ai] analyst fell back: ${err instanceof Error ? `${err.name}: ${err.message}` : "unknown"}`,
     );
     return fallbackAnalyse(question);
   }
