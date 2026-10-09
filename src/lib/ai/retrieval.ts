@@ -1,10 +1,8 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import type { Dataset, Evidence, Outcome, Policy } from "@/lib/domain/schema";
 import type { WorkspaceFilter } from "@/store/workspace";
 import { resolveQuery } from "@/lib/query/resolve";
 import { searchCatalogue } from "@/lib/search/catalogue";
+import { cosine, loadEmbeddings, rankPolicies } from "@/lib/search/rank";
 import type { LLMProvider } from "./provider";
 
 export interface WorkspaceContext {
@@ -28,34 +26,6 @@ export interface RetrievalContext {
   policyIds: Set<string>;
 }
 
-interface EmbeddingsFile {
-  model: string;
-  dims: number;
-  policies: Record<string, number[]>;
-  evidence: Record<string, number[]>;
-}
-
-function loadEmbeddings(): EmbeddingsFile | null {
-  try {
-    const p = path.join(process.cwd(), "src/data/seed/embeddings.json");
-    return JSON.parse(readFileSync(p, "utf8"));
-  } catch {
-    return null;
-  }
-}
-
-function cosine(a: number[], b: number[]): number {
-  let dot = 0,
-    na = 0,
-    nb = 0;
-  for (let i = 0; i < a.length && i < b.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
-  }
-  return na && nb ? dot / Math.sqrt(na * nb) : 0;
-}
-
 export async function retrieveContext(
   question: string,
   dataset: Dataset,
@@ -64,7 +34,6 @@ export async function retrieveContext(
 ): Promise<RetrievalContext> {
   const resolved = resolveQuery(question, dataset);
   const catalogueResults = searchCatalogue(dataset, question);
-  const maxLexicalScore = Math.max(0, ...catalogueResults.scores.values());
   let documentPolicyIds = new Set<string>();
   try {
     const { searchDocuments } = await import("@/lib/search/documents");
@@ -103,41 +72,16 @@ export async function retrieveContext(
     }
   }
 
-  const scored = dataset.policies.map((p) => {
-    const lex =
-      maxLexicalScore > 0
-        ? (6 * (catalogueResults.scores.get(p.id) ?? 0)) / maxLexicalScore
-        : 0;
-    let score = lex * 0.5;
-    if (p.technology_ids.some((t) => hintTech.has(t))) score += 2;
-    if (p.mechanism_ids.some((m) => hintMech.has(m))) score += 2;
-    if (hintCountry.has(p.country_code)) score += 2;
-    if (pinned.has(p.id)) score += 3;
-    if (documentPolicyIds.has(p.id)) score += 2;
-    // popularity nudge: policies with observed outcomes / evaluating evidence
-    // surface above obscure records at equal relevance
-    const nOutcomes = dataset.outcomes.filter((o) => o.policy_id === p.id).length;
-    const nEvidence = dataset.evidence.filter(
-      (e) =>
-        e.policy_ids.includes(p.id) &&
-        e.policy_relevance !== "CONTEXT" &&
-        e.data_status !== "DEMO",
-    ).length;
-    score += Math.min(3, nOutcomes) * 2.0 + Math.min(5, nEvidence) * 0.75;
-    // evidence-backed coverage bonus: policies with both outcomes and evidence
-    // are the analyst's canonical reference set
-    if (nOutcomes > 0 && nEvidence > 0) score += 1.0;
-    // curated-similarity hubness: well-connected reference policies surface higher
-    const nSim = dataset.similarities.filter(
-      (s) => s.policy_a === p.id || s.policy_b === p.id,
-    ).length;
-    score += Math.min(4, nSim) * 1.5;
-    if (emb) score = score * 0.6 + (emb[p.id] ?? 0) * 10 * 0.4;
-    return { p, score };
+  const scored = rankPolicies(question, dataset, {
+    lexicalScores: catalogueResults.scores,
+    hintTechnologyIds: hintTech,
+    hintMechanismIds: hintMech,
+    hintCountries: hintCountry,
+    pinnedPolicyIds: pinned,
+    documentPolicyIds,
+    emb,
   });
-
-  scored.sort((a, b) => b.score - a.score);
-  const top = scored.slice(0, 12).map((s) => s.p);
+  const top = scored.slice(0, 12).map((s) => s.policy);
   // always include selected/compared policies
   for (const id of pinned) {
     const p = dataset.policies.find((x) => x.id === id);

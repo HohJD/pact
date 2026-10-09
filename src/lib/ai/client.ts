@@ -72,7 +72,6 @@ function keepAnswerVisible(a: UIAction): UIAction {
 export async function submitAnalystQuestion(
   question: string,
   dataset: Dataset,
-  opts?: { demo?: boolean },
 ): Promise<void> {
   const q = question.trim();
   if (!q) return;
@@ -92,17 +91,6 @@ export async function submitAnalystQuestion(
 
   store.setAnalystPending(true);
   store.openPanel("ANALYST");
-
-  // demo mode is deterministic — curated response only, no network call
-  if (opts?.demo) {
-    const data = matchFallback(q);
-    // brief pause so the staged actions read as "thinking"
-    await wait(300);
-    useWorkspace.getState().setAnalyst({ data });
-    await applyActionsSequenced(data.actions ?? [], dataset, { keepAnswer: true });
-    useWorkspace.getState().setAnalystPending(false);
-    return;
-  }
 
   try {
     const s = useWorkspace.getState();

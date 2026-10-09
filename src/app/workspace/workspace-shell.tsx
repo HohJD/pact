@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import { DemoPresenter } from "@/components/demo/presenter";
 import { GraphCanvas } from "@/components/graph/graph-canvas";
 import { CompareView } from "@/components/compare/compare-view";
 import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
@@ -20,7 +19,7 @@ import { submitAnalystQuestion } from "@/lib/ai/client";
 import { cn } from "@/lib/utils";
 import { useWorkspace, type WorkspaceView } from "@/store/workspace";
 
-// expose the store for programmatic control (agent UI actions, e2e, demos) —
+// expose the store for programmatic control (agent UI actions, e2e) —
 // development and debug builds only
 if (
   typeof window !== "undefined" &&
@@ -31,26 +30,9 @@ if (
 }
 
 const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
-const DEMO_QUESTION =
-  "Which policies have successfully accelerated heat-pump adoption?";
 const MOBILE_HINT_STORAGE_KEY = "pact.mobileHintDismissed";
 
-const DEMO_STEPS = [
-  "Open /demo — the heat-pump scenario loads by itself (curated, no network).",
-  "Read the analyst answer in the right panel.",
-  "Click a citation [n] → the evidence drawer opens.",
-  "Esc closes it; browse the graph — nodes highlighted by the answer.",
-  "Select BUS, BEG 2024 and MaPrimeRénov' (⌘K or right-click → compare).",
-  "Open the comparison — shared-row table, key differences, cited lessons.",
-  "SHOW OUTCOMES → time series with policy markers.",
-  "MAP → click Germany → focus + zoom; back to GRAPH.",
-  "TIMELINE → country lanes; click a bar to select.",
-  "Ask “What could the UK learn from Germany?” in the command bar.",
-  "Open Policy transfer from a policy card (Oxford ← BEG).",
-  "⌘K → search evidence, open the drawer.",
-];
-
-export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
+export function WorkspaceShell() {
   const dataset = useDataset();
   const view = useWorkspace((s) => s.view);
   const setView = useWorkspace((s) => s.setView);
@@ -88,7 +70,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
       setPanelToggled((p) => (typeof up === "function" ? up(p ?? isDesktop) : up)),
     [isDesktop],
   );
-  const [scriptOpen, setScriptOpen] = useState(false);
   const [showMobileHint, setShowMobileHint] = useState(false);
   const params = useSearchParams();
   const initialised = useRef(false);
@@ -121,10 +102,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
   useEffect(() => {
     if (initialised.current) return;
     initialised.current = true;
-    if (demo) {
-      void submitAnalystQuestion(DEMO_QUESTION, dataset, { demo: true });
-      return;
-    }
     const q = params.get("q");
     const v = params.get("view")?.toUpperCase();
     if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
@@ -147,10 +124,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       const s = useWorkspace.getState();
       if (e.key === "Escape") {
-        if (scriptOpen) {
-          setScriptOpen(false);
-          return;
-        }
         // drawer first, then selection/panel
         if (s.evidenceDrawerId) {
           s.closeEvidence();
@@ -167,9 +140,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         e.preventDefault();
         document.getElementById("pact-command-input")?.focus();
       }
-      if (e.key === "?") {
-        if (demo) setScriptOpen((v) => !v);
-      }
       if (e.key >= "1" && e.key <= "4") {
         const i = Number(e.key) - 1;
         if (VIEWS[i]) s.setView(VIEWS[i]);
@@ -179,16 +149,15 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [select, openPanel, demo, scriptOpen, setSidebarOpen, setPanelOpen]);
+  }, [select, openPanel, setSidebarOpen, setPanelOpen]);
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
       <TopBar
-        demo={demo}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onTogglePanel={() => setPanelOpen((v) => !v)}
       />
-      {!demo && showMobileHint && (
+      {showMobileHint && (
         <div className="flex min-w-0 shrink-0 items-center gap-2 border-b border-border bg-background/90 px-3 py-1.5 text-[11px] text-muted-foreground lg:hidden">
           <p className="min-w-0 flex-1 leading-snug">
             Best on a larger screen — on phones some views are simplified.
@@ -264,7 +233,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         </main>
         <RightPanel
           open={panelOpen && !comparing}
-          demo={demo}
           onClose={() => {
             if (!isDesktop) setPanelOpen(false);
           }}
@@ -273,39 +241,6 @@ export function WorkspaceShell({ demo = false }: { demo?: boolean }) {
         <CommandPalette />
       </div>
 
-      {demo && <DemoPresenter dataset={dataset} />}
-
-      {/* demo script — “?” toggles it (presenter aid) */}
-      {demo && (
-        <button
-          type="button"
-          onClick={() => setScriptOpen((v) => !v)}
-          className="glass fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-3 z-40 flex size-8 items-center justify-center rounded-full font-mono text-[13px] text-muted-foreground hover:text-foreground"
-          aria-label="Demo script"
-        >
-          ?
-        </button>
-      )}
-      {demo && scriptOpen && (
-        <div className="glass fixed bottom-[calc(3.5rem_+_env(safe-area-inset-bottom))] left-3 z-40 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
-              Demo script
-            </span>
-            <span className="kbd">?</span>
-          </div>
-          <ol className="space-y-1.5">
-            {DEMO_STEPS.map((s, i) => (
-              <li key={i} className="flex gap-2 text-[10.5px] leading-snug text-foreground">
-                <span className="font-mono text-muted-foreground">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {s}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
     </div>
   );
 }

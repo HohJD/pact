@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { seedDataset } from "@/data/seed";
 import { semanticScores } from "@/data/seed/semantic";
 import {
+  DEFAULT_SIMILARITY_WEIGHTS,
   jurisdictionSimilarity,
+  rescoreSimilarity,
   structuredSimilarity,
   topSimilar,
 } from "./structured";
@@ -93,5 +95,47 @@ describe("topSimilar", () => {
     expect(computed).toBeDefined();
     const key = [computed!.policy_a, computed!.policy_b].sort().join("|");
     expect(computed!.breakdown.semantic).toBe(semanticScores[key]);
+  });
+});
+
+describe("rescoreSimilarity", () => {
+  it("default weights reproduce a computed breakdown's overall score", () => {
+    const b = structuredSimilarity(
+      byId("pol_gb_bus"),
+      byId("pol_de_beg"),
+      seedDataset.jurisdictions,
+      semanticScores["pol_de_beg|pol_gb_bus"],
+    );
+    expect(rescoreSimilarity(b, DEFAULT_SIMILARITY_WEIGHTS)).toBeCloseTo(
+      b.overall,
+      2,
+    );
+  });
+
+  it("zero semantic weight ignores the semantic dimension", () => {
+    const s = seedDataset.similarities[0];
+    const a = rescoreSimilarity(s.breakdown, {
+      ...DEFAULT_SIMILARITY_WEIGHTS,
+      semantic: 0,
+    });
+    const b = rescoreSimilarity(
+      { ...s.breakdown, semantic: s.breakdown.semantic === 1 ? 0 : 1 },
+      { ...DEFAULT_SIMILARITY_WEIGHTS, semantic: 0 },
+    );
+    expect(a).toBe(b);
+  });
+
+  it("all-zero weights score 0", () => {
+    const s = seedDataset.similarities[0];
+    expect(
+      rescoreSimilarity(s.breakdown, {
+        technology: 0,
+        mechanism: 0,
+        sector: 0,
+        target: 0,
+        jurisdiction: 0,
+        semantic: 0,
+      }),
+    ).toBe(0);
   });
 });

@@ -16,11 +16,9 @@ import { WorkspaceSummary } from "./workspace-summary";
 
 export function RightPanel({
   open,
-  demo = false,
   onClose,
 }: {
   open: boolean;
-  demo?: boolean;
   onClose?: () => void;
 }) {
   const selection = useWorkspace((s) => s.selection);
@@ -49,7 +47,7 @@ export function RightPanel({
     );
     show = show && !!panel;
   } else if (selection?.kind === "policy") {
-    if (panel === "EVIDENCE") content = <EvidencePanel policyId={selection.id} hideAgent={demo} />;
+    if (panel === "EVIDENCE") content = <EvidencePanel policyId={selection.id} />;
     else if (panel === "OUTCOMES") content = <OutcomesPanel policyId={selection.id} />;
     else content = <PolicyCard policyId={selection.id} />;
     show = show && !!panel;

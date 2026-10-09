@@ -12,11 +12,9 @@ import { useDataset } from "@/components/providers/dataset-provider";
 import { useWorkspace } from "@/store/workspace";
 
 export function TopBar({
-  demo = false,
   onToggleSidebar,
   onTogglePanel,
 }: {
-  demo?: boolean;
   onToggleSidebar?: () => void;
   onTogglePanel?: () => void;
 }) {
@@ -35,7 +33,7 @@ export function TopBar({
       setQuery("");
       return;
     }
-    void submitAnalystQuestion(q, dataset, { demo });
+    void submitAnalystQuestion(q, dataset);
   };
 
   return (
@@ -72,11 +70,12 @@ export function TopBar({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        {demo && (
-          <span className="rounded border border-entity-evidence/50 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-entity-evidence">
-            Demo
-          </span>
-        )}
+        <Link
+          href="/"
+          className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground max-sm:hidden"
+        >
+          Search
+        </Link>
         <button
           type="button"
           onClick={onTogglePanel}

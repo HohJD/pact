@@ -77,7 +77,10 @@ export function structuredSimilarity(
   const targetsA = new Set(a.target_groups.map((t) => t.toLowerCase()));
   const same_target = b.target_groups.some((t) => targetsA.has(t.toLowerCase()));
   const jurisdiction_similarity = jurisdictionSimilarity(a, b, jurisdictions);
-  const semantic = semanticOverride ?? jaccard(policyTokens(a), policyTokens(b));
+  const semantic = Math.min(
+    1,
+    Math.max(0, semanticOverride ?? jaccard(policyTokens(a), policyTokens(b))),
+  );
 
   const overall =
     (same_technology ? WEIGHTS.technology : 0) +
@@ -96,7 +99,7 @@ export function structuredSimilarity(
     differences.push("Closely aligned policy design; differences are mainly contextual.");
 
   return {
-    semantic: Math.min(1, Math.max(0, semantic)),
+    semantic,
     same_sector,
     same_mechanism,
     same_target,
@@ -148,4 +151,41 @@ export function topSimilar(policyId: string, dataset: Dataset, n = 5): Similarit
     .sort((x, y) => y.breakdown.overall - x.breakdown.overall);
 
   return [...curated, ...computed].slice(0, n);
+}
+
+/** User-tunable similarity weights (0–10 each). Defaults mirror WEIGHTS. */
+export interface SimilarityWeights {
+  technology: number;
+  mechanism: number;
+  sector: number;
+  target: number;
+  jurisdiction: number;
+  semantic: number;
+}
+
+export const DEFAULT_SIMILARITY_WEIGHTS: SimilarityWeights = {
+  technology: 10,
+  mechanism: 10,
+  sector: 4,
+  target: 4,
+  jurisdiction: 4,
+  semantic: 8,
+};
+
+/** Recompute a breakdown's overall score with custom weights (0–10 scale). */
+export function rescoreSimilarity(
+  b: SimilarityBreakdownT,
+  w: SimilarityWeights,
+): number {
+  const sum =
+    w.technology + w.mechanism + w.sector + w.target + w.jurisdiction + w.semantic;
+  if (sum <= 0) return 0;
+  const num =
+    (b.same_technology ? w.technology : 0) +
+    (b.same_mechanism ? w.mechanism : 0) +
+    (b.same_sector ? w.sector : 0) +
+    (b.same_target ? w.target : 0) +
+    JURISDICTION_SCORE[b.jurisdiction_similarity] * w.jurisdiction +
+    b.semantic * w.semantic;
+  return Math.min(1, Math.max(0, num / sum));
 }

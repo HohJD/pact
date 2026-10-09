@@ -14,13 +14,6 @@ interface PactStore {
   toggleCompare?: (id: string) => void;
 }
 
-function boxesIntersect(
-  a: { x: number; y: number; width: number; height: number },
-  b: { x: number; y: number; width: number; height: number },
-) {
-  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
-}
-
 test("mobile analyst opens from a question and closes with its X", async ({ page }) => {
   const question = "Which policies have successfully accelerated heat-pump adoption?";
   await page.route("**/api/analyst**", (route) => route.abort());
@@ -98,7 +91,7 @@ test("mobile evidence drawer fits within the viewport", async ({ page }) => {
 });
 
 test("mobile routes have no horizontal overflow", async ({ page }) => {
-  for (const route of ["/", "/workspace", "/demo"]) {
+  for (const route of ["/", "/workspace"]) {
     await page.goto(route);
     await expect(page.locator("header")).toBeVisible();
     await expect
@@ -168,32 +161,3 @@ test("mobile compare row labels stay visible when scrolled sideways", async ({ p
     .toBeLessThanOrEqual(1);
 });
 
-test("mobile demo controls fit and play starts the presenter", async ({ page }) => {
-  await page.goto("/demo");
-
-  const play = page.locator("[data-demo-play]");
-  const presenter = play.locator("xpath=..");
-  const script = page.getByRole("button", { name: "Demo script" });
-  await expect(play).toBeVisible();
-  await expect(script).toBeVisible();
-
-  const playBox = await play.boundingBox();
-  const presenterBox = await presenter.boundingBox();
-  const scriptBox = await script.boundingBox();
-  for (const box of [playBox, presenterBox, scriptBox]) {
-    expect(box).not.toBeNull();
-    if (!box) throw new Error("Demo control has no bounding box");
-    expect(box.x).toBeGreaterThanOrEqual(0);
-    expect(box.y).toBeGreaterThanOrEqual(0);
-    expect(box.x + box.width).toBeLessThanOrEqual(390);
-    expect(box.y + box.height).toBeLessThanOrEqual(844);
-  }
-  if (!presenterBox || !scriptBox || !playBox) {
-    throw new Error("Demo controls have no bounding boxes");
-  }
-  expect(boxesIntersect(presenterBox, scriptBox)).toBe(false);
-  expect(boxesIntersect(playBox, scriptBox)).toBe(false);
-
-  await play.tap();
-  await expect(play).toHaveAttribute("aria-label", "Pause demo");
-});

@@ -28,9 +28,10 @@ the next policymaker doesn't start from zero.
 
 ```
 src/app (Next.js App Router)
- ├── /                  landing
- ├── /workspace         the product shell (server component → loadDataset)
- ├── /demo              deterministic curated scenario
+ ├── /                  search: query → ranked list + similarity tangle
+ ├── /policy/[id]       legislation page — meta, timeline, evidence, similar
+ ├── /compare/[a]/[b]   two-policy comparison, dimension breakdown
+ ├── /workspace         Explore mode — the analyst workspace
  ├── /admin/ingest      internal ingestion + human review
  └── /api/*
       analyst | transfer | evidence-agent | ingest
@@ -124,22 +125,23 @@ EXPERIMENTAL / META_ANALYSIS (+ UNKNOWN).
   to the workspace from the Evidence panel for the session. Without the key
   the agent returns seeded evidence only.
 
-## Demo mode
+## User flow
 
-`/demo` renders the workspace with a deterministic scenario: the flagship
-heat-pump question is answered from the **curated fallback** (no network call),
-actions are applied with the staged delays, and a `DEMO` chip sits in the top
-bar. Press `?` for the 12-step presenter script. Works fully offline.
-
-The 12 steps: curated answer → citation drawer → highlighted graph → select
-BUS/BEG/MPR → comparison → outcomes → map focus → timeline → second question →
-policy transfer → ⌘K evidence search.
+Search-first, like the original HackTheClimate flow: `/` takes a question or
+keywords (`?q=` deep-links), ranks policies lexically + with local MiniLM
+embeddings, and shows a similarity tangle (left) next to the ranked list with a
+streaming analyst summary (right). Click a node to band the list by similarity;
+click an edge to open `/compare/a/b`. Each result links to `/policy/[id]`.
+"Similarity weights" (dialog, persisted in `localStorage`) rescores edges,
+ranking and comparison live. `/workspace` is the full Explore mode; the
+workspace topbar links back to Search.
 
 ## Screens
 
-- `/` — landing: hero search, suggested questions, live network preview
+- `/` — search: query box, example queries, progress steps, tangle + ranked results, AI summary
+- `/policy/[id]` — legislation page: flag, meta, timeline, sources, evidence (with strength), outcomes, similar policies
+- `/compare/[a]/[b]` — side-by-side comparison with per-dimension same/partial/different rows and a /100 score
 - `/workspace` — the analyst workspace: graph, filters, panels, comparison, map, timeline
-- `/demo` — deterministic presenter demo of the flagship scenario (works offline)
 - `/admin/ingest` — internal ingestion pipeline review UI
 
 ## Running locally
@@ -254,7 +256,7 @@ source documents are held in memory and are lost when the server restarts.
 
 ```bash
 pnpm test        # vitest — unit (domain, graph, retrieval, guardrails, ingest, provider)
-pnpm test:e2e    # playwright — landing nav, offline fallback, 12-step demo flow
+pnpm test:e2e    # playwright — search flow, workspace, offline fallback, mobile
 pnpm tsc --noEmit && pnpm lint
 ```
 
