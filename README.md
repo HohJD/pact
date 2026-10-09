@@ -136,6 +136,24 @@ click an edge to open `/compare/a/b`. Each result links to `/policy/[id]`.
 ranking and comparison live. `/workspace` is the full Explore mode; the
 workspace topbar links back to Search.
 
+## Showcase walkthrough
+
+1. `/` — click the example **"Which policies accelerated heat-pump
+   adoption?"** → streaming analyst summary, similarity tangle, ranked list.
+2. Select the **Boiler Upgrade Scheme** (click its circle, or the row's
+   crosshair) → the list re-ranks by similarity, showing /100 scores and
+   compare icons per row.
+3. Click the compare icon on **BEG** → `/compare/pol_gb_bus/pol_de_beg` —
+   score out of 100, per-dimension same/partial/different rows, Swap link,
+   and your similarity weights apply.
+4. Click BEG's title → `/policy/pol_de_beg` — flag, meta, timeline, sources,
+   evidence with strength, outcomes, similar policies.
+5. "Open in Explore" → `/workspace?policy=pol_de_beg` (or
+   `?compare=pol_gb_bus,pol_de_beg` from the compare page) → switch to
+   OUTCOMES → ask "What could the UK learn from Germany?".
+
+Covered end to end by the `showcase: full flow` e2e test.
+
 ## Screens
 
 - `/` — search: query box, example queries, progress steps, tangle + ranked results, AI summary

@@ -72,7 +72,7 @@ export function TopBar({
       <div className="flex items-center gap-2">
         <Link
           href="/"
-          className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground max-sm:hidden"
+          className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
         >
           Search
         </Link>

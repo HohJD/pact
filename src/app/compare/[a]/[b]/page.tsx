@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
+import { BackToResults } from "@/components/back-to-results";
 import { Flag } from "@/components/flag";
 import { SiteNav } from "@/components/site-nav";
 import { loadDataset } from "@/lib/data";
@@ -36,8 +37,15 @@ function PolicyHeader({
         {policy.introduced?.slice(0, 4)}
       </p>
       <h2 className="mt-1 text-[15px] font-semibold leading-snug">
-        {policy.short_name ?? policy.name}
+        <Link href={`/policy/${policy.id}`} className="hover:underline">
+          {policy.name}
+        </Link>
       </h2>
+      {policy.short_name && (
+        <p className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          {policy.short_name}
+        </p>
+      )}
       <p className="mt-1 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
         {policy.status}
       </p>
@@ -88,7 +96,30 @@ export default async function ComparePage({
     <div className="flex min-h-screen flex-col">
       <SiteNav />
       <main className="mx-auto w-full max-w-4xl px-5 py-8">
-        <h1 className="mb-4 font-mono text-lg font-semibold tracking-wide">
+        <nav className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+          <BackToResults />
+          <span aria-hidden>·</span>
+          <Link
+            href={`/policy/${policyA.id}`}
+            className="hover:text-foreground"
+          >
+            {policyA.short_name ?? policyA.name}
+          </Link>
+          <span aria-hidden>↔</span>
+          <Link
+            href={`/policy/${policyB.id}`}
+            className="hover:text-foreground"
+          >
+            {policyB.short_name ?? policyB.name}
+          </Link>
+          <Link
+            href={`/compare/${b}/${a}`}
+            className="ml-auto text-entity-policy hover:underline"
+          >
+            Swap ↔
+          </Link>
+        </nav>
+        <h1 className="mb-4 mt-3 font-mono text-lg font-semibold tracking-wide">
           Compare
         </h1>
         <div className="flex items-stretch gap-4 rounded border border-border bg-card p-4">
@@ -141,7 +172,7 @@ export default async function ComparePage({
 
         <p className="mt-6">
           <Link
-            href="/workspace"
+            href={`/workspace?compare=${a},${b}`}
             className="text-[12px] text-entity-policy hover:underline"
           >
             Open side by side in Explore →

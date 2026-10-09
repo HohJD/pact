@@ -16,6 +16,7 @@ import { FilterSidebar } from "@/components/workspace/filter-sidebar";
 import { TopBar } from "@/components/workspace/topbar";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { submitAnalystQuestion } from "@/lib/ai/client";
+import { parseWorkspaceParams } from "@/lib/query/workspace-params";
 import { cn } from "@/lib/utils";
 import { useWorkspace, type WorkspaceView } from "@/store/workspace";
 
@@ -105,6 +106,14 @@ export function WorkspaceShell() {
     const q = params.get("q");
     const v = params.get("view")?.toUpperCase();
     if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
+    const link = parseWorkspaceParams(params, dataset);
+    if (link.policyId) {
+      if (!v) setView("GRAPH");
+      select({ kind: "policy", id: link.policyId });
+      openPanel("DETAILS");
+    }
+    for (const id of link.compareIds) toggleCompare(id);
+    if (link.compareIds.length >= 2) openPanel("COMPARE");
     if (q) void submitAnalystQuestion(q, dataset);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

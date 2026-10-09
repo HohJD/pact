@@ -59,12 +59,14 @@ export function Tangle({
   nodes,
   links,
   selectedId,
+  hoveredId,
   onSelect,
   onLinkClick,
 }: {
   nodes: TangleNode[];
   links: TangleLink[];
   selectedId: string | null;
+  hoveredId?: string | null;
   onSelect: (id: string | null) => void;
   onLinkClick: (a: string, b: string) => void;
 }) {
@@ -72,6 +74,7 @@ export function Tangle({
     new Map(),
   );
   const [tip, setTip] = useState<Tip | null>(null);
+  const [hotLink, setHotLink] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const radius = useMemo(() => {
@@ -153,6 +156,16 @@ export function Tangle({
     return s;
   }, [links, selectedId]);
 
+  const hotEndpoints = useMemo(() => {
+    const s = new Set<string>();
+    if (!hotLink) return s;
+    const l = links.find(
+      (x) => [x.source, x.target].sort().join("|") === hotLink,
+    );
+    if (l) s.add(l.source).add(l.target);
+    return s;
+  }, [links, hotLink]);
+
   const showTip = (
     e: React.MouseEvent,
     title: string,
@@ -228,12 +241,16 @@ export function Tangle({
                   e.stopPropagation();
                   onLinkClick(l.source, l.target);
                 }}
-                onMouseMove={(e) =>
+                onMouseMove={(e) => {
+                  setHotLink(key);
                   showTip(e, "Similarity", [
                     `${nodeTitle(l.source)} ↔ ${nodeTitle(l.target)} · ${Math.round(l.score * 100)} / 100`,
-                  ])
-                }
-                onMouseLeave={() => setTip(null)}
+                  ]);
+                }}
+                onMouseLeave={() => {
+                  setTip(null);
+                  setHotLink(null);
+                }}
               />
             </g>
           );
@@ -243,6 +260,7 @@ export function Tangle({
           if (!p) return null;
           const faded = !!neighbourIds && !neighbourIds.has(n.id);
           const isSel = n.id === selectedId;
+          const isHot = n.id === hoveredId || hotEndpoints.has(n.id);
           return (
             <circle
               key={n.id}
@@ -250,9 +268,9 @@ export function Tangle({
               cy={p.y}
               r={radius(n.score)}
               fill={isSel ? "#08316D" : ENTITY_COLORS.policy}
-              fillOpacity={faded ? 0.25 : isSel ? 1 : 0.75}
-              stroke={isSel ? "#08316D" : "var(--background)"}
-              strokeWidth={isSel ? 2.5 : 1.5}
+              fillOpacity={faded ? 0.25 : isSel || isHot ? 1 : 0.75}
+              stroke={isSel ? "#08316D" : isHot ? ENTITY_COLORS.policy : "var(--background)"}
+              strokeWidth={isSel || isHot ? 2.5 : 1.5}
               strokeDasharray={n.imported ? "3 3" : undefined}
               className="cursor-pointer"
               style={{ transition: "fill-opacity .15s, stroke-opacity .15s" }}

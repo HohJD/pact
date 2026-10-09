@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { GitCompare } from "lucide-react";
 
+import { BackToResults } from "@/components/back-to-results";
 import { Flag } from "@/components/flag";
 import { InferenceChip } from "@/components/panel/inference-chip";
 import { SiteNav } from "@/components/site-nav";
@@ -55,7 +56,8 @@ export default async function PolicyPage({
     <div className="flex min-h-screen flex-col">
       <SiteNav />
       <main className="mx-auto w-full max-w-3xl px-5 py-8">
-        <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
+        <BackToResults />
+        <p className="mt-3 flex items-center gap-2 text-[13px] text-muted-foreground">
           <Flag code={policy.country_code} />
           {jurisdiction?.name ?? policy.country_code}
           {jurisdiction?.level && (
@@ -276,15 +278,18 @@ export default async function PolicyPage({
               return (
                 <li
                   key={s.id}
-                  className="flex items-baseline gap-2 text-[12px]"
+                  className="relative flex items-baseline gap-2 rounded px-1 py-0.5 text-[12px] hover:bg-secondary/60"
                 >
-                  <Flag code={other.country_code} />
                   <Link
                     href={`/policy/${other.id}`}
-                    className="min-w-0 flex-1 truncate hover:underline"
-                  >
+                    className="absolute inset-0 rounded"
+                    aria-label={other.name}
+                    title={other.name}
+                  />
+                  <Flag code={other.country_code} />
+                  <span className="min-w-0 flex-1 truncate">
                     {other.short_name ?? other.name}
-                  </Link>
+                  </span>
                   <span className="font-mono text-[10px] text-muted-foreground">
                     {jur?.name ?? other.country_code} ·{" "}
                     {other.introduced?.slice(0, 4)}
@@ -295,7 +300,8 @@ export default async function PolicyPage({
                   <Link
                     href={`/compare/${policy.id}/${other.id}`}
                     title="Compare"
-                    className="text-entity-policy"
+                    aria-label={`Compare with ${other.name}`}
+                    className="relative z-10 text-entity-policy"
                   >
                     <GitCompare className="h-3.5 w-3.5" />
                   </Link>
@@ -307,7 +313,7 @@ export default async function PolicyPage({
 
         <p className="mt-8">
           <Link
-            href="/workspace"
+            href={`/workspace?policy=${policy.id}`}
             className="text-[12px] text-entity-policy hover:underline"
           >
             Open in Explore →
