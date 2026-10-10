@@ -14,6 +14,8 @@ test("CPDB policies stay hidden until the Sources filter includes them", async (
   const inView = page.getByText(/^\d+ policies in view$/);
   const before = Number((await inView.textContent())!.split(" ")[0]);
 
+  // the Sources section is collapsed by default — expand it
+  await page.getByRole("button", { name: "Sources", exact: true }).click();
   const toggle = page.getByRole("button", { name: /\+ Climate Policy Database \(\d+\)/ });
   const imported = Number((await toggle.textContent())!.match(/\((\d+)\)/)![1]);
   expect(imported).toBeGreaterThan(0);
@@ -48,6 +50,7 @@ test("asking the analyst keeps the CPDB toggle on", async ({ page }) => {
   await page.goto("/workspace");
   await page.waitForFunction(() => !!(window as unknown as { __pact?: unknown }).__pact);
 
+  await page.getByRole("button", { name: "Sources", exact: true }).click();
   await page.getByRole("button", { name: /\+ Climate Policy Database/ }).click();
   await page.getByPlaceholder(/Ask or search climate policies/).fill("Which German policies support heat pumps?");
   await page.keyboard.press("Enter");

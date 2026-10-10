@@ -47,11 +47,22 @@ export function OutcomesView() {
         .map((id) => dataset.policies.find((p) => p.id === id))
         .filter((p): p is Policy => !!p);
     const { evidence_strength_min, ...rest } = filters;
+    // policies with outcomes or time-series first, then by evidence strength —
+    // the default subject should have something to show
     const inView = repo
       .listPolicies(rest)
-      .map((p) => ({ p, score: repo.getEvidenceStrength(p.id).score }))
+      .map((p) => ({
+        p,
+        score: repo.getEvidenceStrength(p.id).score,
+        hasData:
+          repo.getOutcomesForPolicy(p.id).length > 0 ||
+          repo.getTimeSeries(p.country_code).length > 0,
+      }))
       .filter((x) => x.score >= (evidence_strength_min ?? 0))
-      .sort((a, b) => b.score - a.score)
+      .sort(
+        (a, b) =>
+          Number(b.hasData) - Number(a.hasData) || b.score - a.score,
+      )
       .slice(0, 6)
       .map((x) => x.p);
     return inView;
@@ -98,6 +109,9 @@ export function OutcomesView() {
 
       {pool.length > 1 && (
         <div className="flex shrink-0 items-center gap-1 border-b border-border px-3 py-1.5">
+          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
+            Policy
+          </span>
           {pool.map((p) => (
             <button
               key={p.id}
@@ -120,13 +134,21 @@ export function OutcomesView() {
         {!subject ? (
           <EmptyState />
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-4 p-4 xl:flex-row">
-            <div className="grid flex-1 grid-cols-1 content-start gap-4 2xl:grid-cols-2">
+          <div className="min-h-0 flex-1 space-y-4 p-4">
+            {repo.getOutcomesForPolicy(subject.id).length > 0 ? (
+              <div className="surface p-3">
+                <SectionTitle>Observed outcomes</SectionTitle>
+                <SubjectOutcomes subject={subject} />
+              </div>
+            ) : (
+              <p className="text-[10px] text-muted-foreground">
+                Insufficient outcome data for{" "}
+                {subject.short_name ?? subject.name}. PACT does not infer
+                outcomes without evidence.
+              </p>
+            )}
+            <div className="grid gap-4 md:grid-cols-2">
               <SeriesCards subject={subject} repo={repo} dataset={dataset} openEvidence={openEvidence} />
-            </div>
-            <div className="w-full shrink-0 xl:w-[320px]">
-              <SectionTitle>Observed outcomes</SectionTitle>
-              <SubjectOutcomes subject={subject} />
             </div>
           </div>
         )}
@@ -141,18 +163,10 @@ function SubjectOutcomes({ subject }: { subject: Policy }) {
   const openEvidence = useWorkspace((s) => s.openEvidence);
   const outcomes = repo.getOutcomesForPolicy(subject.id);
 
-  if (outcomes.length === 0)
-    return (
-      <div className="rounded border border-border/60 p-3">
-        <p className="text-[11px] text-muted-foreground">
-          Insufficient outcome data for {subject.short_name ?? subject.name}. PACT does not
-          infer outcomes without evidence.
-        </p>
-      </div>
-    );
+  if (outcomes.length === 0) return null;
 
   return (
-    <ul className="space-y-2">
+    <ul className="mt-1.5 grid gap-2 md:grid-cols-3">
       {outcomes.map((o) => (
         <li key={o.id} className="rounded border border-border/60 p-2">
           <div className="flex items-start justify-between gap-2">
@@ -311,18 +325,18 @@ function SeriesCard({
       <div className="h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -18 }}>
-            <CartesianGrid stroke="#ffffff08" vertical={false} />
+            <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.06)" vertical={false} />
             <XAxis
               dataKey="year"
-              tick={{ fontSize: 9, fill: MUTED, fontFamily: "var(--font-mono)" }}
-              axisLine={{ stroke: "#ffffff14" }}
+              tick={{ fontSize: 10, fill: MUTED, fontFamily: "var(--font-mono)" }}
+              axisLine={false}
               tickLine={false}
               domain={[2014, 2025]}
               type="number"
               allowDecimals={false}
             />
             <YAxis
-              tick={{ fontSize: 9, fill: MUTED, fontFamily: "var(--font-mono)" }}
+              tick={{ fontSize: 10, fill: MUTED, fontFamily: "var(--font-mono)" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))}
@@ -344,7 +358,7 @@ function SeriesCard({
                 label={{
                   value: `${subject.short_name ?? subject.name}`,
                   position: "insideTopRight",
-                  fontSize: 8,
+                  fontSize: 9,
                   fill: "#4C8DFF",
                   fontFamily: "var(--font-mono)",
                 }}
@@ -362,28 +376,25 @@ function SeriesCard({
                 strokeDasharray="2 4"
               />
             ))}
+            <defs>
+              <linearGradient id={`grad-${ts.id}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--chart-5)" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="var(--chart-5)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <Area
               type="monotone"
               dataKey="value"
               stroke={GREEN}
-              strokeWidth={1.5}
+              strokeWidth={1.75}
               strokeDasharray={demo ? "5 4" : undefined}
-              fill={GREEN}
-              fillOpacity={0.08}
-              dot={(props: { cx?: number; cy?: number; payload?: { year: number } }) => {
-                const { cx, cy } = props;
-                const hollow = ts.precision !== "REPORTED";
-                return (
-                  <circle
-                    key={`${cx}-${cy}`}
-                    cx={cx}
-                    cy={cy}
-                    r={2.5}
-                    fill={hollow ? "#0B0C0F" : GREEN}
-                    stroke={GREEN}
-                    strokeWidth={1.2}
-                  />
-                );
+              fill={`url(#grad-${ts.id})`}
+              dot={false}
+              activeDot={{
+                r: 3,
+                fill: GREEN,
+                stroke: "#0a0b0e",
+                strokeWidth: 1.5,
               }}
             />
             <Line type="monotone" dataKey="value" stroke="none" dot={false} isAnimationActive={false} />
@@ -433,7 +444,7 @@ function SeriesTooltip({
   if (!active || !payload?.length) return null;
   const v = payload[0].value;
   return (
-    <div className="rounded-md border border-border bg-card px-2.5 py-1.5 shadow-lg">
+    <div className="surface px-2 py-1.5 text-[11px]">
       <p className="font-mono text-[9px] text-muted-foreground">{label}</p>
       <p className="text-[12px] font-medium text-foreground">
         {typeof v === "number" ? v.toLocaleString() : v}

@@ -202,28 +202,30 @@ export function WorkspaceShell() {
         )}
         {sidebarOpen && <FilterSidebar />}
         <main className="flex min-w-0 flex-1 flex-col">
-          <div className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
-            {VIEWS.map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => {
-                  // tabs always land on the chosen view, even from compare/transfer
-                  if (transferRequest) closeTransfer();
-                  if (comparing) openPanel(null);
-                  setView(v);
-                }}
-                aria-pressed={view === v && !comparing && !transferRequest}
-                className={cn(
-                  "rounded px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors",
-                  view === v && !comparing && !transferRequest
-                    ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {v}
-              </button>
-            ))}
+          <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
+            <div className="inline-flex gap-0.5 rounded-lg bg-secondary/60 p-0.5">
+              {VIEWS.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => {
+                    // tabs always land on the chosen view, even from compare/transfer
+                    if (transferRequest) closeTransfer();
+                    if (comparing) openPanel(null);
+                    setView(v);
+                  }}
+                  aria-pressed={view === v && !comparing && !transferRequest}
+                  className={cn(
+                    "rounded-md px-3 py-1 font-mono text-[10px] tracking-wider transition-colors",
+                    view === v && !comparing && !transferRequest
+                      ? "bg-card text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
             {compareIds.length > 0 && !comparing && !transferRequest && (
               <CompareTray
                 count={compareIds.length}

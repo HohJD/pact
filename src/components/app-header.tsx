@@ -59,7 +59,7 @@ export function AppHeader({
   };
 
   return (
-    <header className="relative flex h-12 shrink-0 items-center gap-4 border-b border-border bg-card px-3">
+    <header className="relative flex h-[52px] shrink-0 items-center gap-4 border-b border-border bg-card px-3">
       <div className="flex items-baseline gap-3">
         <Link
           href="/"
@@ -83,7 +83,7 @@ export function AppHeader({
         </button>
       )}
       <div className="flex flex-1 justify-center">
-        <div className="flex w-full max-w-xl items-center gap-2 rounded-md border border-border bg-secondary/60 px-2.5 py-1">
+        <div className="flex h-8 w-full max-w-xl items-center gap-2 rounded-lg border border-border bg-background/60 px-2.5 focus-within:border-entity-policy/60 focus-within:shadow-[0_0_0_3px_rgba(76,141,255,0.15)]">
           <Sparkles className="size-3.5 text-entity-policy" />
           <input
             ref={inputRef}
@@ -105,8 +105,9 @@ export function AppHeader({
               key={l.href}
               href={l.href}
               className={cn(
+                "text-[12.5px] underline-offset-[6px]",
                 pathname.startsWith(l.href)
-                  ? "text-foreground"
+                  ? "text-foreground underline decoration-entity-policy decoration-1"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >

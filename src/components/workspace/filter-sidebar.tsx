@@ -30,7 +30,7 @@ function Section({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground"
+        className="flex w-full items-center justify-between py-2 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
       >
         <span className="flex items-center gap-1.5">
           {title}
@@ -55,7 +55,7 @@ function Section({
             </span>
           )}
           <ChevronDown
-            className={cn("size-3 transition-transform", open && "rotate-180")}
+            className={cn("size-3.5 transition-transform", open && "rotate-180")}
           />
         </span>
       </button>
@@ -80,12 +80,20 @@ function Chip({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded border px-1.5 py-0.5 font-mono text-[10px] transition-colors",
+        "rounded-md border px-2 py-[3px] font-mono text-[11px] transition-colors",
         active
-          ? "border-transparent text-background"
-          : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+          ? "border-transparent"
+          : "border-border/70 text-muted-foreground hover:border-foreground/30 hover:text-foreground",
       )}
-      style={active && color ? { backgroundColor: color } : undefined}
+      style={
+        active && color
+          ? {
+              backgroundColor: `color-mix(in oklab, ${color} 15%, transparent)`,
+              borderColor: `color-mix(in oklab, ${color} 40%, transparent)`,
+              color,
+            }
+          : undefined
+      }
     >
       {children}
     </button>
@@ -181,6 +189,7 @@ export function FilterSidebar() {
       {importedCount > 0 && (
         <Section
           title="Sources"
+          defaultOpen={false}
           count={filters.include_imported ? 1 : 0}
           onClear={() => patchFilters({ include_imported: undefined })}
         >
@@ -268,6 +277,7 @@ export function FilterSidebar() {
 
       <Section
         title="Years introduced"
+        defaultOpen={false}
         count={filters.year_from || filters.year_to ? 1 : 0}
         onClear={() => patchFilters({ year_from: undefined, year_to: undefined })}
       >
@@ -293,6 +303,7 @@ export function FilterSidebar() {
 
       <Section
         title="Evidence strength"
+        defaultOpen={false}
         count={filters.evidence_strength_min ? 1 : 0}
         onClear={() => patchFilters({ evidence_strength_min: undefined })}
       >
@@ -319,6 +330,7 @@ export function FilterSidebar() {
 
       <Section
         title="Status"
+        defaultOpen={false}
         count={filters.status ? 1 : 0}
         onClear={() => patchFilters({ status: undefined })}
       >
