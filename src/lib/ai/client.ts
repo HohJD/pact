@@ -89,6 +89,8 @@ export async function submitAnalystQuestion(
   ]);
   store.saveCurrentSearch();
 
+  // every question lands on the unified results surface
+  store.setView("RESULTS");
   store.setAnalystPending(true);
   store.openPanel("ANALYST");
 

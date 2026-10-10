@@ -16,13 +16,13 @@ export function storeLastQuery(q: string) {
 const readLastQuery = () => {
   try {
     const q = window.sessionStorage.getItem(LAST_QUERY_KEY);
-    return q ? `/?q=${encodeURIComponent(q)}` : "/";
+    return q ? `/workspace?q=${encodeURIComponent(q)}` : "/";
   } catch {
     return "/";
   }
 };
 
-/** "← Back to results" → the last search (`/?q=…`), or `/` when none. */
+/** "← Back to Explore" → the last search (`/workspace?q=…`), or `/` when none. */
 export function BackToResults() {
   const href = useSyncExternalStore(
     () => () => {},
@@ -34,7 +34,7 @@ export function BackToResults() {
       href={href}
       className="text-[11px] text-muted-foreground hover:text-foreground"
     >
-      ← Back to results
+      ← Back to Explore
     </Link>
   );
 }

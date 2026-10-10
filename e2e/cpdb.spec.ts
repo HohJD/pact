@@ -29,8 +29,8 @@ test("command palette finds an imported policy and its card shows the CPDB label
   page,
 }) => {
   await page.goto("/workspace");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  await page.getByPlaceholder(/Search policies/).fill("KfW Ecological Construction");
+  await page.getByRole("button", { name: "Jump to…", exact: true }).click();
+  await page.getByPlaceholder(/Jump to a policy/).fill("KfW Ecological Construction");
   await page.getByRole("option", { name: /^KfW Ecological Construction\s*DE$/ }).click();
 
   await expect(page.getByText("CPDB", { exact: true })).toBeVisible();
@@ -49,7 +49,7 @@ test("asking the analyst keeps the CPDB toggle on", async ({ page }) => {
   await page.waitForFunction(() => !!(window as unknown as { __pact?: unknown }).__pact);
 
   await page.getByRole("button", { name: /\+ Climate Policy Database/ }).click();
-  await page.getByPlaceholder(/Ask the analyst/).fill("Which German policies support heat pumps?");
+  await page.getByPlaceholder(/Ask or search climate policies/).fill("Which German policies support heat pumps?");
   await page.keyboard.press("Enter");
 
   await expect

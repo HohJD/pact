@@ -5,6 +5,7 @@ import { SectionTitle } from "./section-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { applyActionsSequenced, submitAnalystQuestion } from "@/lib/ai/client";
 import { renumberCitations, stripRecordIds } from "@/lib/ai/citations";
+import { renderInline } from "@/components/panel/render-inline";
 import { useDataset } from "@/components/providers/dataset-provider";
 import type { UIAction } from "@/lib/domain/schema";
 import { cn } from "@/lib/utils";
@@ -64,7 +65,7 @@ export function AnalystPanel() {
         </div>
         {streamText.trim() ? (
           <p className="p-3 text-[12px] leading-relaxed text-foreground">
-            {stripRecordIds(streamText)}
+            {renderInline(stripRecordIds(streamText))}
             <span className="ml-px inline-block h-3 w-[5px] animate-pulse bg-entity-policy/80 align-[-1px]" />
           </p>
         ) : (
@@ -129,7 +130,7 @@ export function AnalystPanel() {
         <p className="text-[12px] leading-relaxed text-foreground">
           {numbered.answerSegments.map((seg, i) =>
             seg.type === "text" ? (
-              <span key={i}>{seg.text}</span>
+              <span key={i}>{renderInline(seg.text)}</span>
             ) : (
               <button
                 key={i}

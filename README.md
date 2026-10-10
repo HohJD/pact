@@ -28,10 +28,10 @@ the next policymaker doesn't start from zero.
 
 ```
 src/app (Next.js App Router)
- ├── /                  search: query → ranked list + similarity tangle
+ ├── /                  entry page — one question box → Explore
  ├── /policy/[id]       legislation page — meta, timeline, evidence, similar
  ├── /compare/[a]/[b]   two-policy comparison, dimension breakdown
- ├── /workspace         Explore mode — the analyst workspace
+ ├── /workspace         Explore — one surface: results, graph, map, timeline, outcomes
  ├── /admin/ingest      internal ingestion + human review
  └── /api/*
       analyst | transfer | evidence-agent | ingest
@@ -127,39 +127,45 @@ EXPERIMENTAL / META_ANALYSIS (+ UNKNOWN).
 
 ## User flow
 
-Search-first, like the original HackTheClimate flow: `/` takes a question or
-keywords (`?q=` deep-links), ranks policies lexically + with local MiniLM
-embeddings, and shows a similarity tangle (left) next to the ranked list with a
-streaming analyst summary (right). Click a node to band the list by similarity;
-click an edge to open `/compare/a/b`. Each result links to `/policy/[id]`.
-"Similarity weights" (dialog, persisted in `localStorage`) rescores edges,
-ranking and comparison live. `/workspace` is the full Explore mode; the
-workspace topbar links back to Search.
+One question box, one Explore surface. `/` is a focused entry page: a question
+or keywords routes to `/workspace?q=…` (old `/?q=` links redirect). Every page
+shares one header (AppHeader) with the same input — submitting runs the analyst
+and lands on the RESULTS tab.
+
+Explore is a five-tab workspace (RESULTS · GRAPH · MAP · TIMELINE · OUTCOMES,
+number keys 1–5). RESULTS ranks policies lexically + with local MiniLM
+embeddings and shows the similarity tangle beside the ranked list; the analyst
+answer streams in the right panel (ANALYST). Click a node to band the list by
+similarity; click a title to open the policy DETAILS panel, or the link icon
+for `/policy/[id]`. Click an edge or a row's compare icon to open the
+in-workspace comparison. "Similarity weights" (dialog, persisted in
+`localStorage`) rescores edges, ranking and comparison live.
 
 ## Showcase walkthrough
 
 1. `/` — click the example **"Which policies accelerated heat-pump
-   adoption?"** → streaming analyst summary, similarity tangle, ranked list.
+   adoption?"** → `/workspace?q=…` on the RESULTS tab: tangle, ranked list,
+   analyst streaming in the right panel.
 2. Select the **Boiler Upgrade Scheme** (click its circle, or the row's
    crosshair) → the list re-ranks by similarity, showing /100 scores and
    compare icons per row.
-3. Click the compare icon on **BEG** → `/compare/pol_gb_bus/pol_de_beg` —
-   score out of 100, per-dimension same/partial/different rows, Swap link,
-   and your similarity weights apply.
-4. Click BEG's title → `/policy/pol_de_beg` — flag, meta, timeline, sources,
-   evidence with strength, outcomes, similar policies.
-5. "Open in Explore" → `/workspace?policy=pol_de_beg` (or
-   `?compare=pol_gb_bus,pol_de_beg` from the compare page) → switch to
-   OUTCOMES → ask "What could the UK learn from Germany?".
+3. Click the compare icon on **BEG** → in-workspace compare —
+   per-dimension rows; "Share / open as page →" opens
+   `/compare/pol_gb_bus/pol_de_beg` (score out of 100, Swap link, your
+   similarity weights apply).
+4. Click BEG's link icon → `/policy/pol_de_beg` — flag, meta, timeline,
+   sources, evidence with strength, outcomes, similar policies.
+5. "Open in Explore" → `/workspace?policy=pol_de_beg` opens the DETAILS
+   panel (`?compare=pol_gb_bus,pol_de_beg` deep-links the comparison).
 
 Covered end to end by the `showcase: full flow` e2e test.
 
 ## Screens
 
-- `/` — search: query box, example queries, progress steps, tangle + ranked results, AI summary
+- `/` — entry page: one question box, thesis line, example chips
 - `/policy/[id]` — legislation page: flag, meta, timeline, sources, evidence (with strength), outcomes, similar policies
 - `/compare/[a]/[b]` — side-by-side comparison with per-dimension same/partial/different rows and a /100 score
-- `/workspace` — the analyst workspace: graph, filters, panels, comparison, map, timeline
+- `/workspace` — the analyst workspace: results (tangle + ranked list), graph, map, timeline, outcomes, panels, comparison
 - `/admin/ingest` — internal ingestion pipeline review UI
 
 ## Running locally
@@ -274,7 +280,7 @@ source documents are held in memory and are lost when the server restarts.
 
 ```bash
 pnpm test        # vitest — unit (domain, graph, retrieval, guardrails, ingest, provider)
-pnpm test:e2e    # playwright — search flow, workspace, offline fallback, mobile
+pnpm test:e2e    # playwright — entry → explore results flow, workspace, offline fallback, mobile
 pnpm tsc --noEmit && pnpm lint
 ```
 

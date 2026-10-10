@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { motion } from "framer-motion";
 import { ArrowLeft, X } from "lucide-react";
 
@@ -44,6 +46,7 @@ export function CompareView() {
   const toggleCompare = useWorkspace((s) => s.toggleCompare);
   const openPanel = useWorkspace((s) => s.openPanel);
   const select = useWorkspace((s) => s.select);
+  const view = useWorkspace((s) => s.view);
 
   const policies = compareIds
     .map((id) => dataset.policies.find((p) => p.id === id))
@@ -150,7 +153,7 @@ export function CompareView() {
           onClick={() => openPanel(null)}
           className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="size-3" /> Back to graph
+          <ArrowLeft className="size-3" /> Back to {view.toLowerCase()}
         </button>
         <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           Comparing {policies.length} policies
@@ -168,6 +171,14 @@ export function CompareView() {
             </span>
           ))}
         </div>
+        {compareIds.length === 2 && (
+          <Link
+            href={`/compare/${compareIds[0]}/${compareIds[1]}`}
+            className="ml-auto shrink-0 text-[10px] text-muted-foreground hover:text-foreground"
+          >
+            Share / open as page →
+          </Link>
+        )}
       </div>
 
       <div className="flex-1 overflow-auto scrollbar-thin">

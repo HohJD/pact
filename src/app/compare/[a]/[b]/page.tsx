@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { BackToResults } from "@/components/back-to-results";
 import { Flag } from "@/components/flag";
-import { SiteNav } from "@/components/site-nav";
+import { AppHeader } from "@/components/app-header";
 import { loadDataset } from "@/lib/data";
 import { explainSimilarity } from "@/lib/similarity/engine";
 import { structuredSimilarity } from "@/lib/similarity/structured";
@@ -94,7 +94,7 @@ export default async function ComparePage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteNav />
+      <AppHeader variant="page" />
       <main className="mx-auto w-full max-w-4xl px-5 py-8">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
           <BackToResults />

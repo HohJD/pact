@@ -6,6 +6,7 @@ import { ChevronDown, X } from "lucide-react";
 
 import { Slider } from "@/components/ui/slider";
 import { resolveQuery } from "@/lib/query/resolve";
+import { submitAnalystQuestion } from "@/lib/ai/client";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
@@ -100,7 +101,6 @@ export function FilterSidebar() {
   const patchFilters = useWorkspace((s) => s.patchFilters);
   const savedSearches = useWorkspace((s) => s.savedSearches);
   const removeSavedSearch = useWorkspace((s) => s.removeSavedSearch);
-  const setQuery = useWorkspace((s) => s.setQuery);
 
   const intent = useMemo(
     () => (query.trim() ? resolveQuery(query, dataset).intent : null),
@@ -157,7 +157,7 @@ export function FilterSidebar() {
                 <button
                   type="button"
                   className="truncate text-left"
-                  onClick={() => setQuery(s.q)}
+                  onClick={() => void submitAnalystQuestion(s.q, dataset)}
                 >
                   {s.q}
                 </button>

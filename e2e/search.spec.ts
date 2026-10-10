@@ -22,8 +22,8 @@ test("command palette finds a source document and opens its policy", async ({
   });
 
   await page.goto("/workspace");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  const input = page.getByPlaceholder(/Search policies/);
+  await page.getByRole("button", { name: "Jump to…", exact: true }).click();
+  const input = page.getByPlaceholder(/Jump to a policy/);
   await input.fill("boiler upgrade");
 
   await expect(
@@ -45,8 +45,8 @@ test("command palette keeps catalogue fuzzy and full-text matches visible", asyn
   page,
 }) => {
   await page.goto("/workspace");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
-  const input = page.getByPlaceholder(/Search policies/);
+  await page.getByRole("button", { name: "Jump to…", exact: true }).click();
+  const input = page.getByPlaceholder(/Jump to a policy/);
 
   await input.fill("manifesto");
   await expect(

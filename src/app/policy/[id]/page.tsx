@@ -5,7 +5,7 @@ import { GitCompare } from "lucide-react";
 import { BackToResults } from "@/components/back-to-results";
 import { Flag } from "@/components/flag";
 import { InferenceChip } from "@/components/panel/inference-chip";
-import { SiteNav } from "@/components/site-nav";
+import { AppHeader } from "@/components/app-header";
 import { loadDataset } from "@/lib/data";
 import { SeedRepository } from "@/lib/data/seed-repository";
 
@@ -54,7 +54,7 @@ export default async function PolicyPage({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteNav />
+      <AppHeader variant="page" />
       <main className="mx-auto w-full max-w-3xl px-5 py-8">
         <BackToResults />
         <p className="mt-3 flex items-center gap-2 text-[13px] text-muted-foreground">

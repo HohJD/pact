@@ -1,27 +1,42 @@
 import { expect, test } from "@playwright/test";
 
-test("search page shows examples and runs a query into the URL", async ({
+test("entry page shows the hero input and submits to Explore", async ({
   page,
 }) => {
   await page.goto("/");
+  // header input + hero input share the placeholder — the hero is last
   await expect(
-    page.getByPlaceholder("Search climate policies — keywords or a question"),
+    page.getByPlaceholder("Ask or search climate policies…").last(),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Connect climate policies to each other and to the evidence of what happened after.",
+    ),
   ).toBeVisible();
   await page
-    .getByPlaceholder("Search climate policies — keywords or a question")
+    .getByPlaceholder("Ask or search climate policies…")
+    .last()
     .fill("heat pumps");
   await page.keyboard.press("Enter");
-  await page.waitForURL(/\?q=heat%20pumps/, { timeout: 5000 });
+  await page.waitForURL(/\/workspace\?q=heat%20pumps/, { timeout: 5000 });
 });
 
-test("clicking an example query fills and runs the search", async ({
+test("clicking an example chip runs the query in Explore", async ({
   page,
 }) => {
   await page.goto("/");
   await page
     .getByRole("button", { name: /building energy codes/i })
     .click();
-  await page.waitForURL(/\?q=/, { timeout: 5000 });
+  await page.waitForURL(/\/workspace\?q=/, { timeout: 5000 });
+  await expect(
+    page.getByRole("button", { name: "RESULTS", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+});
+
+test("old /?q= links redirect into Explore", async ({ page }) => {
+  await page.goto("/?q=heat%20pump%20grants");
+  await page.waitForURL(/\/workspace\?q=/, { timeout: 5000 });
 });
 
 test("nav links reach Explore", async ({ page }) => {

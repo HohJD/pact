@@ -7,7 +7,12 @@ import type { AnalystResponse, CountryCode, Evidence } from "@/lib/domain/schema
 import type { PolicyFilter } from "@/lib/data/repository";
 import type { TransferAssessment } from "@/lib/ai/transfer-fallback";
 
-export type WorkspaceView = "GRAPH" | "MAP" | "TIMELINE" | "OUTCOMES";
+export type WorkspaceView =
+  | "RESULTS"
+  | "GRAPH"
+  | "MAP"
+  | "TIMELINE"
+  | "OUTCOMES";
 
 export type SelectionKind =
   | "policy"

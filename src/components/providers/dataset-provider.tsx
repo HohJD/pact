@@ -39,6 +39,13 @@ export function useDataset(): Dataset {
   return ds;
 }
 
+/** Like useDataset but returns null outside a DatasetProvider (page-variant
+ * chrome such as the unified header renders on routes without the workspace
+ * dataset). */
+export function useOptionalDataset(): Dataset | null {
+  return useContext(DatasetContext);
+}
+
 export function useRepo(): SeedRepository {
   const ds = useDataset();
   return useMemo(() => new SeedRepository(ds), [ds]);

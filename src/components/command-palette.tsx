@@ -29,7 +29,13 @@ const QUESTIONS = [
   "Which policies offer low-interest loans?",
 ];
 
-const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
+const VIEWS: WorkspaceView[] = [
+  "RESULTS",
+  "GRAPH",
+  "MAP",
+  "TIMELINE",
+  "OUTCOMES",
+];
 
 interface SearchDocumentHit {
   id: string;
@@ -119,7 +125,7 @@ export function CommandPalette() {
       shouldFilter={false}
     >
       <CommandInput
-        placeholder="Search policies, evidence, jurisdictions — or ask a question…"
+        placeholder="Jump to a policy, jurisdiction or evidence…"
         value={q}
         onValueChange={setQ}
       />

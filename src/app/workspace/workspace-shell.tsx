@@ -9,11 +9,12 @@ import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
 import { CommandPalette } from "@/components/command-palette";
 import { MapRoot } from "@/components/map/map-root";
 import { OutcomesView } from "@/components/outcomes/outcomes-view";
+import { ResultsView } from "@/components/results/results-view";
 import { TimelineView } from "@/components/timeline/timeline-view";
 import { TransferView } from "@/components/transfer/transfer-view";
 import { RightPanel } from "@/components/panel/right-panel";
 import { FilterSidebar } from "@/components/workspace/filter-sidebar";
-import { TopBar } from "@/components/workspace/topbar";
+import { AppHeader } from "@/components/app-header";
 import { useDataset } from "@/components/providers/dataset-provider";
 import { submitAnalystQuestion } from "@/lib/ai/client";
 import { parseWorkspaceParams } from "@/lib/query/workspace-params";
@@ -30,7 +31,13 @@ if (
   (window as unknown as { __pact: typeof useWorkspace }).__pact = useWorkspace;
 }
 
-const VIEWS: WorkspaceView[] = ["GRAPH", "MAP", "TIMELINE", "OUTCOMES"];
+const VIEWS: WorkspaceView[] = [
+  "RESULTS",
+  "GRAPH",
+  "MAP",
+  "TIMELINE",
+  "OUTCOMES",
+];
 const MOBILE_HINT_STORAGE_KEY = "pact.mobileHintDismissed";
 
 export function WorkspaceShell() {
@@ -105,7 +112,6 @@ export function WorkspaceShell() {
     initialised.current = true;
     const q = params.get("q");
     const v = params.get("view")?.toUpperCase();
-    if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
     const link = parseWorkspaceParams(params, dataset);
     if (link.policyId) {
       if (!v) setView("GRAPH");
@@ -114,7 +120,10 @@ export function WorkspaceShell() {
     }
     for (const id of link.compareIds) toggleCompare(id);
     if (link.compareIds.length >= 2) openPanel("COMPARE");
+    // submitAnalystQuestion flips to RESULTS synchronously, so an explicit
+    // ?view= deep link must be applied afterwards to win
     if (q) void submitAnalystQuestion(q, dataset);
+    if (v && VIEWS.includes(v as WorkspaceView)) setView(v as WorkspaceView);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -149,7 +158,7 @@ export function WorkspaceShell() {
         e.preventDefault();
         document.getElementById("pact-command-input")?.focus();
       }
-      if (e.key >= "1" && e.key <= "4") {
+      if (e.key >= "1" && e.key <= "5") {
         const i = Number(e.key) - 1;
         if (VIEWS[i]) s.setView(VIEWS[i]);
       }
@@ -162,7 +171,8 @@ export function WorkspaceShell() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      <TopBar
+      <AppHeader
+        variant="workspace"
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onTogglePanel={() => setPanelOpen((v) => !v)}
       />
@@ -227,6 +237,8 @@ export function WorkspaceShell() {
               <TransferView />
             ) : comparing ? (
               <CompareView />
+            ) : view === "RESULTS" ? (
+              <ResultsView />
             ) : view === "GRAPH" ? (
               <GraphCanvas />
             ) : view === "OUTCOMES" ? (
