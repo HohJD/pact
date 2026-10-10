@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import {
+  ArrowRight,
   PanelRight,
   Search,
   SlidersHorizontal,
@@ -59,16 +60,16 @@ export function AppHeader({
   };
 
   return (
-    <header className="relative flex h-[52px] shrink-0 items-center gap-4 border-b border-border bg-card px-3">
+    <header className="relative flex min-h-[64px] shrink-0 items-center gap-2 sm:gap-4 border-b border-border bg-card px-3">
       <div className="flex items-baseline gap-3">
         <Link
           href="/"
           aria-label="PACT home"
-          className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground transition-colors hover:text-muted-foreground max-sm:hidden"
+          className="font-mono text-[13px] font-semibold tracking-[0.25em] text-foreground transition-colors hover:text-muted-foreground"
         >
           PACT
         </Link>
-        <span className="hidden text-[11px] text-muted-foreground sm:inline">
+        <span className="hidden text-[11px] text-muted-foreground xl:inline">
           Climate policy intelligence
         </span>
       </div>
@@ -76,14 +77,14 @@ export function AppHeader({
         <button
           type="button"
           onClick={onToggleSidebar}
-          className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2 lg:hidden"
+          className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2"
           aria-label="Filters"
         >
           <SlidersHorizontal className="size-3.5" />
         </button>
       )}
-      <div className="flex flex-1 justify-center">
-        <div className="flex h-8 w-full max-w-xl items-center gap-2 rounded-lg border border-border bg-background/60 px-2.5 focus-within:border-entity-policy/60 focus-within:shadow-[0_0_0_3px_rgba(76,141,255,0.15)]">
+      {(variant === "workspace" || pathname !== "/") && <div className="flex min-w-0 flex-1 justify-center">
+        <div className="flex h-10 w-full max-w-xl items-center gap-2 rounded-lg border border-border bg-background/60 px-2.5 focus-within:border-entity-policy/60 focus-within:shadow-[0_0_0_3px_rgba(76,141,255,0.15)]">
           <Sparkles className="size-3.5 text-entity-policy" />
           <input
             ref={inputRef}
@@ -93,11 +94,14 @@ export function AppHeader({
             onKeyDown={(e) => {
               if (e.key === "Enter") submit();
             }}
+            aria-label="Search climate policies"
             placeholder="Ask or search climate policies…"
             className="w-full bg-transparent text-dense text-foreground outline-none placeholder:text-muted-foreground"
           />
+          <button type="button" onClick={submit} aria-label="Submit search" disabled={!(draft ?? query).trim()} className="rounded-md p-1.5 text-entity-policy hover:bg-secondary disabled:opacity-40"><ArrowRight className="size-4" /></button>
         </div>
-      </div>
+      </div>}
+      {variant === "page" && pathname === "/" && <div className="flex-1" />}
       <div className="flex items-center gap-2">
         <nav className="flex items-center gap-4 text-[12px]">
           {LINKS.map((l) => (
@@ -106,6 +110,7 @@ export function AppHeader({
               href={l.href}
               className={cn(
                 "text-[12.5px] underline-offset-[6px]",
+                l.label === "Admin" && "hidden sm:inline",
                 pathname.startsWith(l.href)
                   ? "text-foreground underline decoration-entity-policy decoration-1"
                   : "text-muted-foreground hover:text-foreground",
@@ -120,7 +125,7 @@ export function AppHeader({
             <button
               type="button"
               onClick={onTogglePanel}
-              className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2 lg:hidden"
+              className="rounded-md border border-border p-1.5 text-muted-foreground hover:text-foreground max-lg:p-2"
               aria-label="Panel"
             >
               <PanelRight className="size-3.5" />

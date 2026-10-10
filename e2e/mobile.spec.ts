@@ -14,11 +14,12 @@ interface PactStore {
   toggleCompare?: (id: string) => void;
 }
 
-test("mobile analyst opens from a question and closes with its X", async ({ page }) => {
+test("mobile analyst opens on demand and closes with its X", async ({ page }) => {
   const question = "Which policies have successfully accelerated heat-pump adoption?";
   await page.route("**/api/analyst**", (route) => route.abort());
   await page.goto(`/workspace?q=${encodeURIComponent(question)}`);
 
+  await page.getByRole("button", { name: "Panel", exact: true }).tap();
   await expect(page.getByText(/CURATED RESPONSE/)).toBeVisible({ timeout: 12000 });
   await page.getByRole("button", { name: "Close panel" }).tap();
   await expect(page.locator("aside")).toHaveCount(0);

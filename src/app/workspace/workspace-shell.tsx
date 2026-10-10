@@ -66,7 +66,7 @@ export function WorkspaceShell() {
   );
   const [sidebarToggled, setSidebarToggled] = useState<boolean | null>(null);
   const [panelToggled, setPanelToggled] = useState<boolean | null>(null);
-  const sidebarOpen = sidebarToggled ?? isDesktop;
+  const sidebarOpen = sidebarToggled ?? (isDesktop && view !== "RESULTS");
   const panelOpen = panelToggled ?? isDesktop;
   const setSidebarOpen = useCallback(
     (up: boolean | ((p: boolean) => boolean)) =>
@@ -98,10 +98,9 @@ export function WorkspaceShell() {
   useEffect(
     () =>
       useWorkspace.subscribe((s, prev) => {
-        if (window.matchMedia("(min-width: 1024px)").matches) return;
-        if (s.panel && (s.panel !== prev.panel || s.selection !== prev.selection)) {
+        if (s.panel && s.panel !== "ANALYST" && (s.panel !== prev.panel || s.selection !== prev.selection)) {
           setPanelToggled(true);
-          setSidebarToggled(false);
+          if (!window.matchMedia("(min-width: 1024px)").matches) setSidebarToggled(false);
         }
       }),
     [],
@@ -202,7 +201,7 @@ export function WorkspaceShell() {
         )}
         {sidebarOpen && <FilterSidebar />}
         <main className="flex min-w-0 flex-1 flex-col">
-          <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
+          <div className="flex h-14 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-3 scrollbar-thin">
             <div className="inline-flex gap-0.5 rounded-lg bg-secondary/60 p-0.5">
               {VIEWS.map((v) => (
                 <button
@@ -214,15 +213,16 @@ export function WorkspaceShell() {
                     if (comparing) openPanel(null);
                     setView(v);
                   }}
+                  aria-label={v}
                   aria-pressed={view === v && !comparing && !transferRequest}
                   className={cn(
-                    "rounded-md px-3 py-1 font-mono text-[10px] tracking-wider transition-colors",
+                    "rounded-md px-3 py-2 text-xs font-medium transition-colors",
                     view === v && !comparing && !transferRequest
                       ? "bg-card text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {v}
+                  {({ RESULTS: "Policies", GRAPH: "Connections", MAP: "Map", TIMELINE: "Timeline", OUTCOMES: "Outcomes" })[v]}
                 </button>
               ))}
             </div>
@@ -255,9 +255,9 @@ export function WorkspaceShell() {
           </div>
         </main>
         <RightPanel
-          open={panelOpen && !comparing}
+          open={panelOpen && !comparing && (isDesktop || panel !== "ANALYST" || panelToggled === true)}
           onClose={() => {
-            if (!isDesktop) setPanelOpen(false);
+            setPanelOpen(false);
           }}
         />
         <EvidenceDrawer />

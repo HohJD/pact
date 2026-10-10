@@ -4,17 +4,16 @@ test("entry page shows the hero input and submits to Explore", async ({
   page,
 }) => {
   await page.goto("/");
-  // header input + hero input share the placeholder — the hero is last
   await expect(
-    page.getByPlaceholder("Ask or search climate policies…").last(),
+    page.getByRole("textbox", { name: "Search climate policies" }).last(),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Connect climate policies to each other and to the evidence of what happened after.",
+      "Find a policy, explore its evidence, and compare what could work in your country.",
     ),
   ).toBeVisible();
   await page
-    .getByPlaceholder("Ask or search climate policies…")
+    .getByRole("textbox", { name: "Search climate policies" })
     .last()
     .fill("heat pumps");
   await page.keyboard.press("Enter");

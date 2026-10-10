@@ -88,6 +88,7 @@ export function ResultsView() {
   const openPanel = useWorkspace((s) => s.openPanel);
   const toggleCompare = useWorkspace((s) => s.toggleCompare);
 
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -116,6 +117,7 @@ export function ResultsView() {
   const run = useCallback(async (q: string) => {
     const id = ++seq.current;
     setLoading(true);
+    setError(false);
     setStep(0);
     setSelectedId(null);
     storeLastQuery(q);
@@ -127,7 +129,7 @@ export function ResultsView() {
       const data = (await res.json()) as SearchResponse;
       if (seq.current === id) setResult(data);
     } catch {
-      if (seq.current === id) setResult(null);
+      if (seq.current === id) { setResult(null); setError(true); }
     } finally {
       if (seq.current === id) setLoading(false);
     }
@@ -314,7 +316,7 @@ export function ResultsView() {
   const pinnedColor = "color-mix(in oklab, var(--entity-policy) 45%, transparent)";
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 overflow-y-auto px-5 py-6 scrollbar-thin">
+    <div className="mx-auto w-full max-w-6xl h-full overflow-y-auto px-5 py-6 scrollbar-thin">
       {loading && (
         <div className="surface p-4">
           <div className="mb-2 flex items-center gap-2 text-[12px] font-medium">
@@ -352,14 +354,16 @@ export function ResultsView() {
       {query && !loading && !result && (
         <div className="surface p-5">
           <p className="text-[12px] text-muted-foreground">
-            No policies matched “{query}”
+            {error ? "We couldn’t load policies. Please try again." : `No policies matched “${query}”`}
           </p>
+          {error && <button type="button" onClick={() => void run(query)} className="mt-3 rounded-lg bg-entity-policy px-4 py-2 text-sm text-white">Retry search</button>}
           <div className="mt-3">{examples}</div>
         </div>
       )}
 
       {result && !loading && (
         <>
+          <div className="mb-5"><h1 className="text-2xl font-semibold tracking-tight">Policies for “{result.query}”</h1><p className="mt-2 text-sm text-muted-foreground">Open a policy to see its evidence. Select similar policies to compare approaches.</p></div>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="font-mono text-[10px] text-muted-foreground">
               {result.policies.length} of {result.total_searched} policies ·
@@ -378,7 +382,7 @@ export function ResultsView() {
 
           <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start">
             {/* left column — charts */}
-            <div className="w-full shrink-0 space-y-4 lg:w-[48%]">
+            <div className="w-full shrink-0 space-y-4 lg:w-[36%] order-2">
               <div className="surface p-4">
                 <div className="mb-1 flex items-baseline justify-between gap-2">
                   <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
@@ -533,7 +537,7 @@ export function ResultsView() {
             </div>
 
             {/* right column — ranked list */}
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 order-1">
               {rows.length === 0 && (
                 <div className="surface p-4">
                   <p className="text-[12px] text-muted-foreground">
@@ -542,7 +546,7 @@ export function ResultsView() {
                   <div className="mt-3">{examples}</div>
                 </div>
               )}
-              <ul className="space-y-1.5">
+              <ul className="space-y-3">
                 {rows.map((p) => {
                   const sim = simToSelected?.get(p.id);
                   const isSel = selectedId === p.id;
@@ -561,7 +565,7 @@ export function ResultsView() {
                     >
                       <div
                         className={cn(
-                          "group flex items-center gap-2 rounded-md px-3 py-2 text-[12.5px] leading-snug hover:bg-secondary/50",
+                          "group flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card px-4 py-4 text-[14px] leading-snug hover:bg-secondary/50",
                           isSel && "bg-entity-policy/5 ring-1 ring-entity-policy/40",
                         )}
                       >
@@ -572,12 +576,12 @@ export function ResultsView() {
                             select({ kind: "policy", id: p.id });
                             openPanel("DETAILS");
                           }}
-                          className="flex min-w-0 flex-1 flex-col gap-0.5 text-left"
+                          className="flex min-w-0 basis-full flex-col gap-0.5 text-left sm:basis-auto sm:flex-1"
                         >
                           <span className="flex min-w-0 items-baseline gap-2">
                             <Flag code={p.country_code} />
-                            <span className="min-w-0 flex-1">
-                              <span className="line-clamp-1">{p.name}</span>
+                            <span className="min-w-0 flex-1 order-1">
+                              <span className="line-clamp-2">{p.name}</span>
                               {p.short_name && (
                                 <span className="ml-1.5 rounded border border-border px-1 font-mono text-[8px] uppercase tracking-wider text-muted-foreground">
                                   {p.short_name}
@@ -585,6 +589,8 @@ export function ResultsView() {
                               )}
                             </span>
                           </span>
+                          <span className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{p.description}</span>
+                          {p.data_status === "DEMO" && <span className="mt-1 text-[10px] font-medium text-entity-mechanism">Demo policy · synthetic data</span>}
                           <span
                             className="h-[2px] rounded-full bg-entity-policy/60"
                             style={{
@@ -625,7 +631,7 @@ export function ResultsView() {
                                 title={`Compare ${selected?.short_name ?? selectedId} ↔ ${p.short_name ?? p.name}`}
                                 aria-label={`Compare with ${p.short_name ?? p.name}`}
                                 onClick={() => compare(selectedId, p.id)}
-                                className="text-muted-foreground transition-opacity hover:text-entity-policy lg:opacity-0 lg:group-hover:opacity-100"
+                                className="text-muted-foreground transition-opacity hover:text-entity-policy "
                               >
                                 <GitCompare className="size-3.5" />
                               </button>
@@ -642,7 +648,7 @@ export function ResultsView() {
                               onClick={() =>
                                 setSelectedId(isSel ? null : p.id)
                               }
-                              className="text-muted-foreground transition-opacity hover:text-entity-policy lg:opacity-0 lg:group-hover:opacity-100"
+                              className="text-muted-foreground transition-opacity hover:text-entity-policy "
                             >
                               <Crosshair className="size-3.5" />
                             </button>
@@ -650,7 +656,7 @@ export function ResultsView() {
                               href={`/policy/${p.id}`}
                               title={`Open ${p.short_name ?? p.name}`}
                               aria-label="Open policy page"
-                              className="text-muted-foreground transition-opacity hover:text-entity-policy lg:opacity-0 lg:group-hover:opacity-100"
+                              className="text-muted-foreground transition-opacity hover:text-entity-policy "
                             >
                               <ExternalLink className="size-3.5" />
                             </Link>
