@@ -9,7 +9,7 @@ test("entry page shows the hero input and submits to Explore", async ({
   ).toBeVisible();
   await expect(
     page.getByText(
-      /PACT maps them, links every claim to its evidence/,
+      /PACT maps them, ties every claim to its evidence/,
     ),
   ).toBeVisible();
   await page

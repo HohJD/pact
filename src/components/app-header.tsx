@@ -59,7 +59,13 @@ export function AppHeader({
   };
 
   return (
-    <header className="relative flex min-h-[64px] shrink-0 items-center gap-2 border-b border-border bg-card px-3 max-sm:flex-wrap max-sm:gap-y-2 max-sm:py-2.5 sm:gap-4">
+    <header
+      className={cn(
+        "relative flex min-h-[64px] shrink-0 items-center gap-2 border-b border-border bg-card px-3 max-sm:flex-wrap max-sm:gap-y-2 max-sm:py-2.5 sm:gap-4",
+        // content pages line up with the 72rem content column; the workspace keeps full width
+        variant === "page" && "px-5 sm:px-[max(2rem,calc((100%-72rem)/2+2rem))]",
+      )}
+    >
       <div className="flex items-baseline gap-3">
         <Link
           href="/"
@@ -103,6 +109,12 @@ export function AppHeader({
       {variant === "page" && pathname === "/" && <div className="flex-1" />}
       <div className="flex items-center gap-2 max-sm:ml-auto">
         <nav className={cn("flex items-center gap-4 text-[12px]", variant === "workspace" && "max-sm:hidden")}>
+          {pathname === "/" &&
+            [["#how", "How it works"], ["#method", "Method"]].map(([href, label]) => (
+              <a key={href} href={href} className="text-[12.5px] text-muted-foreground hover:text-foreground max-sm:hidden">
+                {label}
+              </a>
+            ))}
           {LINKS.map((l) => (
             <Link
               key={l.href}
