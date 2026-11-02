@@ -19,10 +19,9 @@ import { submitAnalystQuestion } from "@/lib/ai/client";
 import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/store/workspace";
 
-const LINKS = [
-  { href: "/workspace", label: "Explore" },
-  { href: "/admin/ingest", label: "Admin" },
-];
+// Public navigation. The internal ingest tool (/admin/ingest) stays reachable by URL
+// but isn't advertised to visitors: it has no auth and drafts DEMO records.
+const LINKS = [{ href: "/workspace", label: "Explore" }];
 
 export function AppHeader({
   variant,
@@ -60,7 +59,7 @@ export function AppHeader({
   };
 
   return (
-    <header className="relative flex min-h-[64px] shrink-0 items-center gap-2 sm:gap-4 border-b border-border bg-card px-3">
+    <header className="relative flex min-h-[64px] shrink-0 items-center gap-2 border-b border-border bg-card px-3 max-sm:flex-wrap max-sm:gap-y-2 max-sm:py-2.5 sm:gap-4">
       <div className="flex items-baseline gap-3">
         <Link
           href="/"
@@ -83,7 +82,7 @@ export function AppHeader({
           <SlidersHorizontal className="size-3.5" />
         </button>
       )}
-      {(variant === "workspace" || pathname !== "/") && <div className="flex min-w-0 flex-1 justify-center">
+      {(variant === "workspace" || pathname !== "/") && <div className="flex min-w-0 flex-1 justify-center max-sm:order-last max-sm:basis-full">
         <div className="flex h-10 w-full max-w-xl items-center gap-2 rounded-lg border border-border bg-background/60 px-2.5 focus-within:border-entity-policy/60 focus-within:shadow-[0_0_0_3px_rgba(76,141,255,0.15)]">
           <Sparkles className="size-3.5 text-entity-policy" />
           <input
@@ -102,15 +101,14 @@ export function AppHeader({
         </div>
       </div>}
       {variant === "page" && pathname === "/" && <div className="flex-1" />}
-      <div className="flex items-center gap-2">
-        <nav className="flex items-center gap-4 text-[12px]">
+      <div className="flex items-center gap-2 max-sm:ml-auto">
+        <nav className={cn("flex items-center gap-4 text-[12px]", variant === "workspace" && "max-sm:hidden")}>
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               className={cn(
                 "text-[12.5px] underline-offset-[6px]",
-                l.label === "Admin" && "hidden sm:inline",
                 pathname.startsWith(l.href)
                   ? "text-foreground underline decoration-entity-policy decoration-1"
                   : "text-muted-foreground hover:text-foreground",

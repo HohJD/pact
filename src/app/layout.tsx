@@ -14,9 +14,21 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Find climate policies, read the evidence behind them and compare what worked elsewhere. Every claim cites a record; correlation is labelled correlation.";
+
 export const metadata: Metadata = {
-  title: "PACT — Climate Policy Intelligence",
-  description: "Institutional-grade climate policy intelligence platform",
+  metadataBase: new URL("https://pact-ox.vercel.app"),
+  title: "PACT | Climate policy intelligence",
+  description: DESCRIPTION,
+  openGraph: {
+    type: "website",
+    siteName: "PACT",
+    title: "PACT | What has actually worked in climate policy?",
+    description: DESCRIPTION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "PACT: What has actually worked?" }],
+  },
+  twitter: { card: "summary_large_image", title: "PACT | What has actually worked in climate policy?", description: DESCRIPTION, images: ["/og.png"] },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

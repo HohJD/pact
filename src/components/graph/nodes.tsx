@@ -200,7 +200,7 @@ export function EvidenceNode({ data, selected }: NodeProps<PactFlowNode>) {
           <span
             key={i}
             className="size-1 rounded-full"
-            style={{ backgroundColor: i <= dots ? data.color : "#3a3d44" }}
+            style={{ backgroundColor: i <= dots ? data.color : "color-mix(in srgb, var(--muted-foreground) 35%, transparent)" }}
           />
         ))}
       </span>

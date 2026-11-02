@@ -12,6 +12,7 @@ import {
   type Node,
 } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 import "@xyflow/react/dist/style.css";
 
@@ -66,6 +67,8 @@ function tooltipMeta(n: GraphNode): string {
 }
 
 function Canvas() {
+  const { resolvedTheme } = useTheme();
+  const light = resolvedTheme === "light";
   const dataset = useDataset();
   const filters = useWorkspace((s) => s.filters);
   const expanded = useWorkspace((s) => s.expanded);
@@ -348,10 +351,10 @@ function Canvas() {
         fitViewOptions={{ padding: 0.08, minZoom: 0.5, maxZoom: 1.1 }}
         minZoom={0.2}
         maxZoom={2.5}
-        colorMode="dark"
+        colorMode={light ? "light" : "dark"}
         onlyRenderVisibleElements={phone}
       >
-        <Background variant={BackgroundVariant.Dots} gap={28} size={1} color="#ffffff10" />
+        <Background variant={BackgroundVariant.Dots} gap={28} size={1} color={light ? "#0000001a" : "#ffffff10"} />
         {!phone && (
           <Controls
             showInteractive={false}
@@ -367,7 +370,7 @@ function Canvas() {
             style={{ width: 140, height: 90 }}
             className="!border !border-border !bg-card"
             nodeColor={(n) => (n.data as PactNodeData).color ?? "#8B919A"}
-            maskColor="#0b0c0fcc"
+            maskColor={light ? "#f6f7f9cc" : "#0b0c0fcc"}
           />
         )}
       </ReactFlow>

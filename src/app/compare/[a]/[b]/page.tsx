@@ -14,6 +14,17 @@ import { CompareScore } from "./compare-score";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ a: string; b: string }> }) {
+  const { a, b } = await params;
+  const dataset = await loadDataset();
+  const name = (id: string) => {
+    const p = dataset.policies.find((x) => x.id === id);
+    return p ? p.short_name || p.name : null;
+  };
+  const [na, nb] = [name(a), name(b)];
+  return { title: na && nb ? `${na} vs ${nb} | PACT` : "Compare policies | PACT" };
+}
+
 const PILL: Record<string, string> = {
   same: "border-entity-outcome/40 bg-entity-outcome/15 text-entity-outcome",
   partial:

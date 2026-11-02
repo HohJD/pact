@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 
 import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { select } from "d3-selection";
@@ -15,10 +16,12 @@ import { useMapData } from "./use-map-data";
 
 const W = 960;
 const H = 560;
-const PURPLE = "#9B7BFF";
-// base land: --secondary (#181B21) lightened ~6% so land reads against ocean
-const LAND = "#22252A";
-const STROKE = "#2a2e36";
+// Map palette per theme. Dark: land a touch lighter than the ocean so it reads.
+// Light: soft grey land on a pale ocean, jurisdiction purple darkened for contrast.
+const PALETTE = {
+  dark: { purple: "#9B7BFF", land: "#22252A", stroke: "#2a2e36", hover: "#2a2f38", ocean: "#0B0C0F", count: "#ffffff", label: "#c9cdd4" },
+  light: { purple: "#7C5CF0", land: "#dde1e7", stroke: "#ffffff", hover: "#cdd3dc", ocean: "#f1f3f6", count: "#2e1f7a", label: "#3a4150" },
+} as const;
 
 // Initial view frames North America, Europe, and Asia.
 const VIEW_BBOX: GeoJSON.Feature = {
@@ -66,6 +69,9 @@ const world = feature(
 const countryFeatures = world.features as CountryFeature[];
 
 export function SvgMapView() {
+  const { resolvedTheme } = useTheme();
+  const C = PALETTE[resolvedTheme === "light" ? "light" : "dark"];
+  const { purple: PURPLE, land: LAND, stroke: STROKE } = C;
   const dataset = useDataset();
   const data = useMapData();
   const focusedCountry = useWorkspace((s) => s.focusedCountry);
@@ -163,7 +169,7 @@ export function SvgMapView() {
   const focusedData = focusedCountry ? data.countries.get(focusedCountry) : null;
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#0B0C0F]">
+    <div className="relative h-full w-full overflow-hidden" style={{ background: C.ocean }}>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
@@ -184,7 +190,7 @@ export function SvgMapView() {
                 stroke={STROKE}
                 strokeWidth={0.5}
                 style={{
-                  fill: d ? PURPLE : isHovered && code ? "#2a2f38" : LAND,
+                  fill: d ? PURPLE : isHovered && code ? C.hover : LAND,
                   fillOpacity: d ? 0.25 + d.intensity * 0.6 : 1,
                   transition: "fill-opacity 300ms, opacity 300ms, fill 150ms",
                   opacity: dimmed ? 0.5 : 1,
@@ -252,7 +258,7 @@ export function SvgMapView() {
                   textAnchor="middle"
                   dy="0.35em"
                   fontSize={8}
-                  fill="#fff"
+                  fill={C.count}
                   fontFamily="var(--font-mono)"
                 >
                   {m.count}
@@ -262,7 +268,7 @@ export function SvgMapView() {
                     textAnchor="middle"
                     dy={r + 9}
                     fontSize={7.5}
-                    fill="#c9cdd4"
+                    fill={C.label}
                     fontFamily="var(--font-mono)"
                   >
                     {m.label}

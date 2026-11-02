@@ -6,7 +6,7 @@ import { EvidenceDrawer } from "@/components/evidence/evidence-drawer";
 import { AppHeader } from "@/components/app-header";
 import { EntryPage } from "@/components/entry-page";
 
-export const metadata = { title: "PACT — Climate policy intelligence" };
+export const metadata = { title: "PACT | What has actually worked in climate policy" };
 
 export default async function Home({
   searchParams,
